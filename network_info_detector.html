@@ -15,33 +15,34 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 15px;
+            padding: 8px;
             font-size: 14px;
+            overflow-x: auto;
         }
         
         .container {
             max-width: 1400px;
             margin: 0 auto;
             background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
         
         h1 {
             text-align: center;
             color: #333;
-            margin-bottom: 20px;
-            font-size: 2em;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+            font-size: 1.4em;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         }
         
         .main-table-container {
             background: #fff;
-            border-radius: 12px;
-            padding: 15px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 15px;
+            border-radius: 8px;
+            padding: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 8px;
             overflow-x: auto;
         }
         
@@ -49,21 +50,21 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 0;
-            font-size: 0.85em;
+            font-size: 0.9em;
         }
         
         .info-table th {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 8px 12px;
+            padding: 4px 8px;
             text-align: left;
             font-weight: bold;
-            border-bottom: 2px solid #5a6fd8;
-            font-size: 0.9em;
+            border-bottom: 1px solid #5a6fd8;
+            font-size: 0.95em;
         }
         
         .info-table td {
-            padding: 6px 12px;
+            padding: 4px 8px;
             border-bottom: 1px solid #e9ecef;
             vertical-align: top;
         }
@@ -93,28 +94,28 @@
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: white;
             text-align: center;
-            font-size: 1.1em;
+            font-size: 1.0em;
             font-weight: bold;
         }
         
         .compact-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 8px;
         }
         
         .btn-container {
             text-align: center;
-            margin: 15px 0;
+            margin: 8px 0;
         }
         
         .footer {
             text-align: center;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 2px solid #e9ecef;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #e9ecef;
             color: #6c757d;
-            font-size: 0.85em;
+            font-size: 0.75em;
         }
         
         
@@ -173,13 +174,13 @@
             background: linear-gradient(45deg, #667eea, #764ba2);
             color: white;
             border: none;
-            padding: 10px 25px;
-            border-radius: 20px;
-            font-size: 1em;
+            padding: 6px 15px;
+            border-radius: 15px;
+            font-size: 0.8em;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.4);
-            margin: 0 5px;
+            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.4);
+            margin: 0 3px;
         }
         
         .refresh-btn:hover {
@@ -207,13 +208,25 @@
             background-color: #ffc107;
         }
         
+        .user-agent {
+            font-size: 0.8em;
+            word-break: break-all;
+        }
+        
+        .port-note {
+            text-align: center;
+            font-size: 0.75em;
+            color: #6c757d;
+            padding: 8px;
+        }
+        
         @media (max-width: 768px) {
             .compact-grid {
                 grid-template-columns: 1fr;
             }
             
             h1 {
-                font-size: 1.8em;
+                font-size: 1.3em;
                 margin-bottom: 15px;
             }
             
@@ -222,7 +235,7 @@
             }
             
             .info-table {
-                font-size: 0.8em;
+                font-size: 0.85em;
             }
             
             .info-table th,
@@ -232,7 +245,7 @@
             
             .refresh-btn {
                 padding: 8px 20px;
-                font-size: 0.9em;
+                font-size: 0.85em;
                 margin: 5px;
             }
         }
@@ -247,11 +260,11 @@
             }
             
             h1 {
-                font-size: 1.5em;
+                font-size: 1.2em;
             }
             
             .info-table {
-                font-size: 0.75em;
+                font-size: 0.8em;
             }
             
             .main-table-container {
@@ -273,12 +286,13 @@
             <table class="info-table">
                 <thead>
                     <tr>
-                        <th colspan="3" class="section-title">🌐 网络与系统信息总览</th>
+                        <th colspan="4" class="section-title">🌐 网络与系统信息总览</th>
                     </tr>
                     <tr>
                         <th>IP地址信息</th>
                         <th>网络状态</th>
                         <th>系统信息</th>
+                        <th>DNS/连接信息</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -286,41 +300,49 @@
                         <td class="label-col">本地IP地址</td>
                         <td class="label-col">连接状态</td>
                         <td class="label-col">浏览器</td>
+                        <td class="label-col">DNS服务器</td>
                     </tr>
                     <tr>
                         <td class="value-col loading" id="localIP">检测中...</td>
                         <td class="value-col" id="networkStatus"><span class="status-indicator online"></span>在线</td>
                         <td class="value-col" id="browser">-</td>
+                        <td class="value-col loading" id="dnsServers">检测中...</td>
                     </tr>
                     <tr>
                         <td class="label-col">公网IP地址</td>
                         <td class="label-col">连接类型</td>
                         <td class="label-col">操作系统</td>
+                        <td class="label-col">DNS解析时间</td>
                     </tr>
                     <tr>
                         <td class="value-col loading" id="publicIP">检测中...</td>
                         <td class="value-col" id="connectionType">检测中...</td>
                         <td class="value-col" id="platform">-</td>
+                        <td class="value-col loading" id="dnsTime">测试中...</td>
                     </tr>
                     <tr>
                         <td class="label-col">IPv6地址</td>
                         <td class="label-col">网络速度</td>
                         <td class="label-col">屏幕分辨率</td>
+                        <td class="label-col">主机名</td>
                     </tr>
                     <tr>
                         <td class="value-col loading" id="ipv6">检测中...</td>
                         <td class="value-col" id="networkSpeed">检测中...</td>
                         <td class="value-col" id="screenRes">-</td>
+                        <td class="value-col" id="hostname">-</td>
                     </tr>
                     <tr>
                         <td class="label-col">IP位置</td>
                         <td class="label-col">延迟</td>
                         <td class="label-col">用户代理</td>
+                        <td class="label-col">域名</td>
                     </tr>
                     <tr>
                         <td class="value-col loading" id="ipLocation">检测中...</td>
                         <td class="value-col loading" id="latency">测试中...</td>
-                        <td class="value-col" id="userAgent" style="font-size: 0.8em; word-break: break-all;">-</td>
+                        <td class="value-col user-agent" id="userAgent">-</td>
+                        <td class="value-col" id="domain">-</td>
                     </tr>
                 </tbody>
             </table>
@@ -361,7 +383,7 @@
                     <tbody>
                         <tr>
                             <td class="label-col">STUN服务器</td>
-                            <td class="value-col" id="stunServer">Google STUN</td>
+                            <td class="value-col" id="stunServer">stun.l.google.com:19302</td>
                         </tr>
                         <tr>
                             <td class="label-col">ICE候选</td>
@@ -381,10 +403,7 @@
         </div>
         
         <div class="footer">
-            <p><strong>仅显示实时检测数据：</strong>页面通过WebRTC技术检测真实的本地IP地址。</p>
-            <p><strong>所有无法通过浏览器安全机制获取的信息（如MAC地址、子网掩码、网关、DHCP、DNS等）。</strong></p>
-            <p><strong>获取完整信息：</strong>请在命令行中运行 <code>ipconfig /all</code> 获取完整的网络配置信息。</p>
-            <p><strong>接口名称基于IP地址范围进行推测，仅供参考。</strong></p>
+            <p>💡 提示：由于浏览器安全限制，某些系统级网络信息可能无法直接获取</p>
             <p>🔒 此工具仅在本地运行，不会收集或上传任何数据</p>
         </div>
     </div>
@@ -406,6 +425,7 @@
             getLocalIPs();
             getPublicIP();
             testLatency();
+            getDNSInfo();
             checkCommonPorts();
             getWebRTCInfo();
         }
@@ -494,7 +514,7 @@
             setTimeout(() => {
                 if (localIPAddresses.length === 0) {
                     document.getElementById('localIP').textContent = '无法获取（可能被阻止）';
-                    document.getElementById('localIP').className = 'info-value error';
+                    document.getElementById('localIP').className = 'value-col error';
                 }
                 pc.close();
             }, 5000);
@@ -517,16 +537,16 @@
                         
                         if (data.ip) {
                             document.getElementById('publicIP').textContent = data.ip;
-                            document.getElementById('publicIP').className = 'info-value success';
+                            document.getElementById('publicIP').className = 'value-col success';
                             
                             // 获取位置信息
                             if (data.city && data.region && data.country) {
                                 const location = `${data.city}, ${data.region}, ${data.country}`;
                                 document.getElementById('ipLocation').textContent = location;
-                                document.getElementById('ipLocation').className = 'info-value success';
+                                document.getElementById('ipLocation').className = 'value-col success';
                             } else if (data.country) {
                                 document.getElementById('ipLocation').textContent = data.country;
-                                document.getElementById('ipLocation').className = 'info-value success';
+                                document.getElementById('ipLocation').className = 'value-col success';
                             }
                             
                             publicIPInfo = data;
@@ -544,9 +564,9 @@
                 
             } catch (error) {
                 document.getElementById('publicIP').textContent = '获取失败';
-                document.getElementById('publicIP').className = 'info-value error';
+                document.getElementById('publicIP').className = 'value-col error';
                 document.getElementById('ipLocation').textContent = '获取失败';
-                document.getElementById('ipLocation').className = 'info-value error';
+                document.getElementById('ipLocation').className = 'value-col error';
             }
         }
         
@@ -562,13 +582,40 @@
                 const latency = Math.round(end - start);
                 
                 document.getElementById('latency').textContent = `${latency} ms`;
-                document.getElementById('latency').className = `info-value ${latency < 100 ? 'success' : latency < 300 ? 'warning' : 'error'}`;
+                document.getElementById('latency').className = `value-col ${latency < 100 ? 'success' : latency < 300 ? 'warning' : 'error'}`;
             } catch (error) {
                 document.getElementById('latency').textContent = '测试失败';
-                document.getElementById('latency').className = 'info-value error';
+                document.getElementById('latency').className = 'value-col error';
             }
         }
         
+        // 获取DNS信息
+        async function getDNSInfo() {
+            try {
+                // 测试DNS解析时间
+                const start = performance.now();
+                await fetch('https://www.google.com', { mode: 'no-cors' });
+                const end = performance.now();
+                const dnsTime = Math.round(end - start);
+                
+                document.getElementById('dnsTime').textContent = `${dnsTime} ms`;
+                document.getElementById('dnsTime').className = 'value-col success';
+                
+                // 获取主机名和域名
+                document.getElementById('hostname').textContent = window.location.hostname || 'localhost';
+                document.getElementById('domain').textContent = window.location.host || 'file://';
+                
+                // DNS服务器（浏览器无法直接获取）
+                document.getElementById('dnsServers').textContent = '-';
+                document.getElementById('dnsServers').className = 'value-col';
+                
+            } catch (error) {
+                document.getElementById('dnsTime').textContent = '测试失败';
+                document.getElementById('dnsTime').className = 'value-col error';
+                document.getElementById('dnsServers').textContent = '-';
+                document.getElementById('dnsServers').className = 'value-col';
+            }
+        }
         
         // 检测常用端口（模拟检测，实际浏览器无法直接扫描端口）
         function checkCommonPorts() {
@@ -587,10 +634,8 @@
             portTableBody.innerHTML = '';
             
             commonPorts.forEach(portInfo => {
-                // 模拟端口状态（实际无法检测）
-                const isOpen = Math.random() > 0.7; // 随机模拟
-                const status = isOpen ? 'online' : 'offline';
-                const statusText = isOpen ? '🟢 开放' : '🔴 关闭';
+                // 浏览器无法直接检测端口状态
+                const statusText = '-';
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -604,7 +649,7 @@
             // 添加说明行
             const noteRow = document.createElement('tr');
             noteRow.innerHTML = `
-                <td colspan="2" style="text-align: center; font-size: 0.8em; color: #6c757d; padding: 8px;">
+                <td colspan="2" class="port-note">
                     ⚠️ 注意：由于浏览器安全限制，端口状态为模拟显示
                 </td>
             `;
@@ -635,10 +680,10 @@
                     }
                     
                     document.getElementById('iceCandidates').textContent = `${candidates.length} 个`;
-                    document.getElementById('iceCandidates').className = 'info-value success';
+                    document.getElementById('iceCandidates').className = 'value-col success';
                     
                     document.getElementById('localCandidates').textContent = `${localCandidates.length} 个`;
-                    document.getElementById('localCandidates').className = 'info-value success';
+                    document.getElementById('localCandidates').className = 'value-col success';
                     
                     // 解析网络接口类型
                     const interfaces = new Set();
@@ -650,7 +695,7 @@
                     });
                     
                     document.getElementById('networkInterfaces').textContent = Array.from(interfaces).join(', ') || '无';
-                    document.getElementById('networkInterfaces').className = 'info-value success';
+                    document.getElementById('networkInterfaces').className = 'value-col success';
                 }
             };
             
@@ -666,11 +711,11 @@
             setTimeout(() => {
                 if (candidates.length === 0) {
                     document.getElementById('iceCandidates').textContent = '收集失败';
-                    document.getElementById('iceCandidates').className = 'info-value error';
+                    document.getElementById('iceCandidates').className = 'value-col error';
                     document.getElementById('localCandidates').textContent = '收集失败';
-                    document.getElementById('localCandidates').className = 'info-value error';
+                    document.getElementById('localCandidates').className = 'value-col error';
                     document.getElementById('networkInterfaces').textContent = '检测失败';
-                    document.getElementById('networkInterfaces').className = 'info-value error';
+                    document.getElementById('networkInterfaces').className = 'value-col error';
                 }
                 pc.close();
             }, 10000);
@@ -681,7 +726,7 @@
             // 重置加载状态
             document.querySelectorAll('.loading').forEach(el => {
                 el.textContent = '检测中...';
-                el.className = 'info-value loading';
+                el.className = 'value-col loading';
             });
             
             // 清空缓存
@@ -702,10 +747,10 @@
                 });
                 const ipv6 = await response.text();
                 document.getElementById('ipv6').textContent = ipv6.trim() || '不支持IPv6';
-                document.getElementById('ipv6').className = 'info-value success';
+                document.getElementById('ipv6').className = 'value-col success';
             } catch (error) {
                 document.getElementById('ipv6').textContent = '不支持IPv6或检测失败';
-                document.getElementById('ipv6').className = 'info-value error';
+                document.getElementById('ipv6').className = 'value-col error';
             }
         }
         
@@ -729,7 +774,7 @@
         
         // 为IP地址添加点击复制功能
         document.addEventListener('click', function(event) {
-            if (event.target.classList.contains('info-value') && 
+            if (event.target.classList.contains('value-col') && 
                 (event.target.id === 'localIP' || event.target.id === 'publicIP')) {
                 const text = event.target.textContent;
                 if (text && !text.includes('检测中') && !text.includes('失败')) {
