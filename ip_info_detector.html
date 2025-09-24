@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网络IP相关信息</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 15px;
+            font-size: 12px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        
+        h1::before { content: "🖥️"; margin-right: 10px; }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover { transform: translateY(-1px); }
+        
+        .main-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            font-size: 0.8em;
+        }
+        
+        .main-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+
+        .main-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #e9ecef;
+            text-align: center;
+            vertical-align: middle;
+            word-break: break-all;
+            max-width: 120px;
+        }
+        
+        .main-table tr:nth-child(even) { background-color: #f8f9fa; }
+        .main-table tr:hover { background-color: #e3f2fd; }
+        
+        .adapter-name {
+            font-weight: bold;
+            color: #495057;
+            text-align: left;
+            max-width: 180px;
+            word-break: break-word;
+        }
+
+        .ip-address {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #007bff;
+            cursor: pointer;
+            padding: 2px;
+            border-radius: 3px;
+        }
+        
+        .ip-address:hover { background-color: rgba(0, 123, 255, 0.1); }
+
+        .mac-address {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #28a745;
+            cursor: pointer;
+            font-size: 0.75em;
+        }
+        
+        .mac-address:hover { background-color: rgba(40, 167, 69, 0.1); }
+        
+        .status-connected { color: #28a745; font-weight: bold; }
+        .status-disconnected { color: #dc3545; font-weight: bold; }
+        .status-enabled { color: #28a745; }
+        .status-disabled { color: #dc3545; }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+                margin-bottom: 15px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .stat-item { text-align: center; }
+        .stat-number { font-size: 1.3em; font-weight: bold; color: #667eea; }
+        .stat-label { font-size: 0.75em; color: #6c757d; }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        
+        .page-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            cursor: pointer;
+        }
+        
+        .page-btn.active { background: linear-gradient(45deg, #667eea, #764ba2); }
+        .page-btn:disabled { background: #dee2e6; cursor: not-allowed; }
+        
+        .tooltip {
+            position: fixed;
+            background: #333;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.7em;
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .tooltip.show { opacity: 1; }
+        
+        @media (max-width: 1200px) {
+            .main-table { font-size: 0.7em; }
+            .main-table th, .main-table td { padding: 4px 6px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>网络IP相关信息</h1>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-number" id="totalAdapters">-</div>
+                <div class="stat-label">网络接口</div>
+        </div>
+            <div class="stat-item">
+                <div class="stat-number" id="activeAdapters">-</div>
+                <div class="stat-label">活动接口</div>
+                </div>
+            <div class="stat-item">
+                <div class="stat-number" id="dhcpEnabled">-</div>
+                <div class="stat-label">检测到IP</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="ipv4Count">-</div>
+                <div class="stat-label">IPv4地址</div>
+            </div>
+        </div>
+
+        <!-- 重要说明 -->
+        <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 12px; margin-bottom: 15px; font-size: 0.85em;">
+            <div style="color: #856404; font-weight: bold; margin-bottom: 5px;">⚠️ 浏览器安全限制说明</div>
+            <div style="color: #664d03;">
+                <strong>仅显示实时检测数据：</strong> 页面通过WebRTC技术检测真实的本地IP地址。
+                所有无法通过浏览器安全机制获取的信息（如MAC地址、子网掩码、网关、DHCP、DNS等）均显示为 <strong>"-"</strong>。
+                <br><strong>获取完整信息：</strong> 请在命令行中运行 <code>ipconfig /all</code> 获取完整的网络配置信息。
+                <br><span style="font-size: 0.8em; opacity: 0.8;">接口名称基于IP地址范围进行推测，仅供参考。</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="refreshData()">🔄 刷新</button>
+            <button class="btn" onclick="exportData()">📥 导出</button>
+            <button class="btn" onclick="openDevConsole()" title="查看检测日志">🔍 调试</button>
+            <span>每页: <select id="pageSize" onchange="changePageSize()">
+                <option value="12" selected>12条</option>
+                <option value="15">15条</option>
+                <option value="20">20条</option>
+            </select></span>
+            <span>共 <span id="totalCount">0</span> 条</span>
+            </div>
+
+        <table class="main-table">
+                    <thead>
+                        <tr>
+                    <th style="width: 16%">接口名称</th>
+                    <th style="width: 10%">类型</th>
+                    <th style="width: 8%">状态</th>
+                    <th style="width: 11%">IP地址</th>
+                    <th style="width: 9%">子网掩码</th>
+                    <th style="width: 10%">网关</th>
+                    <th style="width: 13%">MAC地址</th>
+                    <th style="width: 7%">DHCP</th>
+                    <th style="width: 12%">DNS服务器</th>
+                    <th style="width: 4%">MTU</th>
+                        </tr>
+                    </thead>
+            <tbody id="tableBody">
+                        <tr>
+                    <td colspan="10" style="padding: 30px; color: #6c757d;">🔍 正在检测网络接口...</td>
+                        </tr>
+                    </tbody>
+                </table>
+        
+        <div class="pagination" id="pagination" style="display: none;">
+            <button class="page-btn" id="prevBtn" onclick="prevPage()">上一页</button>
+            <span id="pageNumbers"></span>
+            <button class="page-btn" id="nextBtn" onclick="nextPage()">下一页</button>
+        </div>
+
+        <div style="text-align: center; margin-top: 15px; font-size: 0.8em; color: #6c757d; padding: 10px; background: rgba(108, 117, 125, 0.1); border-radius: 8px;">
+            💡 点击检测到的IP地址可复制到剪贴板 | "-" 表示浏览器无法获取的信息
+        </div>
+    </div>
+    
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        let allAdapters = [];
+        let currentPage = 1;
+        let pageSize = 12;
+        let localIPs = [];
+        
+        document.addEventListener('DOMContentLoaded', initializeData);
+        
+        async function initializeData() {
+            try {
+                await detectLocalIPs();
+                allAdapters = await generateAdapters();
+                updateStats();
+                renderTable();
+            } catch (error) {
+                showError('获取网络信息失败');
+            }
+        }
+        
+        function detectLocalIPs() {
+            return new Promise((resolve) => {
+                const pc = new RTCPeerConnection({
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                        { urls: 'stun:stun1.l.google.com:19302' },
+                        { urls: 'stun:stun.qq.com:3478' },
+                        { urls: 'stun:stun.miwifi.com:3478' }
+                ]
+                });
+
+            const ips = new Set();
+                const candidates = [];
+                let candidateCount = 0;
+
+            pc.createDataChannel("");
+
+                pc.onicecandidate = (event) => {
+                if (event.candidate) {
+                        candidateCount++;
+                    const candidate = event.candidate.candidate;
+                        candidates.push(candidate);
+                        
+                        // 提取IPv4地址
+                        const ipv4Match = candidate.match(/([0-9]{1,3}(\.[0-9]{1,3}){3})/);
+                        if (ipv4Match) {
+                            const ip = ipv4Match[1];
+                            // 包含更多本地IP范围
+                            if (!ip.startsWith('127.') && 
+                                !ip.startsWith('0.') && 
+                                ip !== '255.255.255.255') {
+                            ips.add(ip);
+                                localIPs = Array.from(ips);
+                                console.log('检测到IP:', ip);
+                            }
+                        }
+                        
+                        // 提取IPv6地址
+                        const ipv6Match = candidate.match(/([0-9a-fA-F:]+::[0-9a-fA-F:]*)/);
+                        if (ipv6Match && !ipv6Match[1].startsWith('::1')) {
+                            ips.add(ipv6Match[1]);
+                            localIPs = Array.from(ips);
+                            console.log('检测到IPv6:', ipv6Match[1]);
+                        }
+                        
+                        console.log(`已收集${candidateCount}个ICE候选，发现${ips.size}个IP`);
+                }
+            };
+
+            pc.createOffer().then(offer => pc.setLocalDescription(offer));
+
+                // 延长检测时间，让更多适配器被发现
+            setTimeout(() => {
+                pc.close();
+                    console.log('IP检测完成，共发现:', Array.from(ips));
+                    resolve(); 
+                }, 8000);
+            });
+        }
+        
+        function generateAdapters() {
+            const adapters = [];
+            console.log('生成适配器，检测到的IP:', localIPs);
+            
+            // 基于检测到的真实IP生成适配器
+            localIPs.forEach((ip, index) => {
+                let adapterName, type, status = "已连接", active = true;
+                
+                // 基于IP地址推测适配器名称和类型
+                if (ip.startsWith('192.168.1.')) {
+                    adapterName = `网络接口 ${index + 1} (推测: 以太网)`;
+                    type = "以太网";
+                } else if (ip.startsWith('192.168.170.') || ip.startsWith('192.168.221.')) {
+                    adapterName = `网络接口 ${index + 1} (推测: VMware)`;
+                    type = "虚拟网卡";
+                } else if (ip.startsWith('198.18.')) {
+                    adapterName = `网络接口 ${index + 1} (推测: 代理)`;
+                    type = "代理适配器";
+                } else if (ip.startsWith('172.')) {
+                    adapterName = `网络接口 ${index + 1} (推测: 容器)`;
+                    type = "虚拟网卡";
+                } else if (ip.startsWith('10.')) {
+                    adapterName = `网络接口 ${index + 1} (推测: VPN)`;
+                    type = "VPN";
+                } else if (ip.startsWith('169.254.')) {
+                    adapterName = `网络接口 ${index + 1} (推测: 链路本地)`;
+                    type = "链路本地";
+                    status = "受限连接";
+                    active = false;
+                } else if (ip.includes(':')) {
+                    adapterName = `网络接口 ${index + 1} (IPv6)`;
+                    type = "IPv6";
+                } else {
+                    adapterName = `网络接口 ${index + 1}`;
+                    type = "未知";
+                }
+                
+                adapters.push({
+                    name: adapterName,
+                    type: type,
+                    status: status,
+                    ipAddress: ip,
+                    subnetMask: "-",
+                    gateway: "-",
+                    macAddress: "-",
+                    dhcp: "-",
+                    dns: "-",
+                    mtu: "-",
+                    active: active
+                });
+            });
+            
+            // 如果没有检测到IP，显示无法检测的提示
+            if (adapters.length === 0) {
+                adapters.push({
+                    name: "无法检测网络接口",
+                    type: "未知",
+                    status: "无法检测",
+                    ipAddress: "无法检测",
+                    subnetMask: "-",
+                    gateway: "-",
+                    macAddress: "-",
+                    dhcp: "-",
+                    dns: "-",
+                    mtu: "-",
+                    active: false
+                });
+            }
+            
+            // 添加环回接口（这个是已知的标准接口）
+            adapters.push({
+                name: "Loopback Interface",
+                type: "环回接口",
+                status: "已连接",
+                ipAddress: "127.0.0.1",
+                subnetMask: "-",
+                gateway: "-",
+                macAddress: "-",
+                dhcp: "-",
+                dns: "-",
+                mtu: "-",
+                active: true
+            });
+            
+            return adapters;
+        }
+
+        
+        function updateStats() {
+            document.getElementById('totalAdapters').textContent = allAdapters.length;
+            document.getElementById('activeAdapters').textContent = allAdapters.filter(a => a.active).length;
+            document.getElementById('dhcpEnabled').textContent = localIPs.length;
+            document.getElementById('ipv4Count').textContent = allAdapters.filter(a => a.ipAddress.includes('.') && !a.ipAddress.includes('无法')).length;
+            document.getElementById('totalCount').textContent = allAdapters.length;
+        }
+        
+        function renderTable() {
+            const start = (currentPage - 1) * pageSize;
+            const end = start + pageSize;
+            const pageData = allAdapters.slice(start, end);
+            
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = pageData.map(adapter => `
+                <tr>
+                    <td class="adapter-name">${adapter.name}</td>
+                    <td>${adapter.type}</td>
+                    <td class="${adapter.active ? 'status-connected' : 'status-disconnected'}">${adapter.status}</td>
+                    <td class="${adapter.ipAddress !== '-' && !adapter.ipAddress.includes('无法') ? 'ip-address' : ''}" 
+                        ${adapter.ipAddress !== '-' && !adapter.ipAddress.includes('无法') ? `onclick="copyText('${adapter.ipAddress}')"` : ''}>
+                        ${adapter.ipAddress}
+                    </td>
+                    <td>${adapter.subnetMask}</td>
+                    <td>${adapter.gateway}</td>
+                    <td>${adapter.macAddress}</td>
+                    <td>${adapter.dhcp}</td>
+                    <td>${adapter.dns}</td>
+                    <td>${adapter.mtu}</td>
+                </tr>
+            `).join('');
+            
+            renderPagination();
+        }
+        
+        function renderPagination() {
+            const totalPages = Math.ceil(allAdapters.length / pageSize);
+            const pagination = document.getElementById('pagination');
+            
+            if (totalPages <= 1) {
+                pagination.style.display = 'none';
+                return;
+            }
+            
+            pagination.style.display = 'flex';
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages;
+            
+            const pageNumbers = document.getElementById('pageNumbers');
+            pageNumbers.innerHTML = '';
+            
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement('button');
+                btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                btn.textContent = i;
+                btn.onclick = () => goToPage(i);
+                pageNumbers.appendChild(btn);
+            }
+        }
+        
+        function goToPage(page) { currentPage = page; renderTable(); }
+        function prevPage() { if (currentPage > 1) { currentPage--; renderTable(); } }
+        function nextPage() { 
+            if (currentPage < Math.ceil(allAdapters.length / pageSize)) { 
+                currentPage++; renderTable(); 
+            } 
+        }
+        
+        function changePageSize() {
+            pageSize = parseInt(document.getElementById('pageSize').value);
+            currentPage = 1;
+            renderTable();
+        }
+        
+        function refreshData() {
+            document.getElementById('tableBody').innerHTML = '<tr><td colspan="10" style="padding: 30px;">🔄 刷新中...</td></tr>';
+            setTimeout(initializeData, 1000);
+        }
+        
+        function exportData() {
+            let csv = "接口名称,类型,状态,IP地址,子网掩码,网关,MAC地址,DHCP,DNS服务器,MTU\n";
+            allAdapters.forEach(a => {
+                csv += `"${a.name}","${a.type}","${a.status}","${a.ipAddress}","${a.subnetMask}","${a.gateway}","${a.macAddress}","${a.dhcp}","${a.dns}","${a.mtu}"\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `网络IP信息_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showTooltip('已导出CSV文件');
+        }
+        
+        function copyText(text) {
+            if (text === '-' || text === '不适用') return;
+            navigator.clipboard.writeText(text).then(() => showTooltip(`已复制: ${text}`));
+        }
+        
+        function showTooltip(msg) {
+            const tooltip = document.getElementById('tooltip');
+            tooltip.textContent = msg;
+            tooltip.style.top = '50%';
+            tooltip.style.left = '50%';
+            tooltip.style.transform = 'translate(-50%, -50%)';
+            tooltip.classList.add('show');
+            setTimeout(() => tooltip.classList.remove('show'), 2000);
+        }
+        
+        function showError(msg) {
+            document.getElementById('tableBody').innerHTML = `<tr><td colspan="10" style="padding: 30px; color: #dc3545;">❌ ${msg}</td></tr>`;
+        }
+        
+        function openDevConsole() {
+            alert('请按F12打开开发者工具，在Console标签页中查看网络检测的详细日志信息。\n\n日志包含：\n- WebRTC检测到的所有IP地址\n- ICE候选收集过程\n- 适配器推测逻辑\n- 检测失败的原因等\n\n注意：页面仅显示真实检测到的IP地址，其他信息均为"-"');
+        }
+    </script>
+</body>
+</html>
