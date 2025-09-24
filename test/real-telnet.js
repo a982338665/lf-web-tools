@@ -8,7 +8,7 @@ const net = require('net');
 // 真正的TCP连接函数
 function telnetPort(host, port, timeout = 3000) {
     return new Promise((resolve) => {
-        console.log(`🔍 Telnet连接测试: ${host}:${port}`);
+        // console.log(`🔍 Telnet连接测试: ${host}:${port}`);
 
         const socket = new net.Socket();
         let isResolved = false;
@@ -18,7 +18,7 @@ function telnetPort(host, port, timeout = 3000) {
             if (!isResolved) {
                 isResolved = true;
                 socket.destroy();
-                console.log(`⏰ 端口 ${port}: 连接超时`);
+                // console.log(`⏰ 端口 ${port}: 连接超时`);
                 resolve({ status: 'timeout', port, host });
             }
         }, timeout);
@@ -49,7 +49,7 @@ function telnetPort(host, port, timeout = 3000) {
                 isResolved = true;
                 clearTimeout(timer);
 
-                if (error.code === 'ECONNREFUSED') {
+               /* if (error.code === 'ECONNREFUSED') {
                     console.log(`❌ 端口 ${port}: 连接被拒绝（端口关闭）`);
                     resolve({ status: 'closed', port, host });
                 } else if (error.code === 'ENOTFOUND') {
@@ -58,18 +58,18 @@ function telnetPort(host, port, timeout = 3000) {
                 } else {
                     console.log(`❌ 端口 ${port}: ${error.message}`);
                     resolve({ status: 'error', port, host, error: error.message });
-                }
+                }*/
             }
         });
 
         // 连接关闭
         socket.on('close', () => {
-            if (!isResolved) {
+            /*if (!isResolved) {
                 isResolved = true;
                 clearTimeout(timer);
                 console.log(`🔌 端口 ${port}: 连接已关闭`);
                 resolve({ status: 'closed', port, host });
-            }
+            }*/
         });
 
         // 开始连接
@@ -79,7 +79,7 @@ function telnetPort(host, port, timeout = 3000) {
             if (!isResolved) {
                 isResolved = true;
                 clearTimeout(timer);
-                console.log(`❌ 端口 ${port}: 连接异常 - ${error.message}`);
+                // console.log(`❌ 端口 ${port}: 连接异常 - ${error.message}`);
                 resolve({ status: 'error', port, host, error: error.message });
             }
         }
@@ -122,15 +122,15 @@ async function batchTelnetTest(host = 'localhost', ports = []) {
     }
 
     if (summary.closed.length > 0) {
-        console.log(`🔴 关闭端口 (${summary.closed.length}): ${summary.closed.join(', ')}`);
+        console.log(`🔴 关闭端口 (${summary.closed.length})}`);
     }
 
     if (summary.timeout.length > 0) {
-        console.log(`⏰ 超时端口 (${summary.timeout.length}): ${summary.timeout.join(', ')}`);
+        console.log(`⏰ 超时端口 (${summary.timeout.length})}`);
     }
 
     if (summary.error.length > 0) {
-        console.log(`❌ 错误端口 (${summary.error.length}): ${summary.error.join(', ')}`);
+        console.log(`❌ 错误端口 (${summary.error.length})}`);
     }
 
     console.log(`\n🎯 总计测试: ${ports.length} 个端口`);
@@ -144,7 +144,11 @@ async function allTelnetTest(host = 'localhost') {
         ports.push(i)
     }
     console.log(`\n🚀 开始批量Telnet测试 ${host}...`);
-    console.log(`📋 测试端口: ${ports.join(', ')}`);
+    if (ports.length > 10){
+        console.log(`📋 测试端口: ${ports.slice(0,10).join(', ')}...`);
+    }else{
+        console.log(`📋 测试端口: ${ports.join(', ')}`);
+    }
     console.log('=====================================\n');
 
     const results = [];
