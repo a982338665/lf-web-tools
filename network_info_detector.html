@@ -10,7 +10,7 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -19,7 +19,7 @@
             font-size: 14px;
             overflow-x: auto;
         }
-        
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -28,7 +28,7 @@
             padding: 12px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
-        
+
         h1 {
             text-align: center;
             color: #333;
@@ -36,7 +36,7 @@
             font-size: 1.4em;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         }
-        
+
         .main-table-container {
             background: #fff;
             border-radius: 8px;
@@ -45,14 +45,14 @@
             margin-bottom: 8px;
             overflow-x: auto;
         }
-        
+
         .info-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 0;
             font-size: 0.9em;
         }
-        
+
         .info-table th {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -62,34 +62,34 @@
             border-bottom: 1px solid #5a6fd8;
             font-size: 0.95em;
         }
-        
+
         .info-table td {
             padding: 4px 8px;
             border-bottom: 1px solid #e9ecef;
             vertical-align: top;
         }
-        
+
         .info-table tr:nth-child(even) {
             background-color: #f8f9fa;
         }
-        
+
         .info-table tr:hover {
             background-color: #e3f2fd;
         }
-        
+
         .info-table .label-col {
             font-weight: bold;
             color: #495057;
             width: 25%;
             background-color: rgba(102, 126, 234, 0.05);
         }
-        
+
         .info-table .value-col {
             color: #007bff;
             font-family: 'Courier New', monospace;
             width: 25%;
         }
-        
+
         .section-title {
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: white;
@@ -97,18 +97,18 @@
             font-size: 1.0em;
             font-weight: bold;
         }
-        
+
         .compact-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 8px;
         }
-        
+
         .btn-container {
             text-align: center;
             margin: 8px 0;
         }
-        
+
         .footer {
             text-align: center;
             margin-top: 8px;
@@ -117,9 +117,9 @@
             color: #6c757d;
             font-size: 0.75em;
         }
-        
-        
-        
+
+
+
         .status-badge {
             display: inline-block;
             padding: 4px 8px;
@@ -128,48 +128,53 @@
             font-weight: bold;
             text-transform: uppercase;
         }
-        
+
         .status-enabled {
             background-color: #d4edda;
             color: #155724;
         }
-        
+
         .status-disabled {
             background-color: #f8d7da;
             color: #721c24;
         }
-        
+
         .status-unknown {
             background-color: #fff3cd;
             color: #856404;
         }
-        
+
         .mac-address {
             font-family: 'Courier New', monospace;
             font-weight: bold;
             color: #28a745;
         }
-        
+
         .ip-address {
             font-family: 'Courier New', monospace;
             font-weight: bold;
             color: #007bff;
         }
-        
-        
-        
+
+        .multi-line-ip {
+            line-height: 1.6;
+            word-break: break-all;
+        }
+
+
+
         .loading {
             color: #ffc107;
         }
-        
+
         .error {
             color: #dc3545;
         }
-        
+
         .success {
             color: #28a745;
         }
-        
+
         .refresh-btn {
             background: linear-gradient(45deg, #667eea, #764ba2);
             color: white;
@@ -182,12 +187,12 @@
             box-shadow: 0 2px 6px rgba(102, 126, 234, 0.4);
             margin: 0 3px;
         }
-        
+
         .refresh-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.6);
         }
-        
+
         .status-indicator {
             display: inline-block;
             width: 10px;
@@ -195,78 +200,78 @@
             border-radius: 50%;
             margin-right: 8px;
         }
-        
+
         .online {
             background-color: #28a745;
         }
-        
+
         .offline {
             background-color: #dc3545;
         }
-        
+
         .warning {
             background-color: #ffc107;
         }
-        
+
         .user-agent {
             font-size: 0.8em;
             word-break: break-all;
         }
-        
+
         .port-note {
             text-align: center;
             font-size: 0.75em;
             color: #6c757d;
             padding: 8px;
         }
-        
+
         @media (max-width: 768px) {
             .compact-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             h1 {
                 font-size: 1.3em;
                 margin-bottom: 15px;
             }
-            
+
             .container {
                 padding: 15px;
             }
-            
+
             .info-table {
                 font-size: 0.85em;
             }
-            
+
             .info-table th,
             .info-table td {
                 padding: 5px 8px;
             }
-            
+
             .refresh-btn {
                 padding: 8px 20px;
                 font-size: 0.85em;
                 margin: 5px;
             }
         }
-        
+
         @media (max-width: 480px) {
             body {
                 padding: 10px;
             }
-            
+
             .container {
                 padding: 10px;
             }
-            
+
             h1 {
                 font-size: 1.2em;
             }
-            
+
             .info-table {
                 font-size: 0.8em;
             }
-            
+
             .main-table-container {
                 padding: 10px;
             }
@@ -276,11 +281,11 @@
 <body>
     <div class="container">
         <h1>🌐 网络信息检测器</h1>
-        
+
         <div class="btn-container">
             <button class="refresh-btn" onclick="refreshAllInfo()">🔄 刷新所有信息</button>
         </div>
-        
+
         <!-- 主要网络信息表格 -->
         <div class="main-table-container">
             <table class="info-table">
@@ -321,33 +326,33 @@
                         <td class="value-col loading" id="dnsTime">测试中...</td>
                     </tr>
                     <tr>
-                        <td class="label-col">IPv6地址</td>
                         <td class="label-col">网络速度</td>
+                        <td class="label-col">延迟</td>
                         <td class="label-col">屏幕分辨率</td>
                         <td class="label-col">主机名</td>
                     </tr>
                     <tr>
-                        <td class="value-col loading" id="ipv6">检测中...</td>
                         <td class="value-col" id="networkSpeed">检测中...</td>
+                        <td class="value-col loading" id="latency">测试中...</td>
                         <td class="value-col" id="screenRes">-</td>
                         <td class="value-col" id="hostname">-</td>
                     </tr>
                     <tr>
-                        <td class="label-col">IP位置</td>
-                        <td class="label-col">延迟</td>
+                        <td class="label-col">-</td>
+                        <td class="label-col">-</td>
                         <td class="label-col">用户代理</td>
                         <td class="label-col">域名</td>
                     </tr>
                     <tr>
-                        <td class="value-col loading" id="ipLocation">检测中...</td>
-                        <td class="value-col loading" id="latency">测试中...</td>
+                        <td class="label-col">-</td>
+                        <td class="label-col">-</td>
                         <td class="value-col user-agent" id="userAgent">-</td>
                         <td class="value-col" id="domain">-</td>
                     </tr>
                 </tbody>
             </table>
         </div>
-        
+
         <!-- 端口和WebRTC信息表格 -->
         <div class="compact-grid">
             <div class="main-table-container">
@@ -368,7 +373,7 @@
                     </tbody>
                 </table>
             </div>
-            
+
             <div class="main-table-container">
                 <table class="info-table">
                     <thead>
@@ -401,10 +406,11 @@
                 </table>
             </div>
         </div>
-        
+
         <div class="footer">
-            <p>💡 提示：由于浏览器安全限制，某些系统级网络信息可能无法直接获取</p>
+            <p>💡 提示：外网IP通过WebRTC STUN服务器获取，地理位置信息查询自公开API</p>
             <p>🔒 此工具仅在本地运行，不会收集或上传任何数据</p>
+            <p>⚡ 端口检测通过实际连接测试，"-" 表示无法连接或超时</p>
         </div>
     </div>
 
@@ -412,41 +418,67 @@
         // 全局变量
         let localIPAddresses = [];
         let publicIPInfo = {};
-        
+
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', function() {
             initNetworkInfo();
         });
-        
+
         // 初始化所有网络信息检测
         function initNetworkInfo() {
             getBrowserInfo();
             getNetworkStatus();
-            getLocalIPs();
-            getPublicIP();
+            getLocalIPs();  // 现在这个函数会同时获取本地IP和外网IP，并查询位置
             testLatency();
             getDNSInfo();
             checkCommonPorts();
             getWebRTCInfo();
         }
-        
+
         // 获取浏览器信息
         function getBrowserInfo() {
             const userAgent = navigator.userAgent;
             document.getElementById('userAgent').textContent = userAgent;
-            
-            // 解析浏览器类型
+
+            // 解析浏览器类型 - 改进检测顺序，优先检测特殊情况
             let browserName = "Unknown";
-            if (userAgent.indexOf("Chrome") > -1) browserName = "Chrome";
-            else if (userAgent.indexOf("Firefox") > -1) browserName = "Firefox";
-            else if (userAgent.indexOf("Safari") > -1) browserName = "Safari";
-            else if (userAgent.indexOf("Edge") > -1) browserName = "Edge";
-            
+
+            // Edge 检测（新版和旧版）
+            if (userAgent.indexOf("Edg/") > -1 || userAgent.indexOf("Edge/") > -1) {
+                browserName = "Edge";
+            }
+            // Internet Explorer 检测
+            else if (userAgent.indexOf("MSIE") > -1 || userAgent.indexOf("Trident/") > -1) {
+                browserName = "Internet Explorer";
+            }
+            // Chrome 检测（需要排除Edge和其他基于Chromium的浏览器）
+            else if (userAgent.indexOf("Chrome") > -1 && userAgent.indexOf("Safari") > -1) {
+                browserName = "Chrome";
+            }
+            // Firefox 检测
+            else if (userAgent.indexOf("Firefox") > -1) {
+                browserName = "Firefox";
+            }
+            // Safari 检测（需要排除Chrome）
+            else if (userAgent.indexOf("Safari") > -1 && userAgent.indexOf("Chrome") === -1) {
+                browserName = "Safari";
+            }
+            // Opera 检测
+            else if (userAgent.indexOf("Opera") > -1 || userAgent.indexOf("OPR") > -1) {
+                browserName = "Opera";
+            }
+
             document.getElementById('browser').textContent = browserName;
-            document.getElementById('platform').textContent = navigator.platform;
-            document.getElementById('screenRes').textContent = `${screen.width} x ${screen.height}`;
+            document.getElementById('platform').textContent = navigator.platform || '-';
+
+            // 屏幕分辨率检测
+            try {
+                document.getElementById('screenRes').textContent = `${screen.width} x ${screen.height}`;
+            } catch (e) {
+                document.getElementById('screenRes').textContent = '-';
+            }
         }
-        
+
         // 获取网络状态
         function getNetworkStatus() {
             // 检测在线状态
@@ -458,17 +490,17 @@
                     statusEl.innerHTML = '<span class="status-indicator offline"></span>离线';
                 }
             };
-            
+
             updateOnlineStatus();
             window.addEventListener('online', updateOnlineStatus);
             window.addEventListener('offline', updateOnlineStatus);
-            
+
             // 获取连接类型
             if ('connection' in navigator) {
                 const conn = navigator.connection;
                 const connType = conn.effectiveType || conn.type || '未知';
                 const downlink = conn.downlink ? `${conn.downlink} Mbps` : '未知';
-                
+
                 document.getElementById('connectionType').textContent = connType;
                 document.getElementById('networkSpeed').textContent = downlink;
             } else {
@@ -476,52 +508,129 @@
                 document.getElementById('networkSpeed').textContent = '浏览器不支持';
             }
         }
-        
-        // 获取本地IP地址（通过WebRTC）
+
+        // 获取本地IP和外网IP地址（通过WebRTC）
         function getLocalIPs() {
             const configuration = {
                 iceServers: [
                     { urls: 'stun:stun.l.google.com:19302' },
-                    { urls: 'stun:stun1.l.google.com:19302' }
+                    { urls: 'stun:stun1.l.google.com:19302' },
+                    { urls: 'stun:stun2.l.google.com:19302' }
                 ]
             };
-            
+
             const pc = new RTCPeerConnection(configuration);
-            const ips = new Set();
-            
+            const localIps = new Set();
+            const publicIps = new Set();
+
             pc.createDataChannel("");
-            
+
             pc.onicecandidate = function(event) {
                 if (event.candidate) {
                     const candidate = event.candidate.candidate;
                     const ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3})/;
                     const ipMatch = candidate.match(ipRegex);
-                    
+
                     if (ipMatch) {
                         const ip = ipMatch[1];
-                        if (!ip.startsWith('127.') && !ip.startsWith('169.254.')) {
-                            ips.add(ip);
-                            localIPAddresses = Array.from(ips);
-                            document.getElementById('localIP').textContent = localIPAddresses.join(', ') || '未检测到';
+
+                        // 区分本地IP和外网IP
+                        if (candidate.includes('typ host')) {
+                            // 本地网络接口IP
+                            if (!ip.startsWith('127.') && !ip.startsWith('169.254.')) {
+                                localIps.add(ip);
+                                localIPAddresses = Array.from(localIps);
+                                document.getElementById('localIP').textContent = localIPAddresses.join(', ') || '-';
+                                document.getElementById('localIP').className = 'value-col success';
+                            }
+                        } else if (candidate.includes('typ srflx')) {
+                            // STUN服务器反射的外网IP
+                            publicIps.add(ip);
+                            const publicIpsArray = Array.from(publicIps);
+
+                            // 异步获取位置并格式化显示
+                            updatePublicIPDisplay(publicIpsArray);
                         }
                     }
                 }
             };
-            
+
             pc.createOffer().then(offer => pc.setLocalDescription(offer));
-            
+
             // 超时处理
             setTimeout(() => {
                 if (localIPAddresses.length === 0) {
-                    document.getElementById('localIP').textContent = '无法获取（可能被阻止）';
-                    document.getElementById('localIP').className = 'value-col error';
+                    document.getElementById('localIP').textContent = '-';
+                    document.getElementById('localIP').className = 'value-col';
+                }
+                if (publicIps.size === 0) {
+                    // 如果WebRTC获取不到外网IP，fallback到API方式
+                    getPublicIPFallback();
                 }
                 pc.close();
-            }, 5000);
+            }, 8000);
         }
-        
-        // 获取公网IP地址和位置信息
-        async function getPublicIP() {
+
+        // 根据IP地址获取位置信息
+        async function getIPLocation(ip) {
+            try {
+                // 使用多个API服务以提高可靠性
+                const apis = [
+                    `https://ipapi.co/${ip}/json/`,
+                    `https://ipinfo.io/${ip}/json`,
+                    `https://api.ipgeolocation.io/ipgeo?apiKey=free&ip=${ip}`
+                ];
+
+                for (const api of apis) {
+                    try {
+                        const response = await fetch(api);
+                        const data = await response.json();
+
+                        // 获取位置信息并返回
+                        if (data.city && data.region && data.country) {
+                            return `${data.city}, ${data.region}, ${data.country}`;
+                        } else if (data.country) {
+                            return data.country;
+                        }
+                    } catch (e) {
+                        continue;
+                    }
+                }
+
+                // 如果所有API都失败，返回默认值
+                return '位置未知';
+
+            } catch (error) {
+                return '位置未知';
+            }
+        }
+
+        // 更新公网IP显示（包含位置信息）
+        async function updatePublicIPDisplay(publicIpsArray) {
+            try {
+                const formattedIPs = [];
+
+                for (const ip of publicIpsArray) {
+                    const location = await getIPLocation(ip);
+                    formattedIPs.push(`${ip}（${location}）`);
+                }
+
+                // 多个IP换行显示
+                document.getElementById('publicIP').style.whiteSpace = 'pre-line';
+                document.getElementById('publicIP').textContent = formattedIPs.join('\n');
+                document.getElementById('publicIP').className = 'value-col success multi-line-ip';
+
+            } catch (error) {
+                // 如果位置获取失败，显示不带位置的格式
+                const formattedIPs = publicIpsArray.map(ip => `${ip}（位置未知）`).join('\n');
+                document.getElementById('publicIP').style.whiteSpace = 'pre-line';
+                document.getElementById('publicIP').textContent = formattedIPs;
+                document.getElementById('publicIP').className = 'value-col success multi-line-ip';
+            }
+        }
+
+        // WebRTC获取不到外网IP时的后备方案
+        async function getPublicIPFallback() {
             try {
                 // 使用多个API服务以提高可靠性
                 const apis = [
@@ -529,26 +638,15 @@
                     'https://ipinfo.io/json',
                     'https://api.ipify.org?format=json'
                 ];
-                
+
                 for (const api of apis) {
                     try {
                         const response = await fetch(api);
                         const data = await response.json();
-                        
+
                         if (data.ip) {
-                            document.getElementById('publicIP').textContent = data.ip;
-                            document.getElementById('publicIP').className = 'value-col success';
-                            
-                            // 获取位置信息
-                            if (data.city && data.region && data.country) {
-                                const location = `${data.city}, ${data.region}, ${data.country}`;
-                                document.getElementById('ipLocation').textContent = location;
-                                document.getElementById('ipLocation').className = 'value-col success';
-                            } else if (data.country) {
-                                document.getElementById('ipLocation').textContent = data.country;
-                                document.getElementById('ipLocation').className = 'value-col success';
-                            }
-                            
+                            // 使用统一的显示方法
+                            await updatePublicIPDisplay([data.ip]);
                             publicIPInfo = data;
                             break;
                         }
@@ -556,39 +654,44 @@
                         continue;
                     }
                 }
-                
+
                 // 如果所有API都失败
-                if (!document.getElementById('publicIP').textContent.includes('.')) {
+                const currentText = document.getElementById('publicIP').textContent;
+                if (!currentText || currentText === '检测中...' || currentText === '-') {
                     throw new Error('所有API都无法访问');
                 }
-                
+
             } catch (error) {
-                document.getElementById('publicIP').textContent = '获取失败';
-                document.getElementById('publicIP').className = 'value-col error';
-                document.getElementById('ipLocation').textContent = '获取失败';
-                document.getElementById('ipLocation').className = 'value-col error';
+                document.getElementById('publicIP').textContent = '-';
+                document.getElementById('publicIP').className = 'value-col';
             }
         }
-        
+
+        // 保持原有的getPublicIP函数作为兼容性接口
+        async function getPublicIP() {
+            // 现在主要通过WebRTC获取，这里作为后备
+            return;
+        }
+
         // 测试网络延迟
         async function testLatency() {
             try {
                 const start = performance.now();
-                await fetch('https://www.google.com/favicon.ico', { 
+                await fetch('https://www.google.com/favicon.ico', {
                     mode: 'no-cors',
                     cache: 'no-cache'
                 });
                 const end = performance.now();
                 const latency = Math.round(end - start);
-                
+
                 document.getElementById('latency').textContent = `${latency} ms`;
                 document.getElementById('latency').className = `value-col ${latency < 100 ? 'success' : latency < 300 ? 'warning' : 'error'}`;
             } catch (error) {
-                document.getElementById('latency').textContent = '测试失败';
-                document.getElementById('latency').className = 'value-col error';
+                document.getElementById('latency').textContent = '-';
+                document.getElementById('latency').className = 'value-col';
             }
         }
-        
+
         // 获取DNS信息
         async function getDNSInfo() {
             try {
@@ -597,65 +700,95 @@
                 await fetch('https://www.google.com', { mode: 'no-cors' });
                 const end = performance.now();
                 const dnsTime = Math.round(end - start);
-                
+
                 document.getElementById('dnsTime').textContent = `${dnsTime} ms`;
                 document.getElementById('dnsTime').className = 'value-col success';
-                
+
                 // 获取主机名和域名
                 document.getElementById('hostname').textContent = window.location.hostname || 'localhost';
                 document.getElementById('domain').textContent = window.location.host || 'file://';
-                
+
                 // DNS服务器（浏览器无法直接获取）
                 document.getElementById('dnsServers').textContent = '-';
                 document.getElementById('dnsServers').className = 'value-col';
-                
+
             } catch (error) {
-                document.getElementById('dnsTime').textContent = '测试失败';
-                document.getElementById('dnsTime').className = 'value-col error';
+                document.getElementById('dnsTime').textContent = '-';
+                document.getElementById('dnsTime').className = 'value-col';
                 document.getElementById('dnsServers').textContent = '-';
                 document.getElementById('dnsServers').className = 'value-col';
             }
         }
-        
-        // 检测常用端口（模拟检测，实际浏览器无法直接扫描端口）
-        function checkCommonPorts() {
-            const commonPorts = [
-                { port: 80, name: 'HTTP', protocol: 'TCP' },
-                { port: 443, name: 'HTTPS', protocol: 'TCP' },
-                { port: 21, name: 'FTP', protocol: 'TCP' },
-                { port: 22, name: 'SSH', protocol: 'TCP' },
-                { port: 25, name: 'SMTP', protocol: 'TCP' },
-                { port: 53, name: 'DNS', protocol: 'UDP' },
-                { port: 110, name: 'POP3', protocol: 'TCP' },
-                { port: 143, name: 'IMAP', protocol: 'TCP' }
+
+        // 检测常用端口（通过GET请求测试服务可用性）
+        async function checkCommonPorts() {
+            const commonServices = [
+                { port: 80, name: 'HTTP', testUrl: 'http://httpbin.org/status/200', timeout: 3000 },
+                { port: 443, name: 'HTTPS', testUrl: 'https://httpbin.org/status/200', timeout: 3000 },
+                { port: 8080, name: 'HTTP-Alt', testUrl: 'http://httpbin.org:8080/status/200', timeout: 3000 },
+                { port: 3000, name: 'Dev Server', testUrl: 'http://localhost:3000', timeout: 2000 },
+                { port: 8000, name: 'Python HTTP', testUrl: 'http://localhost:8000', timeout: 2000 },
+                { port: 8888, name: 'Jupyter', testUrl: 'http://localhost:8888', timeout: 2000 },
+                { port: 5000, name: 'Flask', testUrl: 'http://localhost:5000', timeout: 2000 },
+                { port: 9000, name: 'Dev Tools', testUrl: 'http://localhost:9000', timeout: 2000 }
             ];
-            
+
             const portTableBody = document.getElementById('portTableBody');
             portTableBody.innerHTML = '';
-            
-            commonPorts.forEach(portInfo => {
-                // 浏览器无法直接检测端口状态
-                const statusText = '-';
-                
+
+            // 创建初始行，显示检测状态
+            commonServices.forEach(service => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td class="label-col">端口 ${portInfo.port} (${portInfo.name}/${portInfo.protocol})</td>
-                    <td class="value-col">${statusText}</td>
+                    <td class="label-col">端口 ${service.port} (${service.name})</td>
+                    <td class="value-col loading" id="port_${service.port}">检测中...</td>
                 `;
-                
                 portTableBody.appendChild(row);
             });
-            
+
+            // 并行检测所有服务
+            const promises = commonServices.map(async (service) => {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), service.timeout);
+
+                    const response = await fetch(service.testUrl, {
+                        method: 'GET',
+                        mode: 'no-cors', // 避免CORS问题
+                        signal: controller.signal,
+                        cache: 'no-cache'
+                    });
+
+                    clearTimeout(timeoutId);
+
+                    // no-cors模式下，只能通过是否抛出异常来判断
+                    document.getElementById(`port_${service.port}`).innerHTML =
+                        '<span class="status-indicator online"></span>可访问';
+                    document.getElementById(`port_${service.port}`).className = 'value-col success';
+
+                } catch (error) {
+                    if (error.name === 'AbortError') {
+                        document.getElementById(`port_${service.port}`).textContent = '-';
+                    } else {
+                        document.getElementById(`port_${service.port}`).textContent = '-';
+                    }
+                    document.getElementById(`port_${service.port}`).className = 'value-col';
+                }
+            });
+
+            // 等待所有检测完成
+            await Promise.allSettled(promises);
+
             // 添加说明行
             const noteRow = document.createElement('tr');
             noteRow.innerHTML = `
                 <td colspan="2" class="port-note">
-                    ⚠️ 注意：由于浏览器安全限制，端口状态为模拟显示
+                    💡 提示：通过尝试连接测试服务可用性，"-" 表示无法连接或超时
                 </td>
             `;
             portTableBody.appendChild(noteRow);
         }
-        
+
         // 获取WebRTC信息
         function getWebRTCInfo() {
             const configuration = {
@@ -663,28 +796,28 @@
                     { urls: 'stun:stun.l.google.com:19302' }
                 ]
             };
-            
+
             const pc = new RTCPeerConnection(configuration);
             const candidates = [];
             const localCandidates = [];
-            
+
             pc.createDataChannel("");
-            
+
             pc.onicecandidate = function(event) {
                 if (event.candidate) {
                     candidates.push(event.candidate.candidate);
-                    
+
                     // 区分本地和远程候选
                     if (event.candidate.candidate.includes('typ host')) {
                         localCandidates.push(event.candidate.candidate);
                     }
-                    
+
                     document.getElementById('iceCandidates').textContent = `${candidates.length} 个`;
                     document.getElementById('iceCandidates').className = 'value-col success';
-                    
+
                     document.getElementById('localCandidates').textContent = `${localCandidates.length} 个`;
                     document.getElementById('localCandidates').className = 'value-col success';
-                    
+
                     // 解析网络接口类型
                     const interfaces = new Set();
                     candidates.forEach(candidate => {
@@ -693,34 +826,34 @@
                         if (candidate.includes('typ relay')) interfaces.add('Relay');
                         if (candidate.includes('typ prflx')) interfaces.add('Peer Reflexive');
                     });
-                    
+
                     document.getElementById('networkInterfaces').textContent = Array.from(interfaces).join(', ') || '无';
                     document.getElementById('networkInterfaces').className = 'value-col success';
                 }
             };
-            
+
             pc.onicegatheringstatechange = function() {
                 if (pc.iceGatheringState === 'complete') {
                     setTimeout(() => pc.close(), 1000);
                 }
             };
-            
+
             pc.createOffer().then(offer => pc.setLocalDescription(offer));
-            
+
             // 超时处理
             setTimeout(() => {
                 if (candidates.length === 0) {
-                    document.getElementById('iceCandidates').textContent = '收集失败';
-                    document.getElementById('iceCandidates').className = 'value-col error';
-                    document.getElementById('localCandidates').textContent = '收集失败';
-                    document.getElementById('localCandidates').className = 'value-col error';
-                    document.getElementById('networkInterfaces').textContent = '检测失败';
-                    document.getElementById('networkInterfaces').className = 'value-col error';
+                    document.getElementById('iceCandidates').textContent = '-';
+                    document.getElementById('iceCandidates').className = 'value-col';
+                    document.getElementById('localCandidates').textContent = '-';
+                    document.getElementById('localCandidates').className = 'value-col';
+                    document.getElementById('networkInterfaces').textContent = '-';
+                    document.getElementById('networkInterfaces').className = 'value-col';
                 }
                 pc.close();
             }, 10000);
         }
-        
+
         // 刷新所有信息
         function refreshAllInfo() {
             // 重置加载状态
@@ -728,35 +861,24 @@
                 el.textContent = '检测中...';
                 el.className = 'value-col loading';
             });
-            
+
+            // 重置所有显示元素
+            document.getElementById('publicIP').textContent = '检测中...';
+            document.getElementById('publicIP').className = 'value-col loading';
+            document.getElementById('localIP').textContent = '检测中...';
+            document.getElementById('localIP').className = 'value-col loading';
+
             // 清空缓存
             localIPAddresses = [];
             publicIPInfo = {};
-            
+
             // 重新检测
             setTimeout(() => {
                 initNetworkInfo();
             }, 500);
         }
-        
-        // IPv6 检测
-        async function checkIPv6() {
-            try {
-                const response = await fetch('https://ipv6.icanhazip.com/', {
-                    signal: AbortSignal.timeout(5000)
-                });
-                const ipv6 = await response.text();
-                document.getElementById('ipv6').textContent = ipv6.trim() || '不支持IPv6';
-                document.getElementById('ipv6').className = 'value-col success';
-            } catch (error) {
-                document.getElementById('ipv6').textContent = '不支持IPv6或检测失败';
-                document.getElementById('ipv6').className = 'value-col error';
-            }
-        }
-        
-        // 延迟执行IPv6检测
-        setTimeout(checkIPv6, 2000);
-        
+
+
         // 添加键盘快捷键
         document.addEventListener('keydown', function(event) {
             if (event.ctrlKey && event.key === 'r') {
@@ -764,17 +886,17 @@
                 refreshAllInfo();
             }
         });
-        
+
         // 添加复制功能
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(function() {
                 // 可以添加复制成功提示
             });
         }
-        
+
         // 为IP地址添加点击复制功能
         document.addEventListener('click', function(event) {
-            if (event.target.classList.contains('value-col') && 
+            if (event.target.classList.contains('value-col') &&
                 (event.target.id === 'localIP' || event.target.id === 'publicIP')) {
                 const text = event.target.textContent;
                 if (text && !text.includes('检测中') && !text.includes('失败')) {
@@ -787,7 +909,7 @@
                 }
             }
         });
-        
+
     </script>
 </body>
 </html>
