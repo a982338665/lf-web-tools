@@ -161,8 +161,6 @@
             word-break: break-all;
         }
 
-
-
         .loading {
             color: #ffc107;
         }
@@ -408,7 +406,7 @@
         </div>
 
         <div class="footer">
-            <p>💡 提示：外网IP通过WebRTC STUN服务器获取，地理位置信息查询自公开API</p>
+            <p>💡 提示：外网IP通过WebRTC STUN服务器获取，地理位置使用多个API备选查询</p>
             <p>🔒 此工具仅在本地运行，不会收集或上传任何数据</p>
             <p>⚡ 端口检测通过实际连接测试，"-" 表示无法连接或超时</p>
         </div>
@@ -473,7 +471,7 @@
 
             // 屏幕分辨率检测
             try {
-                document.getElementById('screenRes').textContent = `${screen.width} x ${screen.height}`;
+            document.getElementById('screenRes').textContent = `${screen.width} x ${screen.height}`;
             } catch (e) {
                 document.getElementById('screenRes').textContent = '-';
             }
@@ -537,7 +535,7 @@
                         // 区分本地IP和外网IP
                         if (candidate.includes('typ host')) {
                             // 本地网络接口IP
-                            if (!ip.startsWith('127.') && !ip.startsWith('169.254.')) {
+                        if (!ip.startsWith('127.') && !ip.startsWith('169.254.')) {
                                 localIps.add(ip);
                                 localIPAddresses = Array.from(localIps);
                                 document.getElementById('localIP').textContent = localIPAddresses.join(', ') || '-';
@@ -571,36 +569,117 @@
             }, 8000);
         }
 
-        // 根据IP地址获取位置信息
+        // 根据IP地址获取位置信息（优先级模式）
         async function getIPLocation(ip) {
             try {
-                // 使用多个API服务以提高可靠性
-                const apis = [
-                    `https://ipapi.co/${ip}/json/`,
-                    `https://ipinfo.io/${ip}/json`,
-                    `https://api.ipgeolocation.io/ipgeo?apiKey=free&ip=${ip}`
+                // 使用多个API服务，按优先级顺序查询
+                const apiTests = [
+                    // ipinfo.io - 不太准确
+                    /*{
+                        name: 'ipinfo.io',
+                        url: `https://ipinfo.io/${ip}/json`,
+                        parser: (data) => {
+                            if (data.city && data.region && data.country) {
+                                return `${data.city}, ${data.region}, ${data.country}`;
+                            } else if (data.country) {
+                                return data.country;
+                            }
+                            return null;
+                        }
+                    },*/
+                    // ipip.net - 最后备选API
+                    {
+                        name: 'ipip.net',
+                        url: `http://myip.ipip.net`,
+                        parser: (data) => {
+                            return data.split("来自于：");
+                        }
+                    },
+                    // ipapi.co - 备选API，精确度较高
+                    {
+                        name: 'ipapi.co',
+                        url: `https://ipapi.co/${ip}/json/`,
+                        parser: (data) => {
+                            if (data.city && data.region && data.country_name) {
+                                return `${data.city}, ${data.region}, ${data.country_name}`;
+                            } else if (data.country_name) {
+                                return data.country_name;
+                            }
+                            return null;
+                        }
+                    },
+                    // ipgeolocation.io - 备选API
+                    {
+                        name: 'ipgeolocation.io',
+                        url: `https://api.ipgeolocation.io/v2/ipgeo?apiKey=c12f4e421c214d7ea0dbba0f34111261&ip=${ip}`,
+                        parser: (data) => {
+                            if (data.location.city && data.location.state_prov && data.location.country_name) {
+                                return `${data.location.city}, ${data.location.state_prov}, ${data.location.country_name}`;
+                            } else if (data.location.country_name) {
+                                return data.location.country_name;
+                            }
+                            return null;
+                        }
+                    },
+                    // freeipapi.com - 备选API
+                    {
+                        name: 'freeipapi.com',
+                        url: `https://free.freeipapi.com/api/json/${ip}`,
+                        parser: (data) => {
+                            if (data.cityName && data.regionName && data.countryName) {
+                                return `${data.cityName}, ${data.regionName}, ${data.countryName}`;
+                            } else if (data.countryName) {
+                                return data.countryName;
+                            }
+                            return null;
+                        }
+                    }
+
                 ];
 
-                for (const api of apis) {
-                    try {
-                        const response = await fetch(api);
-                        const data = await response.json();
+                console.log(`开始查询IP ${ip} 的位置信息...`);
 
-                        // 获取位置信息并返回
-                        if (data.city && data.region && data.country) {
-                            return `${data.city}, ${data.region}, ${data.country}`;
-                        } else if (data.country) {
-                            return data.country;
+                // 按优先级顺序尝试每个API
+                for (const apiTest of apiTests) {
+                    try {
+                        console.log(`🔍 尝试 ${apiTest.name}...`);
+
+                        const response = await fetch(apiTest.url, {
+                            method: 'GET',
+                            mode: 'cors',
+                            cache: 'no-cache',
+                            signal: AbortSignal.timeout(5000), // 5秒超时
+                            headers: {
+                                'Accept': 'application/json'
+                            }
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}`);
                         }
+
+                        const data = await response.json();
+                        const location = apiTest.parser(data);
+
+                        if (location) {
+                            console.log(`✅ ${apiTest.name} 成功返回位置:`, location);
+                            return location;
+                        } else {
+                            console.log(`⚠️ ${apiTest.name} 返回数据不完整`);
+                        }
+
                     } catch (e) {
+                        console.log(`❌ ${apiTest.name} 查询失败:`, e.message);
                         continue;
                     }
                 }
 
-                // 如果所有API都失败，返回默认值
+                // 如果所有API都失败
+                console.warn('所有IP位置查询API都失败');
                 return '位置未知';
 
             } catch (error) {
+                console.error('IP位置查询出错:', error);
                 return '位置未知';
             }
         }
@@ -611,21 +690,28 @@
                 const formattedIPs = [];
 
                 for (const ip of publicIpsArray) {
+                    console.log(`\n🔍 开始查询IP ${ip} 的位置信息...`);
                     const location = await getIPLocation(ip);
                     formattedIPs.push(`${ip}（${location}）`);
+                    console.log(`✅ IP ${ip} 位置查询完成: ${location}\n`);
                 }
 
-                // 多个IP换行显示
-                document.getElementById('publicIP').style.whiteSpace = 'pre-line';
-                document.getElementById('publicIP').textContent = formattedIPs.join('\n');
-                document.getElementById('publicIP').className = 'value-col success multi-line-ip';
+                // 设置显示样式
+                const element = document.getElementById('publicIP');
+                element.style.whiteSpace = 'pre-line';
+                element.textContent = formattedIPs.join('\n');
+                element.className = 'value-col success multi-line-ip';
+
+                console.log('🎉 所有IP位置查询完成！');
 
             } catch (error) {
+                console.error('位置查询过程出错:', error);
                 // 如果位置获取失败，显示不带位置的格式
                 const formattedIPs = publicIpsArray.map(ip => `${ip}（位置未知）`).join('\n');
-                document.getElementById('publicIP').style.whiteSpace = 'pre-line';
-                document.getElementById('publicIP').textContent = formattedIPs;
-                document.getElementById('publicIP').className = 'value-col success multi-line-ip';
+                const element = document.getElementById('publicIP');
+                element.style.whiteSpace = 'pre-line';
+                element.textContent = formattedIPs;
+                element.className = 'value-col success multi-line-ip';
             }
         }
 
