@@ -185,6 +185,22 @@
             font-size: 0.9em;
         }
         
+        .device-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 0.9em;
+            background-color: white;
+            cursor: pointer;
+        }
+        
+        .device-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
         .audio-player {
             background: #fff;
             border-radius: 15px;
@@ -280,9 +296,8 @@
         
         <!-- 控制按钮 -->
         <div class="controls">
-            <button class="control-btn" id="startBtn" onclick="startMicTest()">🎯 开始检测</button>
+            <button class="control-btn" id="toggleBtn" onclick="toggleMicTest()">🎯 开始检测</button>
             <button class="control-btn" id="recordBtn" onclick="toggleRecording()" disabled>🔴 开始录音</button>
-            <button class="control-btn" id="stopBtn" onclick="stopMicTest()" disabled>⏹️停止检测</button>
             <button class="control-btn" onclick="refreshDevices()">🔄 刷新设备</button>
         </div>
         
@@ -295,9 +310,24 @@
             <div class="volume-text" id="volumeText">音量: 0%</div>
         </div>
         
-        <!-- 设备信息 -->
+        <!-- 设备选择 -->
         <div class="device-info">
-            <div class="device-title">🎤 可用音频设备</div>
+            <div class="device-title">🎤 音频设备选择</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <div>
+                    <label for="inputDevice" style="display: block; margin-bottom: 8px; font-weight: bold;">输入设备（麦克风）:</label>
+                    <select id="inputDevice" class="device-select" onchange="changeInputDevice()">
+                        <option value="">选择输入设备...</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="outputDevice" style="display: block; margin-bottom: 8px; font-weight: bold;">输出设备（扬声器）:</label>
+                    <select id="outputDevice" class="device-select" onchange="changeOutputDevice()">
+                        <option value="">选择输出设备...</option>
+                    </select>
+                </div>
+            </div>
+            <div class="device-title">📋 设备详细信息</div>
             <div class="device-list" id="deviceList">
                 <div style="text-align: center; color: #666;">正在检测音频设备...</div>
             </div>
@@ -332,6 +362,9 @@
         let recordings = [];
         let isRecording = false;
         let animationId = null;
+        let isTestingMic = false;
+        let currentInputDeviceId = null;
+        let currentOutputDeviceId = null;
         
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', function() {
@@ -350,26 +383,44 @@
             return true;
         }
         
+        // 切换麦克风测试状态
+        function toggleMicTest() {
+            if (isTestingMic) {
+                stopMicTest();
+            } else {
+                startMicTest();
+            }
+        }
+        
         // 开始麦克风测试
         async function startMicTest() {
             try {
                 updateStatus('testing', '请求麦克风权限...');
                 
-                mediaStream = await navigator.mediaDevices.getUserMedia({ 
+                const constraints = { 
                     audio: {
                         echoCancellation: true,
                         noiseSuppression: true,
                         autoGainControl: true
-                    } 
-                });
+                    }
+                };
+                
+                // 如果选择了特定的输入设备，使用该设备
+                if (currentInputDeviceId) {
+                    constraints.audio.deviceId = { exact: currentInputDeviceId };
+                }
+                
+                mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
                 
                 updateStatus('connected', '麦克风连接成功');
                 document.getElementById('permissionText').textContent = '麦克风权限已授权，可以正常使用';
                 
-                // 启用控制按钮
+                // 更新按钮状态
+                const toggleBtn = document.getElementById('toggleBtn');
+                toggleBtn.textContent = '⏹️ 停止检测';
+                toggleBtn.style.background = 'linear-gradient(45deg, #dc3545, #fd7e14)';
                 document.getElementById('recordBtn').disabled = false;
-                document.getElementById('stopBtn').disabled = false;
-                document.getElementById('startBtn').disabled = true;
+                isTestingMic = true;
                 
                 // 初始化音频分析
                 initAudioAnalysis();
@@ -381,6 +432,7 @@
                 console.error('获取麦克风权限失败:', error);
                 updateStatus('disconnected', '麦克风权限被拒绝或设备不可用');
                 document.getElementById('permissionText').textContent = '麦克风权限被拒绝，请在浏览器设置中允许访问';
+                isTestingMic = false;
             }
         }
         
@@ -411,9 +463,11 @@
             document.getElementById('volumeBar').style.width = '0%';
             
             // 重置按钮状态
-            document.getElementById('startBtn').disabled = false;
+            const toggleBtn = document.getElementById('toggleBtn');
+            toggleBtn.textContent = '🎯 开始检测';
+            toggleBtn.style.background = 'linear-gradient(45deg, #667eea, #764ba2)';
             document.getElementById('recordBtn').disabled = true;
-            document.getElementById('stopBtn').disabled = true;
+            isTestingMic = false;
         }
         
         // 初始化音频分析
@@ -434,20 +488,25 @@
             if (!analyser || !dataArray) return;
             
             function updateVolume() {
-                analyser.getByteFrequencyData(dataArray);
+                analyser.getByteTimeDomainData(dataArray);
                 
+                // 计算RMS (均方根) 用于音量检测
                 let sum = 0;
                 for (let i = 0; i < dataArray.length; i++) {
-                    sum += dataArray[i];
+                    const sample = (dataArray[i] - 128) / 128; // 转换为 -1 到 1 的范围
+                    sum += sample * sample;
                 }
                 
-                const average = sum / dataArray.length;
-                const volume = Math.round((average / 255) * 100);
+                const rms = Math.sqrt(sum / dataArray.length);
+                const volume = Math.round(rms * 100 * 5); // 放大5倍以获得更敏感的响应
+                const clampedVolume = Math.min(100, volume); // 限制在100%以内
                 
-                document.getElementById('volumeText').textContent = `音量: ${volume}%`;
-                document.getElementById('volumeBar').style.width = `${volume}%`;
+                document.getElementById('volumeText').textContent = `音量: ${clampedVolume}%`;
+                document.getElementById('volumeBar').style.width = `${clampedVolume}%`;
                 
-                animationId = requestAnimationFrame(updateVolume);
+                if (isTestingMic) {
+                    animationId = requestAnimationFrame(updateVolume);
+                }
             }
             
             updateVolume();
@@ -467,7 +526,20 @@
             if (!mediaStream) return;
             
             recordedChunks = [];
-            mediaRecorder = new MediaRecorder(mediaStream);
+            
+            // 尝试使用支持的音频格式
+            let mimeType = 'audio/webm';
+            if (MediaRecorder.isTypeSupported('audio/webm; codecs=opus')) {
+                mimeType = 'audio/webm; codecs=opus';
+            } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                mimeType = 'audio/mp4';
+            } else if (MediaRecorder.isTypeSupported('audio/ogg; codecs=opus')) {
+                mimeType = 'audio/ogg; codecs=opus';
+            } else if (MediaRecorder.isTypeSupported('audio/wav')) {
+                mimeType = 'audio/wav';
+            }
+            
+            mediaRecorder = new MediaRecorder(mediaStream, { mimeType: mimeType });
             
             mediaRecorder.ondataavailable = function(event) {
                 if (event.data.size > 0) {
@@ -476,14 +548,15 @@
             };
             
             mediaRecorder.onstop = function() {
-                const blob = new Blob(recordedChunks, { type: 'audio/wav' });
+                const blob = new Blob(recordedChunks, { type: mimeType });
                 const url = URL.createObjectURL(blob);
                 const timestamp = new Date().toLocaleString('zh-CN');
                 
                 recordings.push({
                     url: url,
                     timestamp: timestamp,
-                    blob: blob
+                    blob: blob,
+                    mimeType: mimeType
                 });
                 
                 updateRecordingsList();
@@ -527,6 +600,7 @@
                     <div>
                         <strong>录音 ${index + 1}</strong>
                         <div class="recording-time">${recording.timestamp}</div>
+                        <div style="font-size: 0.8em; color: #666;">${recording.mimeType || 'audio/webm'}</div>
                     </div>
                     <div>
                         <button class="play-btn" onclick="playRecording(${index})">▶️ 播放</button>
@@ -537,10 +611,43 @@
         }
         
         // 播放录音
-        function playRecording(index) {
-            const recording = recordings[index];
-            const audio = new Audio(recording.url);
-            audio.play();
+        async function playRecording(index) {
+            try {
+                const recording = recordings[index];
+                const audio = new Audio(recording.url);
+                
+                // 设置输出设备（如果支持且选择了设备）
+                if (currentOutputDeviceId && audio.setSinkId) {
+                    try {
+                        await audio.setSinkId(currentOutputDeviceId);
+                    } catch (error) {
+                        console.warn('设置输出设备失败:', error);
+                    }
+                }
+                
+                // 添加播放状态指示
+                const playButton = document.querySelector(`button[onclick="playRecording(${index})"]`);
+                const originalText = playButton.textContent;
+                playButton.textContent = '⏸️ 播放中';
+                playButton.disabled = true;
+                
+                audio.onended = function() {
+                    playButton.textContent = originalText;
+                    playButton.disabled = false;
+                };
+                
+                audio.onerror = function(error) {
+                    console.error('音频播放失败:', error);
+                    playButton.textContent = originalText;
+                    playButton.disabled = false;
+                    alert('音频播放失败，请重试');
+                };
+                
+                await audio.play();
+            } catch (error) {
+                console.error('播放录音失败:', error);
+                alert('播放失败，可能需要用户交互权限');
+            }
         }
         
         // 删除录音
@@ -555,19 +662,62 @@
             try {
                 const devices = await navigator.mediaDevices.enumerateDevices();
                 const audioInputs = devices.filter(device => device.kind === 'audioinput');
+                const audioOutputs = devices.filter(device => device.kind === 'audiooutput');
                 
+                // 更新输入设备选择器
+                const inputSelect = document.getElementById('inputDevice');
+                inputSelect.innerHTML = '<option value="">选择输入设备...</option>';
+                
+                audioInputs.forEach(device => {
+                    const option = document.createElement('option');
+                    option.value = device.deviceId;
+                    option.textContent = device.label || `麦克风 ${device.deviceId.substring(0, 8)}...`;
+                    if (device.deviceId === currentInputDeviceId) {
+                        option.selected = true;
+                    }
+                    inputSelect.appendChild(option);
+                });
+                
+                // 设置默认输入设备（第一个设备）
+                if (audioInputs.length > 0 && !currentInputDeviceId) {
+                    currentInputDeviceId = audioInputs[0].deviceId;
+                    inputSelect.value = currentInputDeviceId;
+                }
+                
+                // 更新输出设备选择器
+                const outputSelect = document.getElementById('outputDevice');
+                outputSelect.innerHTML = '<option value="">选择输出设备...</option>';
+                
+                audioOutputs.forEach(device => {
+                    const option = document.createElement('option');
+                    option.value = device.deviceId;
+                    option.textContent = device.label || `扬声器 ${device.deviceId.substring(0, 8)}...`;
+                    if (device.deviceId === currentOutputDeviceId) {
+                        option.selected = true;
+                    }
+                    outputSelect.appendChild(option);
+                });
+                
+                // 设置默认输出设备（第一个设备）
+                if (audioOutputs.length > 0 && !currentOutputDeviceId) {
+                    currentOutputDeviceId = audioOutputs[0].deviceId;
+                    outputSelect.value = currentOutputDeviceId;
+                }
+                
+                // 更新设备详细信息显示
                 const container = document.getElementById('deviceList');
+                const allDevices = [...audioInputs, ...audioOutputs];
                 
-                if (audioInputs.length === 0) {
-                    container.innerHTML = '<div style="text-align: center; color: #666;">未检测到音频输入设备</div>';
+                if (allDevices.length === 0) {
+                    container.innerHTML = '<div style="text-align: center; color: #666;">未检测到音频设备</div>';
                     return;
                 }
                 
-                container.innerHTML = audioInputs.map(device => `
+                container.innerHTML = allDevices.map(device => `
                     <div class="device-item">
                         <strong>设备:</strong> ${device.label || '未知设备'}<br>
-                        <strong>ID:</strong> ${device.deviceId}<br>
-                        <strong>类型:</strong> ${device.kind}
+                        <strong>类型:</strong> ${device.kind === 'audioinput' ? '输入设备' : '输出设备'}<br>
+                        <strong>ID:</strong> ${device.deviceId}
                     </div>
                 `).join('');
                 
@@ -576,6 +726,26 @@
                 document.getElementById('deviceList').innerHTML = 
                     '<div style="text-align: center; color: #dc3545;">获取设备列表失败</div>';
             }
+        }
+        
+        // 切换输入设备
+        async function changeInputDevice() {
+            const select = document.getElementById('inputDevice');
+            currentInputDeviceId = select.value;
+            
+            // 如果正在测试麦克风，重新启动以使用新设备
+            if (isTestingMic) {
+                stopMicTest();
+                setTimeout(() => {
+                    startMicTest();
+                }, 500);
+            }
+        }
+        
+        // 切换输出设备
+        function changeOutputDevice() {
+            const select = document.getElementById('outputDevice');
+            currentOutputDeviceId = select.value;
         }
         
         // 更新状态显示
