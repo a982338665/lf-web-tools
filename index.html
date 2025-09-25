@@ -155,6 +155,10 @@
             content: "🎙️";
         }
         
+        .nav-link[data-page="camera"]::before {
+            content: "📷";
+        }
+        
         
         .nav-link[data-page="welcome"]::before {
             content: "🏠";
@@ -391,6 +395,9 @@
                 <li class="nav-item">
                     <a href="#" class="nav-link" data-page="microphone">麦克风功能测试</a>
                 </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="camera">摄像头功能测试</a>
+                </li>
             </ul>
         </nav>
         
@@ -419,6 +426,11 @@
                         <div class="feature-title">麦克风功能测试</div>
                         <div class="feature-desc">测试麦克风设备状态、音频输入和录制功能</div>
                     </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📷</div>
+                        <div class="feature-title">摄像头功能测试</div>
+                        <div class="feature-desc">测试摄像头设备状态、拍照、录像和录音功能</div>
+                    </div>
                 </div>
             </div>
             
@@ -430,6 +442,9 @@
             
             <!-- 麦克风功能测试 -->
             <iframe id="microphoneFrame" src="microphone_test.html"></iframe>
+            
+            <!-- 摄像头功能测试 -->
+            <iframe id="cameraFrame" src="camera_test.html"></iframe>
             
             
             <!-- 加载中页面 -->
@@ -496,7 +511,8 @@
             const frameMap = {
                 'network': 'networkFrame',
                 'ip': 'ipFrame',
-                'microphone': 'microphoneFrame'
+                'microphone': 'microphoneFrame',
+                'camera': 'cameraFrame'
             };
             return frameMap[page];
         }
@@ -548,6 +564,10 @@
                     case '4':
                         e.preventDefault();
                         document.querySelector('[data-page="microphone"]').click();
+                        break;
+                    case '5':
+                        e.preventDefault();
+                        document.querySelector('[data-page="camera"]').click();
                         break;
                 }
             }
