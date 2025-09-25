@@ -524,6 +524,85 @@
             to { transform: translateY(0); opacity: 1; }
         }
         
+        /* CORS提示工具提示 */
+        .cors-tooltip {
+            position: absolute;
+            top: 25px;
+            left: 0;
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 6px;
+            padding: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            width: 350px;
+            font-size: 0.9em;
+            color: #856404;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+        
+        /* 向上显示的tooltip */
+        .cors-tooltip-up {
+            top: auto;
+            bottom: 25px;
+            transform: translateY(10px);
+        }
+        
+        .cors-tooltip::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 20px;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 6px solid #ffc107;
+        }
+        
+        .cors-tooltip::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 21px;
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 5px solid #fff3cd;
+        }
+        
+        /* 向上显示的tooltip箭头 */
+        .cors-tooltip-up::before {
+            top: auto;
+            bottom: -6px;
+            border-bottom: none;
+            border-top: 6px solid #ffc107;
+        }
+        
+        .cors-tooltip-up::after {
+            top: auto;
+            bottom: -5px;
+            border-bottom: none;
+            border-top: 5px solid #fff3cd;
+        }
+        
+        /* 悬停时显示tooltip */
+        .cors-tooltip-container:hover .cors-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        
+        .cors-tooltip-container:hover .cors-tooltip-up {
+            transform: translateY(0);
+        }
+        
         /* 响应式设计 */
         @media (max-width: 768px) {
             .main-layout {
@@ -554,6 +633,13 @@
                 max-height: 400px;
                 min-height: 300px;
             }
+            
+            /* 移动端tooltip调整 */
+            .cors-tooltip {
+                width: 280px;
+                left: -50px;
+                font-size: 0.8em;
+            }
         }
     </style>
 </head>
@@ -567,7 +653,27 @@
                 <div class="command-section">
                     <div class="section-title">
                         🚀 CURL命令执行
-                        <button class="format-btn" onclick="formatInputCommand()" id="formatInputBtn" disabled>🎨 格式化</button>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="cors-tooltip-container" style="position: relative; display: inline-block;">
+                                <span style="color: #856404; cursor: help; text-decoration: underline dotted; font-size: 0.8em;" 
+                                      title="鼠标悬停查看CORS解决方案">
+                                    ⚠️ CORS跨域提示
+                                </span>
+                                <div class="cors-tooltip cors-tooltip-up">
+                                    <strong>浏览器会阻止跨域请求，解决方案：</strong><br>
+                                    1. 使用支持CORS的API（如httpbin.org）<br>
+                                    2. 启动浏览器时添加参数：<br>
+                                    &nbsp;&nbsp;<code>--disable-web-security --user-data-dir</code><br>
+                                    3. 使用CORS插件或代理服务器<br>
+                                    4. 勾选右侧"使用CORS代理"选项
+                                </div>
+                            </div>
+                            <label style="display: inline-flex; align-items: center; color: #495057; font-size: 0.8em;">
+                                <input type="checkbox" id="useCorsProxy" style="margin-right: 4px;">
+                                使用CORS代理
+                            </label>
+                            <button class="format-btn" onclick="formatInputCommand()" id="formatInputBtn" disabled>🎨 格式化</button>
+                        </div>
                     </div>
                     
                     <div class="command-input-group">
@@ -580,12 +686,13 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                     
                     <div class="quick-commands">
                         <button class="quick-cmd" onclick="setQuickCommand('curl -X GET https://httpbin.org/get')">GET测试</button>
-                        <button class="quick-cmd" onclick="setQuickCommand('curl -X POST -H \'Content-Type: application/json\' -d \'{\"test\":\"data\"}\' https://httpbin.org/post')">POST测试</button>
+                        <button class="quick-cmd" onclick="setQuickCommand('curl -X POST -H \'Content-Type: application/json\' --data-raw \'{\"test\":\"data\"}\' https://httpbin.org/post')">POST测试</button>
                         <button class="quick-cmd" onclick="setQuickCommand('curl -H \'User-Agent: MyApp/1.0\' https://httpbin.org/headers')">Headers测试</button>
-                        <button class="quick-cmd" onclick="setQuickCommand('curl -X PUT -d \'update data\' https://httpbin.org/put')">PUT测试</button>
+                        <button class="quick-cmd" onclick="setQuickCommand('curl -X PUT --data-raw \'update data\' https://httpbin.org/put')">PUT测试</button>
                         <button class="quick-cmd" onclick="setQuickCommand('curl -X DELETE https://httpbin.org/delete')">DELETE测试</button>
                         <button class="quick-cmd" onclick="setQuickCommand('curl -I https://httpbin.org/get')">HEAD测试</button>
                     </div>
+                    
                     
                     <div class="status-bar" id="statusBar">
                         🟢 就绪 - 输入CURL命令并点击执行
@@ -696,13 +803,28 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
         
         // 设置快速命令
         function setQuickCommand(command) {
-            document.getElementById('curlCommand').value = command;
-            
-            // 更新格式化按钮状态
-            const formatBtn = document.getElementById('formatInputBtn');
-            formatBtn.disabled = false;
-            
-            logMessage('info', `已设置快速命令: ${command.substring(0, 50)}...`);
+            try {
+                const commandInput = document.getElementById('curlCommand');
+                if (!commandInput) {
+                    console.error('找不到命令输入框');
+                    return;
+                }
+                
+                commandInput.value = command;
+                
+                // 更新格式化按钮状态
+                const formatBtn = document.getElementById('formatInputBtn');
+                if (formatBtn) {
+                    formatBtn.disabled = false;
+                }
+                
+                logMessage('success', `已设置快速命令: ${command.substring(0, 50)}...`);
+                console.log('快速命令设置成功:', command);
+                
+            } catch (error) {
+                console.error('设置快速命令时出错:', error);
+                logMessage('error', `设置快速命令失败: ${error.message}`);
+            }
         }
         
         // 格式化输入的CURL命令
@@ -860,10 +982,22 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                 const endTime = Date.now();
                 const duration = endTime - startTime;
                 
-                logMessage('error', `执行失败: ${error.message} (耗时: ${duration}ms)`);
-                updateStatus('error', `❌ 执行失败`);
+                // 检查是否为CORS错误
+                let errorMessage = error.message;
+                let isCorsError = false;
                 
-                displayError(error, duration);
+                if (error.message.includes('CORS') || 
+                    error.message.includes('Access-Control-Allow-Origin') ||
+                    error.message.includes('preflight') ||
+                    error.name === 'TypeError' && error.message.includes('fetch')) {
+                    isCorsError = true;
+                    errorMessage = `CORS跨域错误: ${error.message}`;
+                }
+                
+                logMessage('error', `执行失败: ${errorMessage} (耗时: ${duration}ms)`);
+                updateStatus('error', `❌ 执行失败${isCorsError ? ' - CORS错误' : ''}`);
+                
+                displayError(error, duration, isCorsError);
                 
                 // 记录到历史
                 executionHistory.push({
@@ -890,19 +1024,20 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                 options: {}
             };
             
-            // 移除curl前缀并分割参数
-            const args = command.replace(/^curl\s+/, '').trim();
+            // 移除curl前缀，处理多行命令（移除反斜杠和换行）
+            let args = command.replace(/^curl\s+/, '').trim();
+            args = args.replace(/\\\s*\n\s*/g, ' ').replace(/\s+/g, ' ');
             
             // 简单的参数解析（支持主要选项）
             const patterns = {
                 // URL (最后一个不以-开头的参数通常是URL)
-                url: /(?:^|\s+)([^\s-][^\s]*(?:\/[^\s]*)?(?:\?[^\s]*)?)(?:\s|$)/,
+                url: /(?:^|\s+)['"]?(https?:\/\/[^\s'"]+)['"]?(?:\s|$)/,
                 // 方法
                 method: /-X\s+([A-Z]+)/i,
                 // Headers
                 headers: /-H\s+['"]([^'"]+)['"]/g,
-                // 数据 (-d 或 --data)
-                data: /(?:-d|--data)\s+['"]([^'"]+)['"]/,
+                // 数据 (-d, --data, --data-raw) - 支持复杂的JSON数据
+                data: /(?:-d|--data|--data-raw)\s+['"]([^'"]*(?:\\"[^'"]*)*)['"]/,
                 // 用户代理
                 userAgent: /(?:-A|--user-agent)\s+['"]([^'"]+)['"]/,
                 // 基本认证
@@ -918,13 +1053,22 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                 // 包含响应头
                 include: /-i|--include/,
                 // 仅获取头信息
-                head: /-I|--head/
+                head: /-I|--head/,
+                // 忽略SSL证书错误
+                insecure: /-k|--insecure/
             };
             
-            // 解析URL
-            const urlMatch = args.match(patterns.url);
+            // 解析URL - 更精确的URL提取
+            let urlMatch = args.match(patterns.url);
             if (urlMatch) {
                 config.url = urlMatch[1];
+            } else {
+                // 备用方案：查找所有可能的URL
+                const urlPattern = /(https?:\/\/[^\s'"\\]+)/g;
+                const urls = args.match(urlPattern);
+                if (urls && urls.length > 0) {
+                    config.url = urls[0]; // 取第一个找到的URL
+                }
             }
             
             // 解析方法
@@ -947,12 +1091,22 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                 }
             }
             
-            // 解析数据
-            const dataMatch = args.match(patterns.data);
+            // 解析数据 - 改进的数据提取
+            let dataMatch = args.match(patterns.data);
             if (dataMatch) {
                 config.data = dataMatch[1];
                 if (config.method === 'GET') {
                     config.method = 'POST'; // 有数据时默认改为POST
+                }
+            } else {
+                // 备用方案：查找--data-raw后的内容
+                const dataRawPattern = /--data-raw\s+'([^']+)'/;
+                const dataRawMatch = args.match(dataRawPattern);
+                if (dataRawMatch) {
+                    config.data = dataRawMatch[1];
+                    if (config.method === 'GET') {
+                        config.method = 'POST';
+                    }
                 }
             }
             
@@ -976,6 +1130,12 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
             config.options.followRedirects = patterns.location.test(args);
             config.options.silent = patterns.silent.test(args);
             config.options.includeHeaders = patterns.include.test(args);
+            config.options.insecure = patterns.insecure.test(args);
+            
+            // 调试信息
+            console.log('CURL解析结果:', config);
+            console.log('原始命令:', command);
+            console.log('处理后参数:', args);
             
             return config;
         }
@@ -992,6 +1152,25 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                 mode: 'cors',
                 cache: 'no-cache'
             };
+            
+            // 检查是否为跨域请求
+            const currentOrigin = window.location.origin;
+            const targetUrl = new URL(config.url);
+            const isCorsConcern = currentOrigin !== `${targetUrl.protocol}//${targetUrl.host}`;
+            
+            if (isCorsConcern) {
+                logMessage('warning', `检测到跨域请求: ${currentOrigin} → ${targetUrl.origin}`);
+                
+                // 检查是否使用CORS代理
+                const useCorsProxy = document.getElementById('useCorsProxy').checked;
+                if (useCorsProxy) {
+                    const corsProxyUrl = 'https://cors-anywhere.herokuapp.com/';
+                    if (!config.url.startsWith(corsProxyUrl)) {
+                        config.url = corsProxyUrl + config.url;
+                        logMessage('info', `使用CORS代理: ${config.url}`);
+                    }
+                }
+            }
             
             // 添加请求体
             if (config.data && ['POST', 'PUT', 'PATCH'].includes(config.method)) {
@@ -1131,8 +1310,32 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
         }
         
         // 显示错误
-        function displayError(error, duration) {
+        function displayError(error, duration, isCorsError = false) {
             const resultContent = document.getElementById('resultContent');
+            
+            let corsHelp = '';
+            if (isCorsError) {
+                corsHelp = `
+                <div class="result-section" style="background: #fff3cd; border-left: 4px solid #ffc107; margin-top: 10px;">
+                    <div class="result-title">🛡️ CORS跨域解决方案</div>
+                    <div class="result-data">
+<strong>方案1: 浏览器参数启动（推荐）</strong>
+• Chrome: --disable-web-security --user-data-dir="C:/temp/chrome"
+• Edge: --disable-web-security --user-data-dir="C:/temp/edge"
+
+<strong>方案2: 浏览器插件</strong>
+• 安装"CORS Unblock"或"Allow CORS"插件
+
+<strong>方案3: 使用代理服务</strong>
+• 使用cors-anywhere: https://cors-anywhere.herokuapp.com/
+• 在URL前添加: https://cors-anywhere.herokuapp.com/
+
+<strong>方案4: 本地服务器</strong>
+• 使用Node.js、Python等搭建本地代理服务器
+
+<strong>注意:</strong> 生产环境应该由后端服务器配置CORS头部</div>
+                </div>`;
+            }
             
             resultContent.innerHTML = `
                 <div class="timing-info">
@@ -1149,12 +1352,13 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                     <div class="result-data">错误类型: ${error.name || 'Error'}
 错误堆栈: ${error.stack || '无堆栈信息'}
 可能原因: 
-• 网络连接问题
+${isCorsError ? '• CORS跨域限制 (主要原因)' : '• 网络连接问题'}
 • URL格式错误
-• CORS跨域限制
+${!isCorsError ? '• CORS跨域限制' : ''}
 • 服务器不可达
 • 请求超时</div>
-                </div>`;
+                </div>
+                ${corsHelp}`;
         }
         
         // 记录日志消息
