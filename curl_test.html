@@ -21,13 +21,17 @@
         }
         
         .container {
-            max-width: 1600px;
-            margin: 0 auto;
+            position: fixed;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            bottom: 8px;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 10px;
             padding: 15px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            min-height: calc(100vh - 16px);
+            display: flex;
+            flex-direction: column;
         }
         
         h1 {
@@ -36,6 +40,7 @@
             margin-bottom: 20px;
             font-size: 1.4em;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
         }
         
         h1::before {
@@ -44,21 +49,34 @@
         }
         
         .main-layout {
+            flex: 1;
             display: grid;
-            grid-template-rows: auto 1fr;
-            gap: 20px;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 280px 1fr;
+            grid-template-areas: 
+                "command log"
+                "result log";
+            gap: 15px;
+            min-height: 0;
         }
         
-        /* 顶部命令输入区域 */
+        /* 左上命令输入区域 */
         .command-panel {
+            grid-area: command;
             background: #fff;
             border-radius: 10px;
             padding: 15px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
         
         .command-section {
-            margin-bottom: 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
         
         .section-title {
@@ -70,12 +88,16 @@
             justify-content: space-between;
             align-items: center;
             gap: 8px;
+            height: 30px;
+            flex-shrink: 0;
         }
         
         .command-input-group {
             display: flex;
             gap: 10px;
             align-items: flex-start;
+            flex: 1;
+            min-height: 0;
         }
         
         .command-input {
@@ -85,9 +107,12 @@
             border-radius: 6px;
             font-size: 0.9em;
             font-family: 'Courier New', monospace;
-            resize: vertical;
-            min-height: 80px;
+            resize: none;
+            height: 140px;
+            max-height: 140px;
             background-color: #f8f9fa;
+            overflow-y: auto;
+            word-wrap: break-word;
         }
         
         .command-input:focus {
@@ -107,7 +132,9 @@
             font-weight: 500;
             transition: all 0.3s ease;
             white-space: nowrap;
-            min-height: 80px;
+            height: 140px;
+            width: 100px;
+            flex-shrink: 0;
         }
         
         .execute-btn:hover {
@@ -127,6 +154,9 @@
             gap: 8px;
             flex-wrap: wrap;
             margin-top: 10px;
+            height: 40px;
+            overflow-y: auto;
+            flex-shrink: 0;
         }
         
         .quick-cmd {
@@ -151,6 +181,8 @@
             font-size: 0.8em;
             font-weight: bold;
             margin-top: 10px;
+            height: 30px;
+            flex-shrink: 0;
         }
         
         .status-ready {
@@ -173,20 +205,26 @@
             color: #721c24;
         }
         
-        /* 底部结果显示区域 */
-        .results-area {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        
-        .result-panel {
+        /* 左下执行结果区域 */
+        .result-area {
+            grid-area: result;
             background: #fff;
             border-radius: 10px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
-            height: 500px;
+            overflow: hidden;
+        }
+        
+        /* 右边执行日志区域 */
+        .log-area {
+            grid-area: log;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
         
         .panel-header {
@@ -246,16 +284,31 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            min-height: 0;
         }
         
-        .result-content, .log-content {
+        .result-content {
             flex: 1;
             overflow-y: auto;
+            overflow-x: hidden;
             padding: 15px;
             font-family: 'Courier New', monospace;
             font-size: 0.8em;
             line-height: 1.4;
             background: #f8f9fa;
+            max-height: 100%;
+        }
+        
+        .log-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8em;
+            line-height: 1.4;
+            background: #f8f9fa;
+            max-height: 100%;
         }
         
         .result-section {
@@ -301,6 +354,9 @@
             border: 1px solid #e9ecef;
             word-break: break-all;
             white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+            overflow-x: auto;
         }
         
         .log-message {
@@ -470,8 +526,13 @@
         
         /* 响应式设计 */
         @media (max-width: 768px) {
-            .results-area {
+            .main-layout {
                 grid-template-columns: 1fr;
+                grid-template-areas: 
+                    "command"
+                    "result"
+                    "log";
+                height: auto;
             }
             
             .command-input-group {
@@ -479,8 +540,19 @@
             }
             
             .execute-btn {
-                min-height: auto;
+                height: auto;
                 width: 100%;
+                min-height: 50px;
+            }
+            
+            .command-input {
+                height: 100px;
+                max-height: 100px;
+            }
+            
+            .result-area, .log-area {
+                max-height: 400px;
+                min-height: 300px;
             }
         }
     </style>
@@ -521,43 +593,40 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                 </div>
             </div>
             
-            <!-- 底部结果显示区域 -->
-            <div class="results-area">
-                <!-- 左侧执行日志 -->
-                <div class="result-panel">
-                    <div class="panel-header">
-                        <div class="panel-title">📋 执行日志</div>
-                        <div class="panel-actions">
-                            <button class="panel-btn" onclick="toggleAutoScroll()" id="autoScrollBtn">📜 自动滚动</button>
-                            <button class="panel-btn save" onclick="saveLog()">💾 保存日志</button>
-                            <button class="panel-btn clear" onclick="clearLog()">🗑️ 清空</button>
-                        </div>
+            <!-- 左下执行结果区域 -->
+            <div class="result-area">
+                <div class="panel-header">
+                    <div class="panel-title">📊 执行结果</div>
+                    <div class="panel-actions">
+                        <button class="panel-btn save" onclick="saveResult()">💾 保存结果</button>
+                        <button class="panel-btn clear" onclick="clearResult()">🗑️ 清空</button>
                     </div>
-                    <div class="panel-content">
-                        <div class="log-content" id="logContent">
-                            <div class="log-message info">
-                                <span class="log-time">[系统]</span>
-                                <span class="log-type">INFO</span>
-                                CURL测试工具已启动，支持HTTP/HTTPS请求测试
-                            </div>
+                </div>
+                <div class="panel-content">
+                    <div class="result-content" id="resultContent">
+                        <div style="text-align: center; color: #666; padding: 40px 20px;">
+                            等待执行CURL命令...
                         </div>
                     </div>
                 </div>
-                
-                <!-- 右侧执行结果 -->
-                <div class="result-panel">
-                    <div class="panel-header">
-                        <div class="panel-title">📊 执行结果</div>
-                        <div class="panel-actions">
-                            <button class="panel-btn save" onclick="saveResult()">💾 保存结果</button>
-                            <button class="panel-btn clear" onclick="clearResult()">🗑️ 清空</button>
-                        </div>
+            </div>
+            
+            <!-- 右边执行日志区域 -->
+            <div class="log-area">
+                <div class="panel-header">
+                    <div class="panel-title">📋 执行日志</div>
+                    <div class="panel-actions">
+                        <button class="panel-btn" onclick="toggleAutoScroll()" id="autoScrollBtn">📜 自动滚动</button>
+                        <button class="panel-btn save" onclick="saveLog()">💾 保存日志</button>
+                        <button class="panel-btn clear" onclick="clearLog()">🗑️ 清空</button>
                     </div>
-                    <div class="panel-content">
-                        <div class="result-content" id="resultContent">
-                            <div style="text-align: center; color: #666; padding: 40px 20px;">
-                                等待执行CURL命令...
-                            </div>
+                </div>
+                <div class="panel-content">
+                    <div class="log-content" id="logContent">
+                        <div class="log-message info">
+                            <span class="log-time">[系统]</span>
+                            <span class="log-type">INFO</span>
+                            CURL测试工具已启动，支持HTTP/HTTPS请求测试
                         </div>
                     </div>
                 </div>
