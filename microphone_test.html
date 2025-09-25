@@ -201,6 +201,43 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         
+        .collapsible-header {
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .collapsible-header:hover {
+            color: #667eea;
+        }
+        
+        .toggle-icon {
+            transition: transform 0.3s ease;
+            font-size: 0.8em;
+            color: #666;
+        }
+        
+        .device-list {
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            overflow: hidden;
+            max-height: 500px;
+            opacity: 1;
+        }
+        
+        .device-list.collapsed {
+            max-height: 0;
+            opacity: 0;
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+        
+        .toggle-icon.rotated {
+            transform: rotate(-90deg);
+        }
+        
         .audio-player {
             background: #fff;
             border-radius: 15px;
@@ -244,6 +281,22 @@
             border-radius: 15px;
             cursor: pointer;
             font-size: 0.9em;
+        }
+        
+        .save-btn {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: 5px;
+            transition: background 0.3s ease;
+        }
+        
+        .save-btn:hover {
+            background: #138496;
         }
         
         .delete-btn {
@@ -327,8 +380,10 @@
                     </select>
                 </div>
             </div>
-            <div class="device-title">📋 设备详细信息</div>
-            <div class="device-list" id="deviceList">
+            <div class="device-title collapsible-header" onclick="toggleDeviceList()">
+                📋 设备详细信息 <span id="deviceListToggle" class="toggle-icon">▼</span>
+            </div>
+            <div class="device-list collapsed" id="deviceList">
                 <div style="text-align: center; color: #666;">正在检测音频设备...</div>
             </div>
         </div>
@@ -347,7 +402,9 @@
             2. 绿色表示麦克风正常，红色表示无信号或权限被拒绝<br>
             3. 说话时音量条会实时显示声音强度<br>
             4. 可以录制音频并回放测试音质效果<br>
-            5. 如果没有声音，请检查系统音频设置和浏览器权限
+            5. 点击"💾 保存"按钮可将录音下载到本地<br>
+            6. 点击"📋 设备详细信息"可展开/折叠设备列表<br>
+            7. 如果没有声音，请检查系统音频设置和浏览器权限
         </div>
     </div>
 
@@ -368,8 +425,8 @@
         
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', function() {
-            refreshDevices();
             checkMicrophoneSupport();
+            refreshDevices();
         });
         
         // 检查浏览器支持
@@ -377,7 +434,7 @@
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 updateStatus('disconnected', '浏览器不支持麦克风功能');
                 document.getElementById('permissionText').textContent = '您的浏览器不支持麦克风访问';
-                document.getElementById('startBtn').disabled = true;
+                document.getElementById('toggleBtn').disabled = true;
                 return false;
             }
             return true;
@@ -604,6 +661,7 @@
                     </div>
                     <div>
                         <button class="play-btn" onclick="playRecording(${index})">▶️ 播放</button>
+                        <button class="save-btn" onclick="saveRecording(${index})">💾 保存</button>
                         <button class="delete-btn" onclick="deleteRecording(${index})">🗑️ 删除</button>
                     </div>
                 </div>
@@ -650,6 +708,56 @@
             }
         }
         
+        // 保存录音到本地
+        function saveRecording(index) {
+            try {
+                const recording = recordings[index];
+                
+                // 获取文件扩展名
+                let extension = 'webm';
+                if (recording.mimeType) {
+                    if (recording.mimeType.includes('audio/mp4')) extension = 'm4a';
+                    else if (recording.mimeType.includes('audio/ogg')) extension = 'ogg';
+                    else if (recording.mimeType.includes('audio/wav')) extension = 'wav';
+                    else if (recording.mimeType.includes('audio/webm')) extension = 'webm';
+                }
+                
+                // 生成文件名（使用时间戳）
+                const date = new Date();
+                const filename = `录音_${date.getFullYear()}${(date.getMonth()+1).toString().padStart(2,'0')}${date.getDate().toString().padStart(2,'0')}_${date.getHours().toString().padStart(2,'0')}${date.getMinutes().toString().padStart(2,'0')}${date.getSeconds().toString().padStart(2,'0')}.${extension}`;
+                
+                // 创建下载链接
+                const a = document.createElement('a');
+                a.href = recording.url;
+                a.download = filename;
+                a.style.display = 'none';
+                
+                // 添加到DOM，触发下载，然后移除
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                
+                // 显示成功反馈
+                const saveButtons = document.querySelectorAll('.save-btn');
+                const currentButton = saveButtons[index];
+                const originalText = currentButton.textContent;
+                
+                currentButton.textContent = '✅ 已保存';
+                currentButton.disabled = true;
+                
+                setTimeout(() => {
+                    currentButton.textContent = originalText;
+                    currentButton.disabled = false;
+                }, 2000);
+                
+                console.log(`录音已保存为: ${filename}`);
+                
+            } catch (error) {
+                console.error('保存录音失败:', error);
+                alert('保存录音失败，请重试');
+            }
+        }
+        
         // 删除录音
         function deleteRecording(index) {
             URL.revokeObjectURL(recordings[index].url);
@@ -678,10 +786,31 @@
                     inputSelect.appendChild(option);
                 });
                 
-                // 设置默认输入设备（第一个设备）
+                // 设置默认输入设备（优先选择以"默认"开头的设备）
                 if (audioInputs.length > 0 && !currentInputDeviceId) {
-                    currentInputDeviceId = audioInputs[0].deviceId;
+                    let defaultDevice = null;
+                    
+                    // 查找以"默认"开头的设备
+                    for (const device of audioInputs) {
+                        const label = (device.label || '').toLowerCase();
+                        if (label.startsWith('默认') || label.startsWith('default') || 
+                            label.includes('default device') || label.includes('默认设备')) {
+                            defaultDevice = device;
+                            break;
+                        }
+                    }
+                    
+                    // 如果没找到"默认"设备，使用第一个设备
+                    if (!defaultDevice) {
+                        defaultDevice = audioInputs[0];
+                    }
+                    
+                    currentInputDeviceId = defaultDevice.deviceId;
                     inputSelect.value = currentInputDeviceId;
+                    
+                    if (defaultDevice !== audioInputs[0]) {
+                        console.log('优先选择的默认输入设备:', defaultDevice.label);
+                    }
                 }
                 
                 // 更新输出设备选择器
@@ -698,10 +827,31 @@
                     outputSelect.appendChild(option);
                 });
                 
-                // 设置默认输出设备（第一个设备）
+                // 设置默认输出设备（优先选择以"默认"开头的设备）
                 if (audioOutputs.length > 0 && !currentOutputDeviceId) {
-                    currentOutputDeviceId = audioOutputs[0].deviceId;
+                    let defaultDevice = null;
+                    
+                    // 查找以"默认"开头的设备
+                    for (const device of audioOutputs) {
+                        const label = (device.label || '').toLowerCase();
+                        if (label.startsWith('默认') || label.startsWith('default') || 
+                            label.includes('default device') || label.includes('默认设备')) {
+                            defaultDevice = device;
+                            break;
+                        }
+                    }
+                    
+                    // 如果没找到"默认"设备，使用第一个设备
+                    if (!defaultDevice) {
+                        defaultDevice = audioOutputs[0];
+                    }
+                    
+                    currentOutputDeviceId = defaultDevice.deviceId;
                     outputSelect.value = currentOutputDeviceId;
+                    
+                    if (defaultDevice !== audioOutputs[0]) {
+                        console.log('优先选择的默认输出设备:', defaultDevice.label);
+                    }
                 }
                 
                 // 更新设备详细信息显示
@@ -746,6 +896,22 @@
         function changeOutputDevice() {
             const select = document.getElementById('outputDevice');
             currentOutputDeviceId = select.value;
+        }
+        
+        // 切换设备详细信息的显示/隐藏
+        function toggleDeviceList() {
+            const deviceList = document.getElementById('deviceList');
+            const toggleIcon = document.getElementById('deviceListToggle');
+            
+            if (deviceList.classList.contains('collapsed')) {
+                deviceList.classList.remove('collapsed');
+                toggleIcon.classList.remove('rotated');
+                toggleIcon.textContent = '▼';
+            } else {
+                deviceList.classList.add('collapsed');
+                toggleIcon.classList.add('rotated');
+                toggleIcon.textContent = '▶';
+            }
         }
         
         // 更新状态显示
