@@ -155,9 +155,6 @@
             content: "🎙️";
         }
         
-        .nav-link[data-page="voice-debug"]::before {
-            content: "🔧";
-        }
         
         .nav-link[data-page="welcome"]::before {
             content: "🏠";
@@ -394,9 +391,6 @@
                 <li class="nav-item">
                     <a href="#" class="nav-link" data-page="microphone">麦克风功能测试</a>
                 </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" data-page="voice-debug">麦克风功能诊断</a>
-                </li>
             </ul>
         </nav>
         
@@ -425,11 +419,6 @@
                         <div class="feature-title">麦克风功能测试</div>
                         <div class="feature-desc">测试麦克风设备状态、音频输入和录制功能</div>
                     </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">🔧</div>
-                        <div class="feature-title">麦克风功能诊断</div>
-                        <div class="feature-desc">Chrome浏览器语音聊天调试工具，诊断音频问题</div>
-                    </div>
                 </div>
             </div>
             
@@ -442,8 +431,6 @@
             <!-- 麦克风功能测试 -->
             <iframe id="microphoneFrame" src="microphone_test.html"></iframe>
             
-            <!-- 麦克风功能诊断 -->
-            <iframe id="voiceDebugFrame" src="chrome_voice_chat_debug.html"></iframe>
             
             <!-- 加载中页面 -->
             <div class="loading" id="loadingPage" style="display: none;">
@@ -509,8 +496,7 @@
             const frameMap = {
                 'network': 'networkFrame',
                 'ip': 'ipFrame',
-                'microphone': 'microphoneFrame',
-                'voice-debug': 'voiceDebugFrame'
+                'microphone': 'microphoneFrame'
             };
             return frameMap[page];
         }
@@ -562,10 +548,6 @@
                     case '4':
                         e.preventDefault();
                         document.querySelector('[data-page="microphone"]').click();
-                        break;
-                    case '5':
-                        e.preventDefault();
-                        document.querySelector('[data-page="voice-debug"]').click();
                         break;
                 }
             }
