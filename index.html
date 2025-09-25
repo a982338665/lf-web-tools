@@ -159,6 +159,10 @@
             content: "📷";
         }
         
+        .nav-link[data-page="socket"]::before {
+            content: "🔌";
+        }
+        
         
         .nav-link[data-page="welcome"]::before {
             content: "🏠";
@@ -398,6 +402,9 @@
                 <li class="nav-item">
                     <a href="#" class="nav-link" data-page="camera">摄像头功能测试</a>
                 </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="socket">Socket测试网页</a>
+                </li>
             </ul>
         </nav>
         
@@ -431,6 +438,11 @@
                         <div class="feature-title">摄像头功能测试</div>
                         <div class="feature-desc">测试摄像头设备状态、拍照、录像和录音功能</div>
                     </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔌</div>
+                        <div class="feature-title">Socket测试网页</div>
+                        <div class="feature-desc">WebSocket连接测试，支持ws://和wss://协议，实时消息通信</div>
+                    </div>
                 </div>
             </div>
             
@@ -445,6 +457,9 @@
             
             <!-- 摄像头功能测试 -->
             <iframe id="cameraFrame" src="camera_test.html"></iframe>
+            
+            <!-- Socket测试网页 -->
+            <iframe id="socketFrame" src="socket_test.html"></iframe>
             
             
             <!-- 加载中页面 -->
@@ -512,7 +527,8 @@
                 'network': 'networkFrame',
                 'ip': 'ipFrame',
                 'microphone': 'microphoneFrame',
-                'camera': 'cameraFrame'
+                'camera': 'cameraFrame',
+                'socket': 'socketFrame'
             };
             return frameMap[page];
         }
@@ -568,6 +584,10 @@
                     case '5':
                         e.preventDefault();
                         document.querySelector('[data-page="camera"]').click();
+                        break;
+                    case '6':
+                        e.preventDefault();
+                        document.querySelector('[data-page="socket"]').click();
                         break;
                 }
             }

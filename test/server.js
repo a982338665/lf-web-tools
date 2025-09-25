@@ -8,7 +8,7 @@ const wss = new WebSocket.Server({ port: 3000 });
 
 wss.on('connection', function connection(ws, req) {
     console.log('📡 WebSocket客户端连接成功 (端口3000)');
-    
+
     // 发送欢迎消息
     ws.send(JSON.stringify({
         type: 'welcome',
@@ -16,8 +16,8 @@ wss.on('connection', function connection(ws, req) {
         port: 3000,
         timestamp: new Date().toISOString()
     }));
-    
-    // 心跳机制
+
+    // 心跳机制,5s,改为500ms测试
     const heartbeat = setInterval(() => {
         if (ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({
@@ -26,12 +26,12 @@ wss.on('connection', function connection(ws, req) {
                 timestamp: new Date().toISOString()
             }));
         }
-    }, 5000);
-    
+    }, 500);
+
     // 处理接收到的消息
     ws.on('message', function incoming(message) {
         console.log('📨 WebSocket收到消息:', message.toString());
-        
+
         // 回显消息
         ws.send(JSON.stringify({
             type: 'echo',
@@ -39,13 +39,13 @@ wss.on('connection', function connection(ws, req) {
             timestamp: new Date().toISOString()
         }));
     });
-    
+
     // 连接关闭时清理
     ws.on('close', function close() {
         console.log('🔌 WebSocket客户端断开连接');
         clearInterval(heartbeat);
     });
-    
+
     ws.on('error', function error(err) {
         console.error('❌ WebSocket错误:', err);
         clearInterval(heartbeat);
@@ -59,20 +59,20 @@ console.log('   连接地址: ws://localhost:3000\n');
 const server8080 = http.createServer((req, res) => {
     const url = req.url;
     const method = req.method;
-    
+
     console.log(`📤 HTTP 8080 请求: ${method} ${url}`);
-    
+
     // 设置CORS头
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    
+
     if (method === 'OPTIONS') {
         res.writeHead(200);
         res.end();
         return;
     }
-    
+
     if (url === '/' || url === '/index.html') {
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
         res.end(`
@@ -136,20 +136,20 @@ server8080.listen(8080, () => {
 const server8000 = http.createServer((req, res) => {
     const url = req.url;
     const method = req.method;
-    
+
     console.log(`📤 HTTP 8000 请求: ${method} ${url}`);
-    
+
     // 设置CORS头
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    
+
     if (method === 'OPTIONS') {
         res.writeHead(200);
         res.end();
         return;
     }
-    
+
     if (url === '/' || url === '/index.html') {
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
         res.end(`
@@ -224,15 +224,15 @@ process.on('unhandledRejection', (reason, promise) => {
 // ========== 优雅关闭 ==========
 process.on('SIGINT', () => {
     console.log('\n🛑 收到终止信号，正在关闭服务器...');
-    
+
     wss.close(() => {
         console.log('✅ WebSocket服务器已关闭');
     });
-    
+
     server8080.close(() => {
         console.log('✅ HTTP服务器8080已关闭');
     });
-    
+
     server8000.close(() => {
         console.log('✅ HTTP服务器8000已关闭');
         process.exit(0);
