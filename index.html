@@ -163,6 +163,10 @@
             content: "🔌";
         }
         
+        .nav-link[data-page="curl"]::before {
+            content: "🌍";
+        }
+        
         
         .nav-link[data-page="welcome"]::before {
             content: "🏠";
@@ -405,6 +409,9 @@
                 <li class="nav-item">
                     <a href="#" class="nav-link" data-page="socket">Socket测试网页</a>
                 </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="curl">CURL测试网页</a>
+                </li>
             </ul>
         </nav>
         
@@ -443,6 +450,11 @@
                         <div class="feature-title">Socket测试网页</div>
                         <div class="feature-desc">WebSocket连接测试，支持ws://和wss://协议，实时消息通信</div>
                     </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🌍</div>
+                        <div class="feature-title">CURL测试网页</div>
+                        <div class="feature-desc">解析并执行CURL命令，支持HTTP/HTTPS请求测试，显示响应结果</div>
+                    </div>
                 </div>
             </div>
             
@@ -460,6 +472,9 @@
             
             <!-- Socket测试网页 -->
             <iframe id="socketFrame" src="socket_test.html"></iframe>
+            
+            <!-- CURL测试网页 -->
+            <iframe id="curlFrame" src="curl_test.html"></iframe>
             
             
             <!-- 加载中页面 -->
@@ -528,7 +543,8 @@
                 'ip': 'ipFrame',
                 'microphone': 'microphoneFrame',
                 'camera': 'cameraFrame',
-                'socket': 'socketFrame'
+                'socket': 'socketFrame',
+                'curl': 'curlFrame'
             };
             return frameMap[page];
         }
@@ -588,6 +604,10 @@
                     case '6':
                         e.preventDefault();
                         document.querySelector('[data-page="socket"]').click();
+                        break;
+                    case '7':
+                        e.preventDefault();
+                        document.querySelector('[data-page="curl"]').click();
                         break;
                 }
             }
