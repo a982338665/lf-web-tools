@@ -1,0 +1,94 @@
+# Gin CORS Proxy
+
+这是一个基于Gin框架的CORS代理服务，可以作为独立服务运行，也可以作为组件集成到现有的Gin应用中。
+
+## 功能特点
+
+- 接收curl命令并执行，解决前端跨域问题
+- 返回详细的执行信息，包括执行时间、响应体、响应头等
+- 支持作为独立服务运行
+- 支持作为Gin组件集成到现有应用
+
+## 使用方法
+
+### 作为独立服务运行
+
+1. 直接运行启动脚本：
+
+```bash
+./start.bat  # Windows
+```
+
+或者
+
+```bash
+go run main.go  # 默认端口8081
+go run main.go -port=8082  # 自定义端口
+```
+
+2. 向服务发送请求：
+
+```
+POST http://localhost:8081/cors-proxy
+Content-Type: application/json
+
+{
+  "curlParam": "curl -X GET https://httpbin.org/get"
+}
+```
+
+### 作为Gin组件集成
+
+在你的Gin应用中，导入middleware包并注册路由：
+
+```go
+import "github.com/lf-web-tools/gin-cors-proxy/middleware"
+
+func main() {
+    r := gin.Default()
+    
+    // 注册CORS代理路由
+    middleware.RegisterCorsProxyRoutes(r)
+    
+    // 你的其他路由...
+    
+    r.Run(":8080")
+}
+```
+
+## API 说明
+
+### 请求
+
+- 路径: `/cors-proxy`
+- 方法: `POST`
+- 内容类型: `application/json`
+- 请求体:
+
+```json
+{
+  "curlParam": "curl -X GET https://httpbin.org/get"
+}
+```
+
+### 响应
+
+```json
+{
+  "executionTime": "235.0394ms",
+  "exitCode": 0,
+  "result": "HTTP/1.1 200 OK\nContent-Type: application/json\n...",
+  "responseBody": "{\n  \"args\": {}, \n  \"headers\": {...}, \n  \"origin\": \"...\", \n  \"url\": \"https://httpbin.org/get\"\n}\n",
+  "responseHeaders": {
+    "Content-Type": "application/json",
+    "Date": "...",
+    "Content-Length": "..."
+  }
+}
+```
+
+## 注意事项
+
+- 服务器需要安装curl命令行工具
+- 为安全起见，建议在内部网络或受信任的环境中使用
+- 默认情况下，服务允许所有来源的CORS请求

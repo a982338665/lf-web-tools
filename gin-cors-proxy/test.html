@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gin CORS Proxy 测试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            font-family: monospace;
+            padding: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ccc;
+        }
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            margin-right: 5px;
+        }
+        .tab.active {
+            background-color: #ddd;
+            border-bottom: 2px solid #4CAF50;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gin CORS Proxy 测试页面</h1>
+    <div class="container">
+        <div>
+            <h3>输入curl命令：</h3>
+            <textarea id="curlInput" placeholder="例如: curl -X GET https://httpbin.org/get">curl -X GET https://httpbin.org/get</textarea>
+        </div>
+        <div>
+            <button id="sendButton">发送请求</button>
+        </div>
+        <div>
+            <h3>结果：</h3>
+            <div class="tabs">
+                <div class="tab active" data-tab="result">执行结果</div>
+                <div class="tab" data-tab="body">响应体</div>
+                <div class="tab" data-tab="headers">响应头</div>
+                <div class="tab" data-tab="info">执行信息</div>
+            </div>
+            <div class="tab-content active" data-tab="result">
+                <pre id="resultOutput">等待执行...</pre>
+            </div>
+            <div class="tab-content" data-tab="body">
+                <pre id="bodyOutput">等待执行...</pre>
+            </div>
+            <div class="tab-content" data-tab="headers">
+                <pre id="headersOutput">等待执行...</pre>
+            </div>
+            <div class="tab-content" data-tab="info">
+                <pre id="infoOutput">等待执行...</pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const curlInput = document.getElementById('curlInput');
+            const sendButton = document.getElementById('sendButton');
+            const resultOutput = document.getElementById('resultOutput');
+            const bodyOutput = document.getElementById('bodyOutput');
+            const headersOutput = document.getElementById('headersOutput');
+            const infoOutput = document.getElementById('infoOutput');
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            // 处理标签页切换
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    
+                    // 更新标签页状态
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // 更新内容显示
+                    tabContents.forEach(content => {
+                        if (content.getAttribute('data-tab') === tabId) {
+                            content.classList.add('active');
+                        } else {
+                            content.classList.remove('active');
+                        }
+                    });
+                });
+            });
+
+            // 发送请求
+            sendButton.addEventListener('click', async () => {
+                const curlParam = curlInput.value.trim();
+                
+                if (!curlParam) {
+                    alert('请输入curl命令');
+                    return;
+                }
+
+                try {
+                    // 更新UI状态
+                    sendButton.disabled = true;
+                    sendButton.textContent = '请求中...';
+                    resultOutput.textContent = '正在执行...';
+                    bodyOutput.textContent = '正在执行...';
+                    headersOutput.textContent = '正在执行...';
+                    infoOutput.textContent = '正在执行...';
+
+                    // 发送请求到代理服务器
+                    const response = await fetch('http://localhost:8081/cors-proxy', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ curlParam }),
+                    });
+
+                    const data = await response.json();
+                    
+                    // 更新结果显示
+                    resultOutput.textContent = data.result || '无结果';
+                    bodyOutput.textContent = data.responseBody || '无响应体';
+                    
+                    // 格式化响应头
+                    const headersText = data.responseHeaders ? 
+                        Object.entries(data.responseHeaders)
+                            .map(([key, value]) => `${key}: ${value}`)
+                            .join('\n') : 
+                        '无响应头';
+                    headersOutput.textContent = headersText;
+                    
+                    // 格式化执行信息
+                    infoOutput.textContent = `执行时间: ${data.executionTime || 'N/A'}
+退出代码: ${data.exitCode !== undefined ? data.exitCode : 'N/A'}
+${data.error ? '错误: ' + data.error : ''}`;
+                    
+                } catch (error) {
+                    resultOutput.textContent = `请求错误: ${error.message}`;
+                    bodyOutput.textContent = '请求失败';
+                    headersOutput.textContent = '请求失败';
+                    infoOutput.textContent = `错误: ${error.message}`;
+                } finally {
+                    sendButton.disabled = false;
+                    sendButton.textContent = '发送请求';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
