@@ -10,7 +10,7 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -19,7 +19,7 @@
             font-size: 14px;
             overflow-x: auto;
         }
-        
+
         .container {
             position: fixed;
             top: 8px;
@@ -33,7 +33,7 @@
             display: flex;
             flex-direction: column;
         }
-        
+
         h1 {
             text-align: center;
             color: #333;
@@ -42,24 +42,24 @@
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
             flex-shrink: 0;
         }
-        
+
         h1::before {
             content: "🌍";
             margin-right: 15px;
         }
-        
+
         .main-layout {
             flex: 1;
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 280px 1fr;
-            grid-template-areas: 
+            grid-template-areas:
                 "command log"
                 "result log";
             gap: 15px;
             min-height: 0;
         }
-        
+
         /* 左上命令输入区域 */
         .command-panel {
             grid-area: command;
@@ -71,14 +71,14 @@
             display: flex;
             flex-direction: column;
         }
-        
+
         .command-section {
             flex: 1;
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
-        
+
         .section-title {
             font-size: 0.9em;
             font-weight: bold;
@@ -91,7 +91,7 @@
             height: 30px;
             flex-shrink: 0;
         }
-        
+
         .command-input-group {
             display: flex;
             gap: 10px;
@@ -99,7 +99,7 @@
             flex: 1;
             min-height: 0;
         }
-        
+
         .command-input {
             flex: 1;
             padding: 10px 12px;
@@ -114,14 +114,14 @@
             overflow-y: auto;
             word-wrap: break-word;
         }
-        
+
         .command-input:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
             background-color: white;
         }
-        
+
         .execute-btn {
             background: linear-gradient(45deg, #28a745, #20c997);
             color: white;
@@ -136,19 +136,19 @@
             width: 100px;
             flex-shrink: 0;
         }
-        
+
         .execute-btn:hover {
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
         }
-        
+
         .execute-btn:disabled {
             background: #6c757d;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
-        
+
         .quick-commands {
             display: flex;
             gap: 8px;
@@ -158,22 +158,32 @@
             overflow-y: auto;
             flex-shrink: 0;
         }
-        
+
         .quick-cmd {
             background: #f8f9fa;
             border: 1px solid #dee2e6;
-            padding: 4px 8px;
+            padding: 6px 10px;
             border-radius: 4px;
             cursor: pointer;
             font-size: 0.8em;
+            font-weight: 500;
             font-family: 'Courier New', monospace;
             transition: all 0.3s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
-        
+
         .quick-cmd:hover {
             background: #e9ecef;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        
+
+        .quick-cmd:active, .quick-cmd.active {
+            background: #e3f2fd;
+            border-color: #2196f3;
+            transform: translateY(0);
+        }
+
         .status-bar {
             padding: 8px 12px;
             border-radius: 6px;
@@ -184,27 +194,27 @@
             height: 30px;
             flex-shrink: 0;
         }
-        
+
         .status-ready {
             background: #e3f2fd;
             color: #1976d2;
         }
-        
+
         .status-executing {
             background: #fff3cd;
             color: #856404;
         }
-        
+
         .status-success {
             background: #d4edda;
             color: #155724;
         }
-        
+
         .status-error {
             background: #f8d7da;
             color: #721c24;
         }
-        
+
         /* 左下执行结果区域 */
         .result-area {
             grid-area: result;
@@ -215,7 +225,7 @@
             flex-direction: column;
             overflow: hidden;
         }
-        
+
         /* 右边执行日志区域 */
         .log-area {
             grid-area: log;
@@ -226,7 +236,7 @@
             flex-direction: column;
             overflow: hidden;
         }
-        
+
         .panel-header {
             padding: 15px;
             border-bottom: 1px solid #e9ecef;
@@ -236,18 +246,18 @@
             background: #f8f9fa;
             border-radius: 10px 10px 0 0;
         }
-        
+
         .panel-title {
             font-size: 1em;
             font-weight: bold;
             color: #333;
         }
-        
+
         .panel-actions {
             display: flex;
             gap: 8px;
         }
-        
+
         .panel-btn {
             background: #6c757d;
             color: white;
@@ -258,27 +268,27 @@
             font-size: 0.8em;
             transition: background 0.3s;
         }
-        
+
         .panel-btn:hover {
             background: #5a6268;
         }
-        
+
         .panel-btn.save {
             background: #28a745;
         }
-        
+
         .panel-btn.save:hover {
             background: #218838;
         }
-        
+
         .panel-btn.clear {
             background: #dc3545;
         }
-        
+
         .panel-btn.clear:hover {
             background: #c82333;
         }
-        
+
         .panel-content {
             flex: 1;
             overflow: hidden;
@@ -286,7 +296,7 @@
             flex-direction: column;
             min-height: 0;
         }
-        
+
         .result-content {
             flex: 1;
             overflow-y: auto;
@@ -298,7 +308,7 @@
             background: #f8f9fa;
             max-height: 100%;
         }
-        
+
         .log-content {
             flex: 1;
             overflow-y: auto;
@@ -310,18 +320,18 @@
             background: #f8f9fa;
             max-height: 100%;
         }
-        
+
         .result-section {
             margin-bottom: 20px;
             padding-bottom: 15px;
             border-bottom: 1px solid #e9ecef;
         }
-        
+
         .result-section:last-child {
             border-bottom: none;
             margin-bottom: 0;
         }
-        
+
         .result-title {
             font-weight: bold;
             color: #333;
@@ -331,7 +341,7 @@
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .format-btn {
             background: #667eea;
             color: white;
@@ -342,11 +352,11 @@
             font-size: 0.7em;
             transition: background 0.3s;
         }
-        
+
         .format-btn:hover {
             background: #5a6fd8;
         }
-        
+
         .result-data {
             background: white;
             padding: 10px;
@@ -358,7 +368,7 @@
             overflow-y: auto;
             overflow-x: auto;
         }
-        
+
         .log-message {
             margin-bottom: 8px;
             padding: 6px 8px;
@@ -366,39 +376,39 @@
             background: white;
             border-left: 3px solid #6c757d;
         }
-        
+
         .log-message.info {
             border-left-color: #17a2b8;
             background: #e7f3ff;
         }
-        
+
         .log-message.success {
             border-left-color: #28a745;
             background: #eaf5ea;
         }
-        
+
         .log-message.warning {
             border-left-color: #ffc107;
             background: #fff8e1;
         }
-        
+
         .log-message.error {
             border-left-color: #dc3545;
             background: #ffeaea;
         }
-        
+
         .log-time {
             color: #666;
             font-size: 0.9em;
             margin-right: 8px;
         }
-        
+
         .log-type {
             font-weight: bold;
             margin-right: 8px;
             text-transform: uppercase;
         }
-        
+
         .timing-info {
             background: #e3f2fd;
             border: 1px solid #2196f3;
@@ -407,7 +417,7 @@
             margin-bottom: 10px;
             font-size: 0.8em;
         }
-        
+
         .status-code {
             display: inline-block;
             padding: 2px 6px;
@@ -416,27 +426,27 @@
             font-size: 0.8em;
             margin-right: 8px;
         }
-        
+
         .status-2xx {
             background: #d4edda;
             color: #155724;
         }
-        
+
         .status-3xx {
             background: #fff3cd;
             color: #856404;
         }
-        
+
         .status-4xx {
             background: #f8d7da;
             color: #721c24;
         }
-        
+
         .status-5xx {
             background: #f8d7da;
             color: #721c24;
         }
-        
+
         /* 模态框样式 */
         .modal {
             display: none;
@@ -449,7 +459,7 @@
             background-color: rgba(0, 0, 0, 0.8);
             animation: fadeIn 0.3s ease;
         }
-        
+
         .modal-content {
             position: relative;
             margin: 2% auto;
@@ -464,7 +474,7 @@
             display: flex;
             flex-direction: column;
         }
-        
+
         .modal-header {
             padding: 15px 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -474,12 +484,12 @@
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .modal-title {
             font-size: 1.1em;
             font-weight: bold;
         }
-        
+
         .modal-close {
             background: rgba(255, 255, 255, 0.2);
             border: none;
@@ -490,11 +500,11 @@
             font-weight: bold;
             transition: background 0.3s;
         }
-        
+
         .modal-close:hover {
             background: rgba(255, 255, 255, 0.3);
         }
-        
+
         .modal-body {
             flex: 1;
             padding: 20px;
@@ -504,7 +514,7 @@
             line-height: 1.5;
             background: #f8f9fa;
         }
-        
+
         .formatted-content {
             background: white;
             padding: 15px;
@@ -513,17 +523,17 @@
             white-space: pre-wrap;
             word-break: break-all;
         }
-        
+
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
-        
+
         @keyframes slideIn {
             from { transform: translateY(-50px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-        
+
         /* CORS提示工具提示 */
         .cors-tooltip {
             position: absolute;
@@ -544,14 +554,14 @@
             transition: all 0.3s ease;
             pointer-events: none;
         }
-        
+
         /* 向上显示的tooltip */
         .cors-tooltip-up {
             top: auto;
             bottom: 25px;
             transform: translateY(10px);
         }
-        
+
         .cors-tooltip::before {
             content: '';
             position: absolute;
@@ -563,7 +573,7 @@
             border-right: 6px solid transparent;
             border-bottom: 6px solid #ffc107;
         }
-        
+
         .cors-tooltip::after {
             content: '';
             position: absolute;
@@ -575,7 +585,7 @@
             border-right: 5px solid transparent;
             border-bottom: 5px solid #fff3cd;
         }
-        
+
         /* 向上显示的tooltip箭头 */
         .cors-tooltip-up::before {
             top: auto;
@@ -583,14 +593,14 @@
             border-bottom: none;
             border-top: 6px solid #ffc107;
         }
-        
+
         .cors-tooltip-up::after {
             top: auto;
             bottom: -5px;
             border-bottom: none;
             border-top: 5px solid #fff3cd;
         }
-        
+
         /* 悬停时显示tooltip */
         .cors-tooltip-container:hover .cors-tooltip {
             opacity: 1;
@@ -598,42 +608,42 @@
             transform: translateY(0);
             pointer-events: auto;
         }
-        
+
         .cors-tooltip-container:hover .cors-tooltip-up {
             transform: translateY(0);
         }
-        
+
         /* 响应式设计 */
         @media (max-width: 768px) {
             .main-layout {
                 grid-template-columns: 1fr;
-                grid-template-areas: 
+                grid-template-areas:
                     "command"
                     "result"
                     "log";
                 height: auto;
             }
-            
+
             .command-input-group {
                 flex-direction: column;
             }
-            
+
             .execute-btn {
                 height: auto;
                 width: 100%;
                 min-height: 50px;
             }
-            
+
             .command-input {
                 height: 100px;
                 max-height: 100px;
             }
-            
+
             .result-area, .log-area {
                 max-height: 400px;
                 min-height: 300px;
             }
-            
+
             /* 移动端tooltip调整 */
             .cors-tooltip {
                 width: 280px;
@@ -646,7 +656,7 @@
 <body>
     <div class="container">
         <h1>CURL测试网页</h1>
-        
+
         <div class="main-layout">
             <!-- 顶部命令输入区域 -->
             <div class="command-panel">
@@ -655,7 +665,7 @@
                         🚀 CURL命令执行
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <div class="cors-tooltip-container" style="position: relative; display: inline-block;">
-                                <span style="color: #856404; cursor: help; text-decoration: underline dotted; font-size: 0.8em;" 
+                                <span style="color: #856404; cursor: help; text-decoration: underline dotted; font-size: 0.8em;"
                                       title="鼠标悬停查看CORS解决方案">
                                     ⚠️ CORS跨域提示
                                 </span>
@@ -676,7 +686,7 @@
                             <button class="format-btn" onclick="formatInputCommand()" id="formatInputBtn" disabled>🎨 格式化</button>
                         </div>
                     </div>
-                    
+
                     <div class="command-input-group">
                         <textarea class="command-input" id="curlCommand" placeholder="输入CURL命令，例如：
 curl -X GET https://api.github.com/users/octocat
@@ -684,23 +694,23 @@ curl -X POST -H 'Content-Type: application/json' -d '{\"name\":\"test\"}' https:
 curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET https://httpbin.org/get</textarea>
                         <button class="execute-btn" id="executeBtn" onclick="executeCurl()">🚀 执行</button>
                     </div>
-                    
+
                     <div class="quick-commands">
                         <button class="quick-cmd" onclick="setQuickCommand('curl -X GET https://httpbin.org/get')">GET测试</button>
-                        <button class="quick-cmd" onclick="setQuickCommand('curl -X POST -H \'Content-Type: application/json\' --data-raw \'{\"test\":\"data\"}\' https://httpbin.org/post')">POST测试</button>
+                        <button class="quick-cmd" onclick="setQuickCommand('curl -X POST -H \'Content-Type: application/json\' --data-raw \'{&quot;test&quot;:&quot;data&quot;}\' https://httpbin.org/post')">POST测试</button>
                         <button class="quick-cmd" onclick="setQuickCommand('curl -H \'User-Agent: MyApp/1.0\' https://httpbin.org/headers')">Headers测试</button>
                         <button class="quick-cmd" onclick="setQuickCommand('curl -X PUT --data-raw \'update data\' https://httpbin.org/put')">PUT测试</button>
                         <button class="quick-cmd" onclick="setQuickCommand('curl -X DELETE https://httpbin.org/delete')">DELETE测试</button>
                         <button class="quick-cmd" onclick="setQuickCommand('curl -I https://httpbin.org/get')">HEAD测试</button>
                     </div>
-                    
-                    
+
+
                     <div class="status-bar" id="statusBar">
                         🟢 就绪 - 输入CURL命令并点击执行
                     </div>
                 </div>
             </div>
-            
+
             <!-- 左下执行结果区域 -->
             <div class="result-area">
                 <div class="panel-header">
@@ -718,7 +728,7 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                     </div>
                 </div>
             </div>
-            
+
             <!-- 右边执行日志区域 -->
             <div class="log-area">
                 <div class="panel-header">
@@ -761,7 +771,7 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
         let autoScroll = true;
         let currentRequest = null;
         let executionHistory = [];
-        
+
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', function() {
             // 监听Ctrl+Enter执行命令
@@ -772,36 +782,36 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                     executeCurl();
                 }
             });
-            
+
             // 监听命令输入变化，控制格式化按钮状态
             curlInput.addEventListener('input', function() {
                 const formatBtn = document.getElementById('formatInputBtn');
                 const hasCommand = this.value.trim().length > 0 && this.value.trim().startsWith('curl');
                 formatBtn.disabled = !hasCommand;
             });
-            
+
             // 监听ESC键关闭模态框
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     closeModal();
                 }
             });
-            
+
             // 点击模态框背景关闭
             document.getElementById('formatModal').addEventListener('click', function(e) {
                 if (e.target === this) {
                     closeModal();
                 }
             });
-            
+
             // 初始化格式化按钮状态
             const initialCommand = document.getElementById('curlCommand').value.trim();
             const formatBtn = document.getElementById('formatInputBtn');
             formatBtn.disabled = !(initialCommand.length > 0 && initialCommand.startsWith('curl'));
-            
+
             logMessage('info', 'CURL测试工具初始化完成');
         });
-        
+
         // 设置快速命令
         function setQuickCommand(command) {
             try {
@@ -810,46 +820,57 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                     console.error('找不到命令输入框');
                     return;
                 }
-                
+
+                // 设置值并触发input事件
                 commandInput.value = command;
-                
+
+                // 创建并触发input事件，确保其他监听器知道值已更改
+                const inputEvent = new Event('input', { bubbles: true });
+                commandInput.dispatchEvent(inputEvent);
+
+                // 设置焦点到文本框
+                commandInput.focus();
+
                 // 更新格式化按钮状态
                 const formatBtn = document.getElementById('formatInputBtn');
                 if (formatBtn) {
                     formatBtn.disabled = false;
                 }
-                
+
+                // 高亮显示被点击的按钮
+                highlightActiveButton(command);
+
                 logMessage('success', `已设置快速命令: ${command.substring(0, 50)}...`);
                 console.log('快速命令设置成功:', command);
-                
+
             } catch (error) {
                 console.error('设置快速命令时出错:', error);
                 logMessage('error', `设置快速命令失败: ${error.message}`);
             }
         }
-        
+
         // 格式化输入的CURL命令
         function formatInputCommand() {
             const commandInput = document.getElementById('curlCommand');
             const command = commandInput.value.trim();
-            
+
             if (!command || !command.startsWith('curl')) {
                 logMessage('warning', '请输入有效的CURL命令');
                 return;
             }
-            
+
             try {
                 // 解析当前输入的命令
                 const config = parseCurlCommand(command);
-                
+
                 let formattedCommand = '';
-                
+
                 // 基本信息
                 formattedCommand += `解析结果:\n`;
                 formattedCommand += '=' .repeat(50) + '\n\n';
                 formattedCommand += `HTTP方法: ${config.method}\n`;
                 formattedCommand += `请求URL: ${config.url}\n\n`;
-                
+
                 // Headers
                 if (config.headers && Object.keys(config.headers).length > 0) {
                     formattedCommand += `请求Headers (${Object.keys(config.headers).length} 个):\n`;
@@ -859,12 +880,12 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                     });
                     formattedCommand += '\n';
                 }
-                
+
                 // 请求数据
                 if (config.data) {
                     formattedCommand += `请求数据:\n`;
                     formattedCommand += '-'.repeat(30) + '\n';
-                    
+
                     // 尝试格式化JSON数据
                     try {
                         const jsonData = JSON.parse(config.data);
@@ -873,7 +894,7 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                         formattedCommand += config.data + '\n\n';
                     }
                 }
-                
+
                 // 选项信息
                 if (config.options && Object.keys(config.options).length > 0) {
                     formattedCommand += `CURL选项:\n`;
@@ -885,67 +906,67 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                     });
                     formattedCommand += '\n';
                 }
-                
+
                 // 重构的标准命令
                 formattedCommand += `标准化命令:\n`;
                 formattedCommand += '=' .repeat(50) + '\n';
                 let standardCommand = `curl -X ${config.method}`;
-                
+
                 Object.entries(config.headers || {}).forEach(([key, value]) => {
                     standardCommand += ` \\\n  -H '${key}: ${value}'`;
                 });
-                
+
                 if (config.data) {
                     standardCommand += ` \\\n  -d '${config.data}'`;
                 }
-                
+
                 if (config.options?.followRedirects) {
                     standardCommand += ` \\\n  -L`;
                 }
-                
+
                 if (config.options?.includeHeaders) {
                     standardCommand += ` \\\n  -i`;
                 }
-                
+
                 standardCommand += ` \\\n  '${config.url}'`;
-                
+
                 formattedCommand += standardCommand;
-                
+
                 showModal('🚀 CURL命令解析与格式化', formattedCommand);
                 logMessage('info', '已显示输入命令的格式化结果');
-                
+
             } catch (error) {
                 logMessage('error', `命令解析失败: ${error.message}`);
                 showModal('❌ 命令解析错误', `解析失败: ${error.message}\n\n请检查CURL命令语法是否正确。\n\n支持的格式示例:\ncurl -X GET https://api.example.com\ncurl -H "Content-Type: application/json" -d '{"key":"value"}' https://api.example.com`);
             }
         }
-        
+
         // 执行CURL命令
         async function executeCurl() {
             const commandInput = document.getElementById('curlCommand');
             const command = commandInput.value.trim();
-            
+
             if (!command) {
                 logMessage('warning', '请输入CURL命令');
                 updateStatus('error', '❌ 命令为空');
                 return;
             }
-            
+
             if (!command.startsWith('curl')) {
                 logMessage('error', '命令必须以"curl"开头');
                 updateStatus('error', '❌ 无效命令');
                 return;
             }
-            
+
             const executeBtn = document.getElementById('executeBtn');
             executeBtn.disabled = true;
             executeBtn.textContent = '⏳ 执行中...';
-            
+
             updateStatus('executing', '🔄 正在执行...');
             logMessage('info', `开始执行: ${command}`);
-            
+
             const startTime = Date.now();
-            
+
             try {
                 // 直接使用CORS代理服务
                 const proxyResponse = await fetch('/cors-proxy', {
@@ -957,19 +978,19 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                         curlParam: command
                     })
                 });
-                
+
                 if (!proxyResponse.ok) {
                     throw new Error(`代理请求失败: ${proxyResponse.status} ${proxyResponse.statusText}`);
                 }
-                
+
                 const proxyData = await proxyResponse.json();
                 const endTime = Date.now();
                 const duration = endTime - startTime;
-                
+
                 // 解析CURL命令（仅用于显示）
                 const curlConfig = parseCurlCommand(command);
                 logMessage('success', `命令解析成功 - 方法: ${curlConfig.method}, URL: ${curlConfig.url}`);
-                
+
                 // 创建模拟响应对象
                 const response = {
                     status: proxyData.statusCode,
@@ -984,7 +1005,7 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                     executionTime: proxyData.executionTime,
                     proxyUsed: true
                 };
-                
+
                 // 尝试解析响应体为JSON
                 try {
                     const jsonBody = JSON.parse(response.body);
@@ -993,13 +1014,13 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                 } catch (e) {
                     // 保持为文本格式
                 }
-                
+
                 // 显示结果
                 await displayResult(response, curlConfig, duration);
-                
+
                 updateStatus('success', `✅ 执行完成 (${proxyData.executionTime || duration + 'ms'})`);
                 logMessage('success', `请求完成 - 状态码: ${response.status}, 耗时: ${proxyData.executionTime || duration + 'ms'}`);
-                
+
                 // 记录到历史
                 executionHistory.push({
                     command: command,
@@ -1008,16 +1029,16 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                     status: response.status,
                     success: true
                 });
-                
+
             } catch (error) {
                 const endTime = Date.now();
                 const duration = endTime - startTime;
-                
+
                 logMessage('error', `执行失败: ${error.message} (耗时: ${duration}ms)`);
                 updateStatus('error', `❌ 执行失败`);
-                
+
                 displayError(error, duration, false);
-                
+
                 // 记录到历史
                 executionHistory.push({
                     command: command,
@@ -1026,13 +1047,13 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                     error: error.message,
                     success: false
                 });
-                
+
             } finally {
                 executeBtn.disabled = false;
                 executeBtn.textContent = '🚀 执行';
             }
         }
-        
+
         // 解析CURL命令
         function parseCurlCommand(command) {
             const config = {
@@ -1042,11 +1063,11 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                 data: null,
                 options: {}
             };
-            
+
             // 移除curl前缀，处理多行命令（移除反斜杠和换行）
             let args = command.replace(/^curl\s+/, '').trim();
             args = args.replace(/\\\s*\n\s*/g, ' ').replace(/\s+/g, ' ');
-            
+
             // 简单的参数解析（支持主要选项）
             const patterns = {
                 // URL (最后一个不以-开头的参数通常是URL)
@@ -1076,7 +1097,7 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                 // 忽略SSL证书错误
                 insecure: /-k|--insecure/
             };
-            
+
             // 解析URL - 更精确的URL提取
             let urlMatch = args.match(patterns.url);
             if (urlMatch) {
@@ -1089,7 +1110,7 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                     config.url = urls[0]; // 取第一个找到的URL
                 }
             }
-            
+
             // 解析方法
             const methodMatch = args.match(patterns.method);
             if (methodMatch) {
@@ -1097,7 +1118,7 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
             } else if (patterns.head.test(args)) {
                 config.method = 'HEAD';
             }
-            
+
             // 解析Headers
             let headerMatch;
             while ((headerMatch = patterns.headers.exec(args)) !== null) {
@@ -1109,7 +1130,7 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                     config.headers[key] = value;
                 }
             }
-            
+
             // 解析数据 - 改进的数据提取
             let dataMatch = args.match(patterns.data);
             if (dataMatch) {
@@ -1128,67 +1149,67 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                     }
                 }
             }
-            
+
             // 解析其他选项
             const userAgentMatch = args.match(patterns.userAgent);
             if (userAgentMatch) {
                 config.headers['User-Agent'] = userAgentMatch[1];
             }
-            
+
             const authMatch = args.match(patterns.auth);
             if (authMatch) {
                 config.headers['Authorization'] = 'Basic ' + btoa(authMatch[1]);
             }
-            
+
             const cookieMatch = args.match(patterns.cookie);
             if (cookieMatch) {
                 config.headers['Cookie'] = cookieMatch[1];
             }
-            
+
             // 选项标志
             config.options.followRedirects = patterns.location.test(args);
             config.options.silent = patterns.silent.test(args);
             config.options.includeHeaders = patterns.include.test(args);
             config.options.insecure = patterns.insecure.test(args);
-            
+
             // 调试信息
             console.log('CURL解析结果:', config);
             console.log('原始命令:', command);
             console.log('处理后参数:', args);
-            
+
             return config;
         }
-        
+
         // 执行请求
         async function executeRequest(config) {
             if (!config.url) {
                 throw new Error('未找到有效的URL');
             }
-            
+
             const fetchOptions = {
                 method: config.method,
                 headers: config.headers,
                 mode: 'cors',
                 cache: 'no-cache'
             };
-            
+
             // 检查是否为跨域请求
             const currentOrigin = window.location.origin;
             const targetUrl = new URL(config.url);
             const isCorsConcern = currentOrigin !== `${targetUrl.protocol}//${targetUrl.host}`;
-            
+
             if (isCorsConcern) {
                 logMessage('warning', `检测到跨域请求: ${currentOrigin} → ${targetUrl.origin}`);
-                
+
                 // 检查是否使用CORS代理
                 const useCorsProxy = document.getElementById('useCorsProxy').checked;
                 if (useCorsProxy) {
                     // 使用本地CORS代理
                     logMessage('info', `使用本地CORS代理服务`);
-                    
+
                     // 保存原始配置用于显示
                     const originalConfig = {...config};
-                    
+
                     // 创建代理请求
                     try {
                         const proxyResponse = await fetch('/cors-proxy', {
@@ -1200,13 +1221,13 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                                 curlParam: curlCmd
                             })
                         });
-                        
+
                         if (!proxyResponse.ok) {
                             throw new Error(`代理请求失败: ${proxyResponse.status} ${proxyResponse.statusText}`);
                         }
-                        
+
                         const proxyData = await proxyResponse.json();
-                        
+
                         // 创建模拟响应
                         return {
                             status: proxyData.statusCode,
@@ -1226,11 +1247,11 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                     }
                 }
             }
-            
+
             // 添加请求体
             if (config.data && ['POST', 'PUT', 'PATCH'].includes(config.method)) {
                 fetchOptions.body = config.data;
-                
+
                 // 如果没有指定Content-Type，尝试自动设置
                 if (!config.headers['Content-Type'] && !config.headers['content-type']) {
                     try {
@@ -1243,16 +1264,16 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                     }
                 }
             }
-            
+
             // 跟随重定向
             if (config.options.followRedirects) {
                 fetchOptions.redirect = 'follow';
             }
-            
+
             logMessage('info', `发起${config.method}请求到: ${config.url}`);
-            
+
             const response = await fetch(config.url, fetchOptions);
-            
+
             // 获取响应数据
             const responseData = {
                 status: response.status,
@@ -1264,15 +1285,15 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                 type: response.type,
                 ok: response.ok
             };
-            
+
             // 获取响应头
             response.headers.forEach((value, key) => {
                 responseData.headers[key] = value;
             });
-            
+
             // 获取响应体
             const contentType = response.headers.get('content-type') || '';
-            
+
             if (contentType.includes('application/json')) {
                 try {
                     responseData.body = await response.json();
@@ -1291,26 +1312,26 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                 responseData.body = await response.text();
                 responseData.bodyType = 'text';
             }
-            
+
             return responseData;
         }
-        
+
         // 显示结果
         async function displayResult(response, config, duration) {
             const resultContent = document.getElementById('resultContent');
-            
+
             // 构建状态码样式
             let statusClass = 'status-2xx';
             if (response.status >= 300 && response.status < 400) statusClass = 'status-3xx';
             else if (response.status >= 400 && response.status < 500) statusClass = 'status-4xx';
             else if (response.status >= 500) statusClass = 'status-5xx';
-            
+
             // 使用代理的情况下，显示代理执行时间
             if (response.proxyUsed && response.executionTime) {
                 duration = response.executionTime.replace('ms', '');
                 logMessage('info', `代理执行时间: ${response.executionTime}`);
             }
-            
+
             // 保存当前结果数据供格式化使用
             window.currentResult = {
                 config: config,
@@ -1319,7 +1340,7 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                 body: response.body,
                 bodyType: response.bodyType
             };
-            
+
             let resultHtml = `
                 <div class="timing-info">
                     ⏱️ 执行时间: ${duration}ms | 📅 ${new Date().toLocaleString()}
@@ -1328,7 +1349,7 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                     ${response.redirected ? ' (重定向)' : ''}
                     ${response.ok ? ' ✅' : ' ❌'}
                 </div>
-                
+
                 <div class="result-section">
                     <div class="result-title">
                         📋 响应Headers
@@ -1336,14 +1357,14 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                     </div>
                     <div class="result-data">${JSON.stringify(response.headers, null, 2)}</div>
                 </div>
-                
+
                 <div class="result-section">
                     <div class="result-title">
                         📄 响应体
                         <button class="format-btn" onclick="formatBody()">🎨 格式化</button>
                     </div>
                     <div class="result-data">`;
-            
+
             // 根据内容类型显示响应体
             if (response.bodyType === 'json') {
                 resultHtml += JSON.stringify(response.body, null, 2);
@@ -1352,15 +1373,15 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
             } else {
                 resultHtml += response.body || '(空响应)';
             }
-            
+
             resultHtml += `</div>
                 </div>`;
-            
+
             resultContent.innerHTML = resultHtml;
-            
+
             // 记录详细日志
             logMessage('info', `响应Headers数量: ${Object.keys(response.headers).length}`);
-            
+
             if (response.bodyType === 'json') {
                 logMessage('info', `JSON响应解析成功，包含 ${Object.keys(response.body || {}).length} 个字段`);
             } else if (response.bodyType === 'binary') {
@@ -1369,11 +1390,11 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                 logMessage('info', `文本响应: ${(response.body || '').length} 个字符`);
             }
         }
-        
+
         // 显示错误
         function displayError(error, duration, isCorsError = false) {
             const resultContent = document.getElementById('resultContent');
-            
+
             let corsHelp = '';
             if (isCorsError) {
                 corsHelp = `
@@ -1397,22 +1418,22 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
 <strong>注意:</strong> 生产环境应该由后端服务器配置CORS头部</div>
                 </div>`;
             }
-            
+
             resultContent.innerHTML = `
                 <div class="timing-info">
                     ⏱️ 执行时间: ${duration}ms | 📅 ${new Date().toLocaleString()}
                 </div>
-                
+
                 <div class="result-section">
                     <div class="result-title">❌ 错误信息</div>
                     <div class="result-data">${error.message}</div>
                 </div>
-                
+
                 <div class="result-section">
                     <div class="result-title">🔍 错误详情</div>
                     <div class="result-data">错误类型: ${error.name || 'Error'}
 错误堆栈: ${error.stack || '无堆栈信息'}
-可能原因: 
+可能原因:
 ${isCorsError ? '• CORS跨域限制 (主要原因)' : '• 网络连接问题'}
 • URL格式错误
 ${!isCorsError ? '• CORS跨域限制' : ''}
@@ -1421,67 +1442,67 @@ ${!isCorsError ? '• CORS跨域限制' : ''}
                 </div>
                 ${corsHelp}`;
         }
-        
+
         // 记录日志消息
         function logMessage(type, message) {
             const logContent = document.getElementById('logContent');
             const logDiv = document.createElement('div');
             logDiv.className = `log-message ${type}`;
-            
+
             const timestamp = new Date().toLocaleTimeString();
-            
+
             logDiv.innerHTML = `
                 <span class="log-time">[${timestamp}]</span>
                 <span class="log-type">${type.toUpperCase()}</span>
                 ${message}
             `;
-            
+
             logContent.appendChild(logDiv);
-            
+
             // 限制日志数量
             const maxLogs = 500;
             const allLogs = logContent.querySelectorAll('.log-message');
             if (allLogs.length > maxLogs) {
                 allLogs[0].remove();
             }
-            
+
             // 自动滚动到底部
             if (autoScroll) {
                 scrollToBottom();
             }
         }
-        
+
         // 更新状态
         function updateStatus(status, message) {
             const statusBar = document.getElementById('statusBar');
             statusBar.className = `status-bar status-${status}`;
             statusBar.textContent = message;
         }
-        
+
         // 滚动到底部
         function scrollToBottom() {
             const logContent = document.getElementById('logContent');
             logContent.scrollTop = logContent.scrollHeight;
         }
-        
+
         // 切换自动滚动
         function toggleAutoScroll() {
             autoScroll = !autoScroll;
             const btn = document.getElementById('autoScrollBtn');
             btn.textContent = autoScroll ? '📜 自动滚动' : '📜 手动滚动';
-            
+
             if (autoScroll) {
                 scrollToBottom();
             }
-            
+
             logMessage('info', `自动滚动已${autoScroll ? '启用' : '禁用'}`);
         }
-        
+
         // 保存结果
         function saveResult() {
             const resultContent = document.getElementById('resultContent');
             const content = `CURL测试结果 - ${new Date().toLocaleString()}\n${'='.repeat(50)}\n\n${resultContent.textContent}`;
-            
+
             const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1492,19 +1513,19 @@ ${!isCorsError ? '• CORS跨域限制' : ''}
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            
+
             logMessage('info', '执行结果已保存');
         }
-        
+
         // 保存日志
         function saveLog() {
             const logMessages = document.querySelectorAll('.log-message');
             let logContent = `CURL测试日志 - ${new Date().toLocaleString()}\n${'='.repeat(50)}\n\n`;
-            
+
             logMessages.forEach(msg => {
                 logContent += msg.textContent + '\n';
             });
-            
+
             const blob = new Blob([logContent], { type: 'text/plain;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1515,10 +1536,10 @@ ${!isCorsError ? '• CORS跨域限制' : ''}
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            
+
             logMessage('info', '执行日志已保存');
         }
-        
+
         // 清空结果
         function clearResult() {
             const resultContent = document.getElementById('resultContent');
@@ -1529,52 +1550,52 @@ ${!isCorsError ? '• CORS跨域限制' : ''}
             `;
             logMessage('info', '执行结果已清空');
         }
-        
+
         // 清空日志
         function clearLog() {
             const logContent = document.getElementById('logContent');
             logContent.innerHTML = '';
             logMessage('info', '执行日志已清空');
         }
-        
-        
+
+
         // 格式化响应Headers
         function formatHeaders() {
             if (!window.currentResult || !window.currentResult.headers) {
                 logMessage('warning', '没有可格式化的Headers数据');
                 return;
             }
-            
+
             const headers = window.currentResult.headers;
             let formattedHeaders = '';
-            
+
             // 按字母顺序排序并格式化
             const sortedHeaders = Object.keys(headers).sort().map(key => ({
                 key: key,
                 value: headers[key]
             }));
-            
+
             formattedHeaders += `响应Headers (共 ${sortedHeaders.length} 个):\n`;
             formattedHeaders += '=' .repeat(50) + '\n\n';
-            
+
             sortedHeaders.forEach(header => {
                 formattedHeaders += `${header.key}:\n  ${header.value}\n\n`;
             });
-            
+
             showModal('📋 格式化响应Headers', formattedHeaders);
             logMessage('info', '已显示格式化的响应Headers');
         }
-        
+
         // 格式化响应体
         function formatBody() {
             if (!window.currentResult || window.currentResult.body === null) {
                 logMessage('warning', '没有可格式化的响应体数据');
                 return;
             }
-            
+
             const result = window.currentResult;
             let formattedBody = '';
-            
+
             if (result.bodyType === 'json') {
                 try {
                     formattedBody = JSON.stringify(result.body, null, 4);
@@ -1591,7 +1612,7 @@ ${!isCorsError ? '• CORS跨域限制' : ''}
             } else {
                 // 文本数据，尝试格式化
                 let bodyStr = String(result.body);
-                
+
                 // 尝试解析为JSON进行格式化
                 try {
                     const parsed = JSON.parse(bodyStr);
@@ -1619,29 +1640,74 @@ ${!isCorsError ? '• CORS跨域限制' : ''}
                     }
                 }
             }
-            
+
             showModal('📄 格式化响应体', formattedBody);
             logMessage('info', '已显示格式化的响应体');
         }
-        
+
         // 显示模态框
         function showModal(title, content) {
             const modal = document.getElementById('formatModal');
             const modalTitle = document.getElementById('modalTitle');
             const formattedContent = document.getElementById('formattedContent');
-            
+
             modalTitle.textContent = title;
             formattedContent.textContent = content;
-            
+
             modal.style.display = 'block';
         }
-        
+
         // 关闭模态框
         function closeModal() {
             const modal = document.getElementById('formatModal');
             modal.style.display = 'none';
         }
-        
+
+        // 高亮显示活跃按钮
+        function highlightActiveButton(command) {
+            try {
+                // 提取命令类型（GET, POST等）和端点
+                const parts = command.split(' ');
+                let method = 'GET';
+                let endpoint = '';
+
+                // 查找方法
+                const methodIndex = parts.indexOf('-X');
+                if (methodIndex !== -1 && methodIndex + 1 < parts.length) {
+                    method = parts[methodIndex + 1];
+                }
+
+                // 查找URL和端点
+                for (let part of parts) {
+                    if (part.startsWith('http')) {
+                        endpoint = part.split('/').pop().replace(/['"]/g, '');
+                        break;
+                    }
+                }
+
+                // 移除所有按钮的活跃状态
+                const quickButtons = document.querySelectorAll('.quick-cmd');
+                quickButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                });
+
+                // 设置匹配按钮的活跃状态
+                for (let btn of quickButtons) {
+                    const btnText = btn.textContent.toLowerCase();
+                    if ((method && btnText.includes(method.toLowerCase())) ||
+                        (endpoint && btnText.includes(endpoint.toLowerCase()))) {
+                        btn.classList.add('active');
+                        setTimeout(() => {
+                            btn.classList.remove('active');
+                        }, 1000);
+                        break;
+                    }
+                }
+            } catch (error) {
+                console.error('高亮按钮时出错:', error);
+            }
+        }
+
         // 初始化状态
         updateStatus('ready', '🟢 就绪 - 输入CURL命令并点击执行');
     </script>
