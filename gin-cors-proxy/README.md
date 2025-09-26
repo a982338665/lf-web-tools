@@ -4,10 +4,11 @@
 
 ## 功能特点
 
-- 接收curl命令并执行，解决前端跨域问题
+- 接收curl命令并解析为原生HTTP请求，解决前端跨域问题
 - 返回详细的执行信息，包括执行时间、响应体、响应头等
 - 支持作为独立服务运行
 - 支持作为Gin组件集成到现有应用
+- 不依赖系统curl命令，完全使用Go原生HTTP客户端
 
 ## 使用方法
 
@@ -76,8 +77,7 @@ func main() {
 ```json
 {
   "executionTime": "235.0394ms",
-  "exitCode": 0,
-  "result": "HTTP/1.1 200 OK\nContent-Type: application/json\n...",
+  "statusCode": 200,
   "responseBody": "{\n  \"args\": {}, \n  \"headers\": {...}, \n  \"origin\": \"...\", \n  \"url\": \"https://httpbin.org/get\"\n}\n",
   "responseHeaders": {
     "Content-Type": "application/json",
@@ -87,8 +87,18 @@ func main() {
 }
 ```
 
+## 支持的curl选项
+
+- `-X, --request`: 指定HTTP请求方法（GET、POST、PUT、DELETE等）
+- `-H, --header`: 设置请求头
+- `-d, --data`: 设置请求体数据
+- `--data-raw`: 设置原始请求体数据
+- `--json`: 设置JSON格式的请求体数据
+- `-k, --insecure`: 允许不安全的SSL连接
+
 ## 注意事项
 
-- 服务器需要安装curl命令行工具
+- 不需要安装curl命令行工具，完全使用Go原生HTTP客户端
 - 为安全起见，建议在内部网络或受信任的环境中使用
 - 默认情况下，服务允许所有来源的CORS请求
+- 当前版本仅支持基本的curl命令解析，不支持所有curl选项

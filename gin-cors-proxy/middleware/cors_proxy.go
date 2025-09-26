@@ -1,12 +1,12 @@
 package middleware
 
 import (
-	"bytes"
+	"crypto/tls"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
-	"os/exec"
-	"runtime"
+	"regexp"
 	"strings"
 	"time"
 
@@ -21,8 +21,7 @@ type CurlRequest struct {
 // CurlResponse 定义响应体结构
 type CurlResponse struct {
 	ExecutionTime   string            `json:"executionTime"`
-	ExitCode        int               `json:"exitCode"`
-	Result          string            `json:"result"`
+	StatusCode      int               `json:"statusCode"`
 	ResponseBody    string            `json:"responseBody"`
 	ResponseHeaders map[string]string `json:"responseHeaders"`
 	Error           string            `json:"error,omitempty"`
@@ -55,15 +54,14 @@ func HandleCurlProxy(c *gin.Context) {
 		return
 	}
 
-	// 执行curl命令并计时
+	// 解析curl命令并执行HTTP请求
 	startTime := time.Now()
-	result, exitCode, responseBody, responseHeaders, err := executeCurl(request.CurlParam)
+	statusCode, responseBody, responseHeaders, err := executeCurlAsHTTP(request.CurlParam)
 	executionTime := time.Since(startTime).String()
 
 	response := CurlResponse{
 		ExecutionTime:   executionTime,
-		ExitCode:        exitCode,
-		Result:          result,
+		StatusCode:      statusCode,
 		ResponseBody:    responseBody,
 		ResponseHeaders: responseHeaders,
 	}
@@ -75,86 +73,179 @@ func HandleCurlProxy(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-// executeCurl 执行curl命令并返回结果
-func executeCurl(curlCmd string) (string, int, string, map[string]string, error) {
-	// 确保命令以curl开头
-	if !strings.HasPrefix(curlCmd, "curl ") {
-		return "", -1, "", nil, fmt.Errorf("command must start with 'curl'")
-	}
-
-	// 添加-i参数获取响应头信息，如果没有的话
-	if !strings.Contains(curlCmd, " -i ") && !strings.Contains(curlCmd, " --include ") {
-		curlCmd = strings.Replace(curlCmd, "curl ", "curl -i ", 1)
-	}
-
-	// 根据操作系统确定命令执行方式
-	var cmd *exec.Cmd
-	if runtime.GOOS == "windows" {
-		cmd = exec.Command("cmd", "/C", curlCmd)
-	} else {
-		cmd = exec.Command("sh", "-c", curlCmd)
-	}
-
-	// 捕获标准输出和错误输出
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	// 执行命令
-	err := cmd.Run()
-	exitCode := 0
-	if err != nil {
-		if exitError, ok := err.(*exec.ExitError); ok {
-			exitCode = exitError.ExitCode()
-		}
-	}
-
-	// 获取输出
-	result := stdout.String()
-	if result == "" && stderr.String() != "" {
-		result = stderr.String()
-	}
-
-	// 分离响应头和响应体
-	responseBody, responseHeaders := parseResponse(result)
-
-	return result, exitCode, responseBody, responseHeaders, err
+// CurlCommand 表示解析后的curl命令
+type CurlCommand struct {
+	Method      string
+	URL         string
+	Headers     map[string]string
+	Data        string
+	Insecure    bool
+	FormData    map[string]string
+	QueryParams map[string]string
 }
 
-// parseResponse 解析响应，分离头部和主体
-func parseResponse(response string) (string, map[string]string) {
-	headers := make(map[string]string)
+// executeCurlAsHTTP 将curl命令解析为HTTP请求并执行
+func executeCurlAsHTTP(curlCmd string) (int, string, map[string]string, error) {
+	// 确保命令以curl开头
+	if !strings.HasPrefix(curlCmd, "curl ") {
+		return 0, "", nil, fmt.Errorf("command must start with 'curl'")
+	}
+
+	// 将多行命令合并为一行（去掉行尾的反斜杠和换行符）
+	curlCmd = strings.ReplaceAll(curlCmd, "\\\n", " ")
+	curlCmd = strings.ReplaceAll(curlCmd, "\\\r\n", " ")
+
+	// 解析curl命令
+	cmd, err := parseCurlCommand(curlCmd)
+	if err != nil {
+		return 0, "", nil, err
+	}
+
+	// 创建HTTP客户端
+	transport := &http.Transport{}
 	
-	// 查找头部和主体的分隔点（空行）
-	parts := strings.SplitN(response, "\r\n\r\n", 2)
-	if len(parts) < 2 {
-		// 尝试不同的换行符
-		parts = strings.SplitN(response, "\n\n", 2)
-		if len(parts) < 2 {
-			// 如果没有找到分隔符，则认为整个响应都是主体
-			return response, headers
+	// 如果指定了insecure选项，则跳过TLS证书验证
+	if cmd.Insecure {
+		transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	}
+	
+	client := &http.Client{
+		Timeout:   30 * time.Second,
+		Transport: transport,
+	}
+
+	// 准备请求体
+	var reqBody io.Reader
+	if cmd.Data != "" {
+		reqBody = strings.NewReader(cmd.Data)
+	}
+
+	// 创建HTTP请求
+	req, err := http.NewRequest(cmd.Method, cmd.URL, reqBody)
+	if err != nil {
+		return 0, "", nil, fmt.Errorf("创建HTTP请求失败: %v", err)
+	}
+
+	// 添加请求头
+	for key, value := range cmd.Headers {
+		req.Header.Set(key, value)
+	}
+
+	// 执行请求
+	resp, err := client.Do(req)
+	if err != nil {
+		return 0, "", nil, fmt.Errorf("执行HTTP请求失败: %v", err)
+	}
+	defer resp.Body.Close()
+
+	// 读取响应体
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return resp.StatusCode, "", headerToMap(resp.Header), fmt.Errorf("读取响应体失败: %v", err)
+	}
+
+	return resp.StatusCode, string(bodyBytes), headerToMap(resp.Header), nil
+}
+
+// parseCurlCommand 解析curl命令
+func parseCurlCommand(curlCmd string) (*CurlCommand, error) {
+	cmd := &CurlCommand{
+		Method:      "GET",
+		Headers:     make(map[string]string),
+		FormData:    make(map[string]string),
+		QueryParams: make(map[string]string),
+	}
+
+	// 提取URL
+	urlPattern := regexp.MustCompile(`curl\s+['"]([^'"]+)['"]`)
+	urlMatches := urlPattern.FindStringSubmatch(curlCmd)
+	if len(urlMatches) < 2 {
+		// 尝试不带引号的URL
+		urlPattern = regexp.MustCompile(`curl\s+(\S+)`)
+		urlMatches = urlPattern.FindStringSubmatch(curlCmd)
+		if len(urlMatches) < 2 {
+			return nil, fmt.Errorf("无法解析URL")
+		}
+	}
+	cmd.URL = urlMatches[1]
+
+	// 提取请求方法
+	methodPattern := regexp.MustCompile(`-X\s+(\S+)`)
+	methodMatches := methodPattern.FindStringSubmatch(curlCmd)
+	if len(methodMatches) >= 2 {
+		cmd.Method = methodMatches[1]
+	}
+
+	// 提取请求头
+	headerPattern := regexp.MustCompile(`-H\s+['"]([^'"]+)['"]`)
+	headerMatches := headerPattern.FindAllStringSubmatch(curlCmd, -1)
+	for _, match := range headerMatches {
+		if len(match) >= 2 {
+			headerParts := strings.SplitN(match[1], ":", 2)
+			if len(headerParts) == 2 {
+				cmd.Headers[strings.TrimSpace(headerParts[0])] = strings.TrimSpace(headerParts[1])
+			}
 		}
 	}
 
-	// 解析头部
-	headerLines := strings.Split(parts[0], "\n")
-	for i, line := range headerLines {
-		// 跳过第一行（HTTP状态行）
-		if i == 0 {
-			continue
+	// 提取请求体数据 - 支持多种数据格式
+	// 1. --data-raw
+	dataRawPattern := regexp.MustCompile(`--data-raw\s+['"]([^'"]+)['"]`)
+	dataRawMatches := dataRawPattern.FindStringSubmatch(curlCmd)
+	if len(dataRawMatches) >= 2 {
+		cmd.Data = dataRawMatches[1]
+	}
+	
+	// 2. --data 或 -d
+	if cmd.Data == "" {
+		dataPattern := regexp.MustCompile(`(?:--data|-d)\s+['"]([^'"]+)['"]`)
+		dataMatches := dataPattern.FindStringSubmatch(curlCmd)
+		if len(dataMatches) >= 2 {
+			cmd.Data = dataMatches[1]
 		}
-		
-		// 解析头部字段
-		colonIdx := strings.Index(line, ":")
-		if colonIdx > 0 {
-			key := strings.TrimSpace(line[:colonIdx])
-			value := strings.TrimSpace(line[colonIdx+1:])
-			headers[key] = value
+	}
+	
+	// 3. --json
+	if cmd.Data == "" {
+		jsonPattern := regexp.MustCompile(`--json\s+['"]([^'"]+)['"]`)
+		jsonMatches := jsonPattern.FindStringSubmatch(curlCmd)
+		if len(jsonMatches) >= 2 {
+			cmd.Data = jsonMatches[1]
+			cmd.Headers["Content-Type"] = "application/json"
+		}
+	}
+	
+	// 如果有数据，设置适当的Content-Type和Method
+	if cmd.Data != "" {
+		// 如果没有明确指定Content-Type，根据数据格式推断
+		if _, exists := cmd.Headers["Content-Type"]; !exists {
+			if strings.HasPrefix(cmd.Data, "{") && strings.HasSuffix(cmd.Data, "}") {
+				cmd.Headers["Content-Type"] = "application/json"
+			} else {
+				cmd.Headers["Content-Type"] = "application/x-www-form-urlencoded"
+			}
+		}
+		// 如果是POST请求但没有指定方法，则设置为POST
+		if cmd.Method == "GET" {
+			cmd.Method = "POST"
 		}
 	}
 
-	// 返回主体和解析的头部
-	return parts[1], headers
+	// 检查是否有--insecure选项
+	cmd.Insecure = strings.Contains(curlCmd, "--insecure") || strings.Contains(curlCmd, "-k")
+
+	return cmd, nil
+}
+
+// headerToMap 将HTTP头转换为map
+func headerToMap(header http.Header) map[string]string {
+	result := make(map[string]string)
+	for key, values := range header {
+		if len(values) > 0 {
+			result[key] = strings.Join(values, ", ")
+		}
+	}
+	return result
 }
 
 // RegisterCorsProxyRoutes 注册CORS代理路由到Gin引擎
