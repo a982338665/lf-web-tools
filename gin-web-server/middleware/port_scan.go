@@ -62,15 +62,27 @@ func checkPort(host string, port int, timeout time.Duration) PortScanResult {
 	conn, err := net.DialTimeout("tcp", address, timeout)
 
 	if err != nil {
+		errStr := strings.ToLower(err.Error())
 		fmt.Printf("[PORT-SCAN] 端口 %d 连接失败: %v\n", port, err)
-		if strings.Contains(err.Error(), "timeout") || strings.Contains(err.Error(), "i/o timeout") {
+		
+		if strings.Contains(errStr, "timeout") || strings.Contains(errStr, "i/o timeout") {
 			result.Status = PortStatusTimeout
 			result.Error = "连接超时"
-		} else if strings.Contains(err.Error(), "refused") || strings.Contains(err.Error(), "connection refused") {
+		} else if strings.Contains(errStr, "refused") || strings.Contains(errStr, "connection refused") {
 			result.Status = PortStatusClosed
-		} else if strings.Contains(err.Error(), "unreachable") || strings.Contains(err.Error(), "no route") {
+			result.Error = "连接被拒绝"
+		} else if strings.Contains(errStr, "unreachable") || strings.Contains(errStr, "no route") {
 			result.Status = PortStatusError
 			result.Error = "网络不可达"
+		} else if strings.Contains(errStr, "no such host") {
+			result.Status = PortStatusError
+			result.Error = "主机不存在"
+		} else if strings.Contains(errStr, "network is down") {
+			result.Status = PortStatusError
+			result.Error = "网络中断"
+		} else if strings.Contains(errStr, "permission denied") {
+			result.Status = PortStatusError
+			result.Error = "权限被拒绝"
 		} else {
 			result.Status = PortStatusError
 			result.Error = err.Error()
@@ -80,15 +92,25 @@ func checkPort(host string, port int, timeout time.Duration) PortScanResult {
 
 	defer conn.Close()
 	
-	// 尝试写入一个字节来验证连接是否真的可用
-	conn.SetWriteDeadline(time.Now().Add(1 * time.Second))
-	_, writeErr := conn.Write([]byte{0x00})
+	// 验证连接是否真实有效
+	// 设置一个很短的读取超时来快速验证连接
+	conn.SetReadDeadline(time.Now().Add(100 * time.Millisecond))
 	
-	if writeErr != nil {
-		fmt.Printf("[PORT-SCAN] 端口 %d 连接建立但写入失败: %v\n", port, writeErr)
-		// 即使写入失败，如果能建立连接，通常还是认为端口开放
+	// 尝试读取数据来验证这不是虚假连接
+	buffer := make([]byte, 1)
+	_, readErr := conn.Read(buffer)
+	
+	// 对于真实的服务，即使读取超时也是正常的，说明端口确实开放
+	// 但如果是代理造成的虚假连接，通常会立即返回特定错误
+	if readErr != nil {
+		if strings.Contains(readErr.Error(), "reset") || 
+		   strings.Contains(readErr.Error(), "broken pipe") {
+			fmt.Printf("[PORT-SCAN] 端口 %d 可能是虚假连接\n", port)
+		} else {
+			fmt.Printf("[PORT-SCAN] 端口 %d 连接成功\n", port)
+		}
 	} else {
-		fmt.Printf("[PORT-SCAN] 端口 %d 连接并写入成功！\n", port)
+		fmt.Printf("[PORT-SCAN] 端口 %d 连接成功并收到数据！\n", port)
 	}
 	
 	result.Status = PortStatusOpen

@@ -239,7 +239,7 @@
             flex: 2;
             min-height: 0;
         }
-        
+
         /* 右下日志区域 */
         .log-area {
             background: #fff;
@@ -327,7 +327,7 @@
             border-radius: 6px;
             min-height: 0;
         }
-        
+
         .log-content {
             flex: 1;
             overflow-y: auto;
@@ -458,7 +458,7 @@
             .result-area {
                 flex: 2;
             }
-            
+
             .log-area {
                 flex: 1;
                 max-height: 200px;
@@ -501,7 +501,7 @@
 
                     <div class="form-group">
                         <label class="form-label">目标IP地址</label>
-                        <input type="text" class="form-input" id="hostInput" placeholder="请输入IP地址，例如：8.8.8.8" value="127.0.0.1">
+                        <input type="text" class="form-input" id="hostInput" placeholder="请输入IP地址，例如：8.8.8.8" value="115.190.5.236">
                     </div>
 
                     <div class="form-group">
@@ -709,9 +709,9 @@
 
             let host = hostInput.value.trim();
             if (!host) {
-                host = '127.0.0.1';
+                host = '115.190.5.236';
                 hostInput.value = host;
-                logMessage('info', '使用默认IP地址: 127.0.0.1');
+                logMessage('info', '使用默认IP地址: 115.190.5.236');
             }
 
             // IP地址格式验证
@@ -847,7 +847,7 @@
             const closedCount = result.closedPorts ? result.closedPorts.length : 0;
             const timeoutCount = result.timeoutPorts ? result.timeoutPorts.length : 0;
             const errorCount = result.errorPorts ? result.errorPorts.length : 0;
-            
+
             logMessage('success', `扫描完成 - 开放: ${openCount}, 关闭: ${closedCount}, 超时: ${timeoutCount}, 错误: ${errorCount}`);
             logMessage('info', `总耗时: ${result.duration}`);
         }
