@@ -87,13 +87,27 @@
         .header-info .status::before {
             content: "🟢";
         }
-
+        .container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            grid-template-rows: 80px 1fr;
+            grid-template-areas:
+                "header header"
+                "sidebar content";
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.95);
+            margin: 10px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
         /* 左侧导航区域 */
         .sidebar {
             grid-area: sidebar;
             background: #f8f9fa;
             border-right: 1px solid #e9ecef;
             padding: 20px 0;
+            margin: 10px;
         }
 
         .nav-title {
@@ -231,18 +245,23 @@
 
         .feature-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            max-width: 800px;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 20px;
             width: 100%;
+            max-width: 1400px;
         }
 
         .feature-card {
             background: rgba(255, 255, 255, 0.9);
-            padding: 30px 20px;
+            padding: 20px 15px;
             border-radius: 15px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
+            text-align: center;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .feature-card:hover {
@@ -250,21 +269,22 @@
         }
 
         .feature-icon {
-            font-size: 3em;
-            margin-bottom: 15px;
+            font-size: 2.5em;
+            margin-bottom: 10px;
         }
 
         .feature-title {
-            font-size: 0.9em;
+            font-size: 0.85em;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             color: #333;
         }
 
         .feature-desc {
             color: #666;
-            line-height: 1.5;
-            font-size: 0.8em;
+            line-height: 1.4;
+            font-size: 0.75em;
+            flex: 1;
         }
 
         /* 加载状态 */
@@ -314,7 +334,7 @@
                 border-right: none;
                 border-bottom: 1px solid #e9ecef;
                 padding: 10px 0;
-                max-height: 200px;
+                max-height: 100px;
                 overflow-y: auto;
             }
 
@@ -354,8 +374,44 @@
             }
 
             .feature-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+            }
+        }
+
+        /* 中等屏幕（平板） */
+        @media (max-width: 1200px) {
+            .feature-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 18px;
+            }
+
+            .feature-card {
+                min-height: 160px;
+                padding: 18px 12px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .feature-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+            }
+
+            .feature-card {
+                min-height: 150px;
+                padding: 15px 10px;
+            }
+
+            .feature-icon {
+                font-size: 2em;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .feature-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
             }
         }
 
@@ -392,7 +448,6 @@
 
         <!-- 左侧导航区域 -->
         <nav class="sidebar">
-            <div class="nav-title">🔧 功能导航</div>
             <ul class="nav-menu">
                 <li class="nav-item">
                     <a href="#" class="nav-link active" data-page="welcome">主页</a>
@@ -425,11 +480,6 @@
         <main class="content">
             <!-- 欢迎页面 -->
             <div class="welcome-page active" id="welcomePage">
-                <div class="welcome-title">🖥️ 计算机网页工具</div>
-                <div class="welcome-subtitle">
-                    集成多种系统检测工具，帮助您全面了解计算机的网络状态、硬件信息和功能测试。
-                    选择左侧菜单开始使用各项功能。
-                </div>
                 <div class="feature-grid">
                     <div class="feature-card">
                         <div class="feature-icon">🌐</div>
@@ -460,6 +510,111 @@
                         <div class="feature-icon">🌍</div>
                         <div class="feature-title">CURL测试网页</div>
                         <div class="feature-desc">解析并执行CURL命令，支持HTTP/HTTPS请求测试，显示响应结果</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-title">公网端口检测</div>
+                        <div class="feature-desc">检测公网IP的端口开放状态，支持全端口扫描和自定义端口列表</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-title">公网端口检测</div>
+                        <div class="feature-desc">检测公网IP的端口开放状态，支持全端口扫描和自定义端口列表</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-title">公网端口检测</div>
+                        <div class="feature-desc">检测公网IP的端口开放状态，支持全端口扫描和自定义端口列表</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-title">公网端口检测</div>
+                        <div class="feature-desc">检测公网IP的端口开放状态，支持全端口扫描和自定义端口列表</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-title">公网端口检测</div>
+                        <div class="feature-desc">检测公网IP的端口开放状态，支持全端口扫描和自定义端口列表</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-title">公网端口检测</div>
+                        <div class="feature-desc">检测公网IP的端口开放状态，支持全端口扫描和自定义端口列表</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-title">公网端口检测</div>
+                        <div class="feature-desc">检测公网IP的端口开放状态，支持全端口扫描和自定义端口列表</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-title">公网端口检测</div>
+                        <div class="feature-desc">检测公网IP的端口开放状态，支持全端口扫描和自定义端口列表</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-title">公网端口检测</div>
+                        <div class="feature-desc">检测公网IP的端口开放状态，支持全端口扫描和自定义端口列表</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-title">公网端口检测</div>
+                        <div class="feature-desc">检测公网IP的端口开放状态，支持全端口扫描和自定义端口列表</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-title">公网端口检测</div>
+                        <div class="feature-desc">检测公网IP的端口开放状态，支持全端口扫描和自定义端口列表</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-title">公网端口检测</div>
+                        <div class="feature-desc">检测公网IP的端口开放状态，支持全端口扫描和自定义端口列表</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-title">公网端口检测</div>
+                        <div class="feature-desc">检测公网IP的端口开放状态，支持全端口扫描和自定义端口列表</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-title">公网端口检测</div>
+                        <div class="feature-desc">检测公网IP的端口开放状态，支持全端口扫描和自定义端口列表</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-title">公网端口检测</div>
+                        <div class="feature-desc">检测公网IP的端口开放状态，支持全端口扫描和自定义端口列表</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-title">公网端口检测</div>
+                        <div class="feature-desc">检测公网IP的端口开放状态，支持全端口扫描和自定义端口列表</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-title">公网端口检测</div>
+                        <div class="feature-desc">检测公网IP的端口开放状态，支持全端口扫描和自定义端口列表</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-title">公网端口检测</div>
+                        <div class="feature-desc">检测公网IP的端口开放状态，支持全端口扫描和自定义端口列表</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-title">公网端口检测</div>
+                        <div class="feature-desc">检测公网IP的端口开放状态，支持全端口扫描和自定义端口列表</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-title">公网端口检测</div>
+                        <div class="feature-desc">检测公网IP的端口开放状态，支持全端口扫描和自定义端口列表</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-title">公网端口检测</div>
+                        <div class="feature-desc">检测公网IP的端口开放状态，支持全端口扫描和自定义端口列表</div>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">🔍</div>
