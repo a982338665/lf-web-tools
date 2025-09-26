@@ -10,7 +10,7 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -19,16 +19,21 @@
             font-size: 14px;
             overflow-x: auto;
         }
-        
+
         .container {
-            max-width: 1000px;
-            margin: 0 auto;
+            position: fixed;
+            top: 0px;
+            left: 6px;
+            right: 6px;
+            bottom: 16px;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 10px;
-            padding: 12px;
+            padding: 15px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
         }
-        
+
         h1 {
             text-align: center;
             color: #333;
@@ -36,12 +41,12 @@
             font-size: 1.4em;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         }
-        
+
         h1::before {
             content: "🎙️";
             margin-right: 15px;
         }
-        
+
         .status-card {
             background: #fff;
             border-radius: 8px;
@@ -50,12 +55,12 @@
             margin-bottom: 8px;
             text-align: center;
         }
-        
+
         .mic-status {
             font-size: 1.0em;
             margin-bottom: 8px;
         }
-        
+
         .status-indicator {
             display: inline-block;
             width: 15px;
@@ -63,32 +68,32 @@
             border-radius: 50%;
             margin-right: 10px;
         }
-        
+
         .status-connected {
             background-color: #28a745;
         }
-        
+
         .status-disconnected {
             background-color: #dc3545;
         }
-        
+
         .status-testing {
             background-color: #ffc107;
             animation: pulse 1s infinite;
         }
-        
+
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.3; }
         }
-        
+
         .controls {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin-bottom: 25px;
         }
-        
+
         .control-btn {
             background: linear-gradient(45deg, #667eea, #764ba2);
             color: white;
@@ -100,23 +105,23 @@
             transition: all 0.3s ease;
             box-shadow: 0 2px 6px rgba(102, 126, 234, 0.4);
         }
-        
+
         .control-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
         }
-        
+
         .control-btn:disabled {
             background: #6c757d;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
-        
+
         .recording {
             background: linear-gradient(45deg, #dc3545, #fd7e14) !important;
         }
-        
+
         .volume-container {
             background: #fff;
             border-radius: 8px;
@@ -124,14 +129,14 @@
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
             margin-bottom: 8px;
         }
-        
+
         .volume-title {
             font-size: 0.9em;
             margin-bottom: 8px;
             color: #333;
             text-align: center;
         }
-        
+
         .volume-meter {
             width: 100%;
             height: 40px;
@@ -141,7 +146,7 @@
             position: relative;
             margin-bottom: 15px;
         }
-        
+
         .volume-bar {
             height: 100%;
             background: linear-gradient(90deg, #28a745, #ffc107, #dc3545);
@@ -149,13 +154,13 @@
             transition: width 0.1s ease;
             border-radius: 20px;
         }
-        
+
         .volume-text {
             text-align: center;
             font-weight: bold;
             color: #666;
         }
-        
+
         .device-info {
             background: #fff;
             border-radius: 15px;
@@ -163,18 +168,18 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             margin-bottom: 25px;
         }
-        
+
         .device-title {
             font-size: 1.3em;
             margin-bottom: 20px;
             color: #333;
         }
-        
+
         .device-list {
             max-height: 200px;
             overflow-y: auto;
         }
-        
+
         .device-item {
             padding: 10px 15px;
             margin: 5px 0;
@@ -184,7 +189,7 @@
             font-family: 'Courier New', monospace;
             font-size: 0.9em;
         }
-        
+
         .device-select {
             width: 100%;
             padding: 8px 12px;
@@ -194,13 +199,13 @@
             background-color: white;
             cursor: pointer;
         }
-        
+
         .device-select:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
-        
+
         .collapsible-header {
             cursor: pointer;
             user-select: none;
@@ -209,35 +214,35 @@
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .collapsible-header:hover {
             color: #667eea;
         }
-        
+
         .toggle-icon {
             transition: transform 0.3s ease;
             font-size: 0.8em;
             color: #666;
         }
-        
+
         .device-list {
             transition: max-height 0.3s ease, opacity 0.3s ease;
             overflow: hidden;
             max-height: 500px;
             opacity: 1;
         }
-        
+
         .device-list.collapsed {
             max-height: 0;
             opacity: 0;
             margin-top: 0;
             margin-bottom: 0;
         }
-        
+
         .toggle-icon.rotated {
             transform: rotate(-90deg);
         }
-        
+
         .audio-player {
             background: #fff;
             border-radius: 15px;
@@ -245,19 +250,19 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             text-align: center;
         }
-        
+
         .player-title {
             font-size: 1.3em;
             margin-bottom: 20px;
             color: #333;
         }
-        
+
         .recordings-list {
             max-height: 200px;
             overflow-y: auto;
             margin-top: 20px;
         }
-        
+
         .recording-item {
             display: flex;
             justify-content: space-between;
@@ -267,12 +272,12 @@
             background: #f8f9fa;
             border-radius: 8px;
         }
-        
+
         .recording-time {
             font-size: 0.9em;
             color: #666;
         }
-        
+
         .play-btn {
             background: #28a745;
             color: white;
@@ -282,7 +287,7 @@
             cursor: pointer;
             font-size: 0.9em;
         }
-        
+
         .save-btn {
             background: #17a2b8;
             color: white;
@@ -294,11 +299,11 @@
             margin-left: 5px;
             transition: background 0.3s ease;
         }
-        
+
         .save-btn:hover {
             background: #138496;
         }
-        
+
         .delete-btn {
             background: #dc3545;
             color: white;
@@ -309,7 +314,7 @@
             font-size: 0.9em;
             margin-left: 5px;
         }
-        
+
         .tips {
             background: #e3f2fd;
             border-left: 4px solid #2196f3;
@@ -318,16 +323,16 @@
             margin-top: 25px;
             color: #1565c0;
         }
-        
+
         @media (max-width: 768px) {
             .controls {
                 grid-template-columns: 1fr;
             }
-            
+
             h1 {
                 font-size: 1.8em;
             }
-            
+
             .container {
                 padding: 20px;
             }
@@ -337,7 +342,7 @@
 <body>
     <div class="container">
         <h1>麦克风功能测试</h1>
-        
+
         <!-- 麦克风状态 -->
         <div class="status-card">
             <div class="mic-status" id="micStatus">
@@ -346,14 +351,14 @@
             </div>
             <div id="permissionText">请点击"开始检测"按钮获取麦克风权限</div>
         </div>
-        
+
         <!-- 控制按钮 -->
         <div class="controls">
             <button class="control-btn" id="toggleBtn" onclick="toggleMicTest()">🎯 开始检测</button>
             <button class="control-btn" id="recordBtn" onclick="toggleRecording()" disabled>🔴 开始录音</button>
             <button class="control-btn" onclick="refreshDevices()">🔄 刷新设备</button>
         </div>
-        
+
         <!-- 音量监测 -->
         <div class="volume-container">
             <div class="volume-title">🔊 音量监测</div>
@@ -362,7 +367,7 @@
             </div>
             <div class="volume-text" id="volumeText">音量: 0%</div>
         </div>
-        
+
         <!-- 设备选择 -->
         <div class="device-info">
             <div class="device-title">🎤 音频设备选择</div>
@@ -387,14 +392,14 @@
                 <div style="text-align: center; color: #666;">正在检测音频设备...</div>
             </div>
         </div>
-        
+
         <!-- 录音播放 -->
         <div class="audio-player">
             <div class="player-title">🎵 录音回放</div>
             <div id="noRecordings">暂无录音文件</div>
             <div class="recordings-list" id="recordingsList"></div>
         </div>
-        
+
         <!-- 使用提示 -->
         <div class="tips">
             <strong>💡 使用提示：</strong><br>
@@ -422,13 +427,13 @@
         let isTestingMic = false;
         let currentInputDeviceId = null;
         let currentOutputDeviceId = null;
-        
+
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', function() {
             checkMicrophoneSupport();
             refreshDevices();
         });
-        
+
         // 检查浏览器支持
         function checkMicrophoneSupport() {
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -439,7 +444,7 @@
             }
             return true;
         }
-        
+
         // 切换麦克风测试状态
         function toggleMicTest() {
             if (isTestingMic) {
@@ -448,43 +453,43 @@
                 startMicTest();
             }
         }
-        
+
         // 开始麦克风测试
         async function startMicTest() {
             try {
                 updateStatus('testing', '请求麦克风权限...');
-                
-                const constraints = { 
+
+                const constraints = {
                     audio: {
                         echoCancellation: true,
                         noiseSuppression: true,
                         autoGainControl: true
                     }
                 };
-                
+
                 // 如果选择了特定的输入设备，使用该设备
                 if (currentInputDeviceId) {
                     constraints.audio.deviceId = { exact: currentInputDeviceId };
                 }
-                
+
                 mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-                
+
                 updateStatus('connected', '麦克风连接成功');
                 document.getElementById('permissionText').textContent = '麦克风权限已授权，可以正常使用';
-                
+
                 // 更新按钮状态
                 const toggleBtn = document.getElementById('toggleBtn');
                 toggleBtn.textContent = '⏹️ 停止检测';
                 toggleBtn.style.background = 'linear-gradient(45deg, #dc3545, #fd7e14)';
                 document.getElementById('recordBtn').disabled = false;
                 isTestingMic = true;
-                
+
                 // 初始化音频分析
                 initAudioAnalysis();
-                
+
                 // 开始音量监测
                 startVolumeMonitoring();
-                
+
             } catch (error) {
                 console.error('获取麦克风权限失败:', error);
                 updateStatus('disconnected', '麦克风权限被拒绝或设备不可用');
@@ -492,33 +497,33 @@
                 isTestingMic = false;
             }
         }
-        
+
         // 停止麦克风测试
         function stopMicTest() {
             if (mediaStream) {
                 mediaStream.getTracks().forEach(track => track.stop());
                 mediaStream = null;
             }
-            
+
             if (audioContext) {
                 audioContext.close();
                 audioContext = null;
             }
-            
+
             if (animationId) {
                 cancelAnimationFrame(animationId);
                 animationId = null;
             }
-            
+
             if (isRecording) {
                 stopRecording();
             }
-            
+
             updateStatus('disconnected', '麦克风已断开');
             document.getElementById('permissionText').textContent = '请点击"开始检测"重新连接麦克风';
             document.getElementById('volumeText').textContent = '音量: 0%';
             document.getElementById('volumeBar').style.width = '0%';
-            
+
             // 重置按钮状态
             const toggleBtn = document.getElementById('toggleBtn');
             toggleBtn.textContent = '🎯 开始检测';
@@ -526,49 +531,49 @@
             document.getElementById('recordBtn').disabled = true;
             isTestingMic = false;
         }
-        
+
         // 初始化音频分析
         function initAudioAnalysis() {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
             analyser = audioContext.createAnalyser();
             microphone = audioContext.createMediaStreamSource(mediaStream);
-            
+
             analyser.fftSize = 256;
             const bufferLength = analyser.frequencyBinCount;
             dataArray = new Uint8Array(bufferLength);
-            
+
             microphone.connect(analyser);
         }
-        
+
         // 开始音量监测
         function startVolumeMonitoring() {
             if (!analyser || !dataArray) return;
-            
+
             function updateVolume() {
                 analyser.getByteTimeDomainData(dataArray);
-                
+
                 // 计算RMS (均方根) 用于音量检测
                 let sum = 0;
                 for (let i = 0; i < dataArray.length; i++) {
                     const sample = (dataArray[i] - 128) / 128; // 转换为 -1 到 1 的范围
                     sum += sample * sample;
                 }
-                
+
                 const rms = Math.sqrt(sum / dataArray.length);
                 const volume = Math.round(rms * 100 * 5); // 放大5倍以获得更敏感的响应
                 const clampedVolume = Math.min(100, volume); // 限制在100%以内
-                
+
                 document.getElementById('volumeText').textContent = `音量: ${clampedVolume}%`;
                 document.getElementById('volumeBar').style.width = `${clampedVolume}%`;
-                
+
                 if (isTestingMic) {
                     animationId = requestAnimationFrame(updateVolume);
                 }
             }
-            
+
             updateVolume();
         }
-        
+
         // 切换录音状态
         function toggleRecording() {
             if (isRecording) {
@@ -577,13 +582,13 @@
                 startRecording();
             }
         }
-        
+
         // 开始录音
         function startRecording() {
             if (!mediaStream) return;
-            
+
             recordedChunks = [];
-            
+
             // 尝试使用支持的音频格式
             let mimeType = 'audio/webm';
             if (MediaRecorder.isTypeSupported('audio/webm; codecs=opus')) {
@@ -595,63 +600,63 @@
             } else if (MediaRecorder.isTypeSupported('audio/wav')) {
                 mimeType = 'audio/wav';
             }
-            
+
             mediaRecorder = new MediaRecorder(mediaStream, { mimeType: mimeType });
-            
+
             mediaRecorder.ondataavailable = function(event) {
                 if (event.data.size > 0) {
                     recordedChunks.push(event.data);
                 }
             };
-            
+
             mediaRecorder.onstop = function() {
                 const blob = new Blob(recordedChunks, { type: mimeType });
                 const url = URL.createObjectURL(blob);
                 const timestamp = new Date().toLocaleString('zh-CN');
-                
+
                 recordings.push({
                     url: url,
                     timestamp: timestamp,
                     blob: blob,
                     mimeType: mimeType
                 });
-                
+
                 updateRecordingsList();
             };
-            
+
             mediaRecorder.start();
             isRecording = true;
-            
+
             const recordBtn = document.getElementById('recordBtn');
             recordBtn.textContent = '⏹️ 停止录音';
             recordBtn.classList.add('recording');
         }
-        
+
         // 停止录音
         function stopRecording() {
             if (mediaRecorder && isRecording) {
                 mediaRecorder.stop();
                 isRecording = false;
-                
+
                 const recordBtn = document.getElementById('recordBtn');
                 recordBtn.textContent = '🔴 开始录音';
                 recordBtn.classList.remove('recording');
             }
         }
-        
+
         // 更新录音列表
         function updateRecordingsList() {
             const container = document.getElementById('recordingsList');
             const noRecordings = document.getElementById('noRecordings');
-            
+
             if (recordings.length === 0) {
                 noRecordings.style.display = 'block';
                 container.innerHTML = '';
                 return;
             }
-            
+
             noRecordings.style.display = 'none';
-            
+
             container.innerHTML = recordings.map((recording, index) => `
                 <div class="recording-item">
                     <div>
@@ -667,13 +672,13 @@
                 </div>
             `).join('');
         }
-        
+
         // 播放录音
         async function playRecording(index) {
             try {
                 const recording = recordings[index];
                 const audio = new Audio(recording.url);
-                
+
                 // 设置输出设备（如果支持且选择了设备）
                 if (currentOutputDeviceId && audio.setSinkId) {
                     try {
@@ -682,37 +687,37 @@
                         console.warn('设置输出设备失败:', error);
                     }
                 }
-                
+
                 // 添加播放状态指示
                 const playButton = document.querySelector(`button[onclick="playRecording(${index})"]`);
                 const originalText = playButton.textContent;
                 playButton.textContent = '⏸️ 播放中';
                 playButton.disabled = true;
-                
+
                 audio.onended = function() {
                     playButton.textContent = originalText;
                     playButton.disabled = false;
                 };
-                
+
                 audio.onerror = function(error) {
                     console.error('音频播放失败:', error);
                     playButton.textContent = originalText;
                     playButton.disabled = false;
                     alert('音频播放失败，请重试');
                 };
-                
+
                 await audio.play();
             } catch (error) {
                 console.error('播放录音失败:', error);
                 alert('播放失败，可能需要用户交互权限');
             }
         }
-        
+
         // 保存录音到本地
         function saveRecording(index) {
             try {
                 const recording = recordings[index];
-                
+
                 // 获取文件扩展名
                 let extension = 'webm';
                 if (recording.mimeType) {
@@ -721,61 +726,61 @@
                     else if (recording.mimeType.includes('audio/wav')) extension = 'wav';
                     else if (recording.mimeType.includes('audio/webm')) extension = 'webm';
                 }
-                
+
                 // 生成文件名（使用时间戳）
                 const date = new Date();
                 const filename = `录音_${date.getFullYear()}${(date.getMonth()+1).toString().padStart(2,'0')}${date.getDate().toString().padStart(2,'0')}_${date.getHours().toString().padStart(2,'0')}${date.getMinutes().toString().padStart(2,'0')}${date.getSeconds().toString().padStart(2,'0')}.${extension}`;
-                
+
                 // 创建下载链接
                 const a = document.createElement('a');
                 a.href = recording.url;
                 a.download = filename;
                 a.style.display = 'none';
-                
+
                 // 添加到DOM，触发下载，然后移除
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-                
+
                 // 显示成功反馈
                 const saveButtons = document.querySelectorAll('.save-btn');
                 const currentButton = saveButtons[index];
                 const originalText = currentButton.textContent;
-                
+
                 currentButton.textContent = '✅ 已保存';
                 currentButton.disabled = true;
-                
+
                 setTimeout(() => {
                     currentButton.textContent = originalText;
                     currentButton.disabled = false;
                 }, 2000);
-                
+
                 console.log(`录音已保存为: ${filename}`);
-                
+
             } catch (error) {
                 console.error('保存录音失败:', error);
                 alert('保存录音失败，请重试');
             }
         }
-        
+
         // 删除录音
         function deleteRecording(index) {
             URL.revokeObjectURL(recordings[index].url);
             recordings.splice(index, 1);
             updateRecordingsList();
         }
-        
+
         // 刷新音频设备列表
         async function refreshDevices() {
             try {
                 const devices = await navigator.mediaDevices.enumerateDevices();
                 const audioInputs = devices.filter(device => device.kind === 'audioinput');
                 const audioOutputs = devices.filter(device => device.kind === 'audiooutput');
-                
+
                 // 更新输入设备选择器
                 const inputSelect = document.getElementById('inputDevice');
                 inputSelect.innerHTML = '<option value="">选择输入设备...</option>';
-                
+
                 audioInputs.forEach(device => {
                     const option = document.createElement('option');
                     option.value = device.deviceId;
@@ -785,38 +790,38 @@
                     }
                     inputSelect.appendChild(option);
                 });
-                
+
                 // 设置默认输入设备（优先选择以"默认"开头的设备）
                 if (audioInputs.length > 0 && !currentInputDeviceId) {
                     let defaultDevice = null;
-                    
+
                     // 查找以"默认"开头的设备
                     for (const device of audioInputs) {
                         const label = (device.label || '').toLowerCase();
-                        if (label.startsWith('默认') || label.startsWith('default') || 
+                        if (label.startsWith('默认') || label.startsWith('default') ||
                             label.includes('default device') || label.includes('默认设备')) {
                             defaultDevice = device;
                             break;
                         }
                     }
-                    
+
                     // 如果没找到"默认"设备，使用第一个设备
                     if (!defaultDevice) {
                         defaultDevice = audioInputs[0];
                     }
-                    
+
                     currentInputDeviceId = defaultDevice.deviceId;
                     inputSelect.value = currentInputDeviceId;
-                    
+
                     if (defaultDevice !== audioInputs[0]) {
                         console.log('优先选择的默认输入设备:', defaultDevice.label);
                     }
                 }
-                
+
                 // 更新输出设备选择器
                 const outputSelect = document.getElementById('outputDevice');
                 outputSelect.innerHTML = '<option value="">选择输出设备...</option>';
-                
+
                 audioOutputs.forEach(device => {
                     const option = document.createElement('option');
                     option.value = device.deviceId;
@@ -826,43 +831,43 @@
                     }
                     outputSelect.appendChild(option);
                 });
-                
+
                 // 设置默认输出设备（优先选择以"默认"开头的设备）
                 if (audioOutputs.length > 0 && !currentOutputDeviceId) {
                     let defaultDevice = null;
-                    
+
                     // 查找以"默认"开头的设备
                     for (const device of audioOutputs) {
                         const label = (device.label || '').toLowerCase();
-                        if (label.startsWith('默认') || label.startsWith('default') || 
+                        if (label.startsWith('默认') || label.startsWith('default') ||
                             label.includes('default device') || label.includes('默认设备')) {
                             defaultDevice = device;
                             break;
                         }
                     }
-                    
+
                     // 如果没找到"默认"设备，使用第一个设备
                     if (!defaultDevice) {
                         defaultDevice = audioOutputs[0];
                     }
-                    
+
                     currentOutputDeviceId = defaultDevice.deviceId;
                     outputSelect.value = currentOutputDeviceId;
-                    
+
                     if (defaultDevice !== audioOutputs[0]) {
                         console.log('优先选择的默认输出设备:', defaultDevice.label);
                     }
                 }
-                
+
                 // 更新设备详细信息显示
                 const container = document.getElementById('deviceList');
                 const allDevices = [...audioInputs, ...audioOutputs];
-                
+
                 if (allDevices.length === 0) {
                     container.innerHTML = '<div style="text-align: center; color: #666;">未检测到音频设备</div>';
                     return;
                 }
-                
+
                 container.innerHTML = allDevices.map(device => `
                     <div class="device-item">
                         <strong>设备:</strong> ${device.label || '未知设备'}<br>
@@ -870,19 +875,19 @@
                         <strong>ID:</strong> ${device.deviceId}
                     </div>
                 `).join('');
-                
+
             } catch (error) {
                 console.error('获取设备列表失败:', error);
-                document.getElementById('deviceList').innerHTML = 
+                document.getElementById('deviceList').innerHTML =
                     '<div style="text-align: center; color: #dc3545;">获取设备列表失败</div>';
             }
         }
-        
+
         // 切换输入设备
         async function changeInputDevice() {
             const select = document.getElementById('inputDevice');
             currentInputDeviceId = select.value;
-            
+
             // 如果正在测试麦克风，重新启动以使用新设备
             if (isTestingMic) {
                 stopMicTest();
@@ -891,18 +896,18 @@
                 }, 500);
             }
         }
-        
+
         // 切换输出设备
         function changeOutputDevice() {
             const select = document.getElementById('outputDevice');
             currentOutputDeviceId = select.value;
         }
-        
+
         // 切换设备详细信息的显示/隐藏
         function toggleDeviceList() {
             const deviceList = document.getElementById('deviceList');
             const toggleIcon = document.getElementById('deviceListToggle');
-            
+
             if (deviceList.classList.contains('collapsed')) {
                 deviceList.classList.remove('collapsed');
                 toggleIcon.classList.remove('rotated');
@@ -913,16 +918,16 @@
                 toggleIcon.textContent = '▶';
             }
         }
-        
+
         // 更新状态显示
         function updateStatus(status, message) {
             const indicator = document.getElementById('statusIndicator');
             const text = document.getElementById('statusText');
-            
+
             indicator.className = `status-indicator status-${status}`;
             text.textContent = message;
         }
-        
+
         // 页面离开时清理资源
         window.addEventListener('beforeunload', function() {
             stopMicTest();
