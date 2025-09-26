@@ -87,29 +87,13 @@
         .header-info .status::before {
             content: "🟢";
         }
-        .container {
-            display: grid;
-            grid-template-columns: 250px 1fr;
-            grid-template-rows: 80px 1fr;
-            grid-template-areas:
-                "header header"
-                "sidebar content";
-            height: 100vh;
-            background: rgba(255, 255, 255, 0.95);
-            margin: 10px;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
         /* 左侧导航区域 */
         .sidebar {
             grid-area: sidebar;
             background: #f8f9fa;
             border-right: 1px solid #e9ecef;
             padding: 20px 0;
-            margin: 10px;
         }
-
         .nav-title {
             padding: 0 20px 15px;
             font-size: 0.9em;
