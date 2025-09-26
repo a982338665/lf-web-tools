@@ -26,9 +26,9 @@
             grid-template-areas:
                 "header header"
                 "sidebar content";
-            height: 100vh;
+            height: calc(100vh - 20px);
             background: rgba(255, 255, 255, 0.95);
-            margin: 10px;
+            margin: 10px 10px 20px 10px;
             border-radius: 15px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             overflow: hidden;
@@ -92,7 +92,8 @@
             grid-area: sidebar;
             background: #f8f9fa;
             border-right: 1px solid #e9ecef;
-            padding: 20px 0;
+            padding: 10px 10px 10px 10px;
+            overflow-y: auto;
         }
         .nav-title {
             padding: 0 20px 15px;
@@ -194,14 +195,16 @@
 
         /* 欢迎页面 */
         .welcome-page {
-            padding: 40px;
+            padding: 40px 40px 10px 40px;
             text-align: center;
             height: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            overflow-y: auto;
+            box-sizing: border-box;
         }
 
         .welcome-page.active {
@@ -233,6 +236,8 @@
             gap: 20px;
             width: 100%;
             max-width: 1400px;
+            margin-top: 20px;
+            padding-bottom: 40px;
         }
 
         .feature-card {
@@ -453,6 +458,30 @@
                 </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link" data-page="curl">CURL测试网页</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="portscan">公网端口检测</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="portscan">公网端口检测</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="portscan">公网端口检测</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="portscan">公网端口检测</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="portscan">公网端口检测</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="portscan">公网端口检测</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="portscan">公网端口检测</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="portscan">公网端口检测</a>
                 </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link" data-page="portscan">公网端口检测</a>
