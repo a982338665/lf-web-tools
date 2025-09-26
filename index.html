@@ -12,11 +12,10 @@
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Microsoft YaHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             height: 100vh;
             overflow: hidden;
-            font-size: 14px;
         }
         
         .container {
@@ -47,12 +46,11 @@
         }
         
         .header h1 {
-            font-size: 1.4em;
+            font-size: 1.8em;
             font-weight: bold;
             display: flex;
             align-items: center;
             gap: 15px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         }
         
         .header h1::before {
@@ -98,7 +96,7 @@
         
         .nav-title {
             padding: 0 20px 15px;
-            font-size: 0.9em;
+            font-size: 1.1em;
             font-weight: bold;
             color: #495057;
             border-bottom: 2px solid #e9ecef;
@@ -155,18 +153,9 @@
             content: "🎙️";
         }
         
-        .nav-link[data-page="camera"]::before {
-            content: "📷";
+        .nav-link[data-page="voice-debug"]::before {
+            content: "🔧";
         }
-        
-        .nav-link[data-page="socket"]::before {
-            content: "🔌";
-        }
-        
-        .nav-link[data-page="curl"]::before {
-            content: "🌍";
-        }
-        
         
         .nav-link[data-page="welcome"]::before {
             content: "🏠";
@@ -212,14 +201,14 @@
         }
         
         .welcome-title {
-            font-size: 1.4em;
+            font-size: 3em;
             margin-bottom: 20px;
             color: #333;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
         
         .welcome-subtitle {
-            font-size: 0.9em;
+            font-size: 1.3em;
             color: #666;
             margin-bottom: 40px;
             max-width: 600px;
@@ -252,7 +241,7 @@
         }
         
         .feature-title {
-            font-size: 0.9em;
+            font-size: 1.2em;
             font-weight: bold;
             margin-bottom: 10px;
             color: #333;
@@ -261,7 +250,6 @@
         .feature-desc {
             color: #666;
             line-height: 1.5;
-            font-size: 0.8em;
         }
         
         /* 加载状态 */
@@ -270,7 +258,7 @@
             justify-content: center;
             align-items: center;
             height: 100%;
-            font-size: 0.9em;
+            font-size: 1.2em;
             color: #666;
             background: #f8f9fa;
         }
@@ -404,13 +392,7 @@
                     <a href="#" class="nav-link" data-page="microphone">麦克风功能测试</a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link" data-page="camera">摄像头功能测试</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" data-page="socket">Socket测试网页</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" data-page="curl">CURL测试网页</a>
+                    <a href="#" class="nav-link" data-page="voice-debug">麦克风功能诊断</a>
                 </li>
             </ul>
         </nav>
@@ -441,19 +423,9 @@
                         <div class="feature-desc">测试麦克风设备状态、音频输入和录制功能</div>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-icon">📷</div>
-                        <div class="feature-title">摄像头功能测试</div>
-                        <div class="feature-desc">测试摄像头设备状态、拍照、录像和录音功能</div>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">🔌</div>
-                        <div class="feature-title">Socket测试网页</div>
-                        <div class="feature-desc">WebSocket连接测试，支持ws://和wss://协议，实时消息通信</div>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">🌍</div>
-                        <div class="feature-title">CURL测试网页</div>
-                        <div class="feature-desc">解析并执行CURL命令，支持HTTP/HTTPS请求测试，显示响应结果</div>
+                        <div class="feature-icon">🔧</div>
+                        <div class="feature-title">麦克风功能诊断</div>
+                        <div class="feature-desc">Chrome浏览器语音聊天调试工具，诊断音频问题</div>
                     </div>
                 </div>
             </div>
@@ -467,15 +439,8 @@
             <!-- 麦克风功能测试 -->
             <iframe id="microphoneFrame" src="microphone_test.html"></iframe>
             
-            <!-- 摄像头功能测试 -->
-            <iframe id="cameraFrame" src="camera_test.html"></iframe>
-            
-            <!-- Socket测试网页 -->
-            <iframe id="socketFrame" src="socket_test.html"></iframe>
-            
-            <!-- CURL测试网页 -->
-            <iframe id="curlFrame" src="curl_test.html"></iframe>
-            
+            <!-- 麦克风功能诊断 -->
+            <iframe id="voiceDebugFrame" src="chrome_voice_chat_debug.html"></iframe>
             
             <!-- 加载中页面 -->
             <div class="loading" id="loadingPage" style="display: none;">
@@ -542,9 +507,7 @@
                 'network': 'networkFrame',
                 'ip': 'ipFrame',
                 'microphone': 'microphoneFrame',
-                'camera': 'cameraFrame',
-                'socket': 'socketFrame',
-                'curl': 'curlFrame'
+                'voice-debug': 'voiceDebugFrame'
             };
             return frameMap[page];
         }
@@ -599,15 +562,7 @@
                         break;
                     case '5':
                         e.preventDefault();
-                        document.querySelector('[data-page="camera"]').click();
-                        break;
-                    case '6':
-                        e.preventDefault();
-                        document.querySelector('[data-page="socket"]').click();
-                        break;
-                    case '7':
-                        e.preventDefault();
-                        document.querySelector('[data-page="curl"]').click();
+                        document.querySelector('[data-page="voice-debug"]').click();
                         break;
                 }
             }
