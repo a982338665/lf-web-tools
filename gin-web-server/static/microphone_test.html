@@ -34,6 +34,32 @@
             flex-direction: column;
         }
 
+        .main-content {
+            display: flex;
+            flex: 1;
+            gap: 20px;
+            min-height: 0;
+        }
+
+        .left-panel {
+            flex: 0 0 400px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .right-panel {
+            flex: 1;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            min-width: 400px;
+        }
+
         h1 {
             text-align: center;
             color: #333;
@@ -89,7 +115,7 @@
 
         .controls {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: 1fr;
             gap: 15px;
             margin-bottom: 25px;
         }
@@ -164,9 +190,9 @@
         .device-info {
             background: #fff;
             border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            margin-bottom: 25px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
         }
 
         .device-title {
@@ -247,8 +273,11 @@
             background: #fff;
             border-radius: 15px;
             padding: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             text-align: center;
+            margin-bottom: 20px;
+            min-height: 300px;
+            width: 100%;
         }
 
         .player-title {
@@ -258,9 +287,13 @@
         }
 
         .recordings-list {
-            max-height: 200px;
+            height: 200px;
+            width: 100%;
             overflow-y: auto;
             margin-top: 20px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 10px;
         }
 
         .recording-item {
@@ -324,17 +357,38 @@
             color: #1565c0;
         }
 
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                flex: none;
+                min-height: 300px;
+            }
+            
+            .right-panel {
+                flex: none;
+                min-height: 400px;
+                min-width: auto;
+            }
+        }
+
         @media (max-width: 768px) {
             .controls {
                 grid-template-columns: 1fr;
             }
 
             h1 {
-                font-size: 1.8em;
+                font-size: 1.4em;
             }
 
             .container {
-                padding: 20px;
+                padding: 15px;
+            }
+            
+            .left-panel, .right-panel {
+                padding: 15px;
             }
         }
     </style>
@@ -342,74 +396,82 @@
 <body>
     <div class="container">
         <h1>麦克风功能测试</h1>
-
-        <!-- 麦克风状态 -->
-        <div class="status-card">
-            <div class="mic-status" id="micStatus">
-                <span class="status-indicator status-disconnected" id="statusIndicator"></span>
-                <span id="statusText">等待权限授权...</span>
-            </div>
-            <div id="permissionText">请点击"开始检测"按钮获取麦克风权限</div>
-        </div>
-
-        <!-- 控制按钮 -->
-        <div class="controls">
-            <button class="control-btn" id="toggleBtn" onclick="toggleMicTest()">🎯 开始检测</button>
-            <button class="control-btn" id="recordBtn" onclick="toggleRecording()" disabled>🔴 开始录音</button>
-            <button class="control-btn" onclick="refreshDevices()">🔄 刷新设备</button>
-        </div>
-
-        <!-- 音量监测 -->
-        <div class="volume-container">
-            <div class="volume-title">🔊 音量监测</div>
-            <div class="volume-meter">
-                <div class="volume-bar" id="volumeBar"></div>
-            </div>
-            <div class="volume-text" id="volumeText">音量: 0%</div>
-        </div>
-
-        <!-- 设备选择 -->
-        <div class="device-info">
-            <div class="device-title">🎤 音频设备选择</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-                <div>
-                    <label for="inputDevice" style="display: block; margin-bottom: 8px; font-weight: bold;">输入设备（麦克风）:</label>
-                    <select id="inputDevice" class="device-select" onchange="changeInputDevice()">
-                        <option value="">选择输入设备...</option>
-                    </select>
+        
+        <div class="main-content">
+            <!-- 左侧控制面板 -->
+            <div class="left-panel">
+                <!-- 麦克风状态 -->
+                <div class="status-card">
+                    <div class="mic-status" id="micStatus">
+                        <span class="status-indicator status-disconnected" id="statusIndicator"></span>
+                        <span id="statusText">等待权限授权...</span>
+                    </div>
+                    <div id="permissionText">请点击"开始检测"按钮获取麦克风权限</div>
                 </div>
-                <div>
-                    <label for="outputDevice" style="display: block; margin-bottom: 8px; font-weight: bold;">输出设备（扬声器）:</label>
-                    <select id="outputDevice" class="device-select" onchange="changeOutputDevice()">
-                        <option value="">选择输出设备...</option>
-                    </select>
+
+                <!-- 控制按钮 -->
+                <div class="controls">
+                    <button class="control-btn" id="toggleBtn" onclick="toggleMicTest()">🎯 开始检测</button>
+                    <button class="control-btn" id="recordBtn" onclick="toggleRecording()" disabled>🔴 开始录音</button>
+                    <button class="control-btn" onclick="refreshDevices()">🔄 刷新设备</button>
+                </div>
+
+                <!-- 音量监测 -->
+                <div class="volume-container">
+                    <div class="volume-title">🔊 音量监测</div>
+                    <div class="volume-meter">
+                        <div class="volume-bar" id="volumeBar"></div>
+                    </div>
+                    <div class="volume-text" id="volumeText">音量: 0%</div>
+                </div>
+
+                <!-- 设备选择 -->
+                <div class="device-info">
+                    <div class="device-title">🎤 音频设备选择</div>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px;">
+                        <div>
+                            <label for="inputDevice" style="display: block; margin-bottom: 8px; font-weight: bold;">输入设备（麦克风）:</label>
+                            <select id="inputDevice" class="device-select" onchange="changeInputDevice()">
+                                <option value="">选择输入设备...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="outputDevice" style="display: block; margin-bottom: 8px; font-weight: bold;">输出设备（扬声器）:</label>
+                            <select id="outputDevice" class="device-select" onchange="changeOutputDevice()">
+                                <option value="">选择输出设备...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="device-title collapsible-header" onclick="toggleDeviceList()">
+                        📋 设备详细信息 <span id="deviceListToggle" class="toggle-icon">▼</span>
+                    </div>
+                    <div class="device-list collapsed" id="deviceList">
+                        <div style="text-align: center; color: #666;">正在检测音频设备...</div>
+                    </div>
                 </div>
             </div>
-            <div class="device-title collapsible-header" onclick="toggleDeviceList()">
-                📋 设备详细信息 <span id="deviceListToggle" class="toggle-icon">▼</span>
-            </div>
-            <div class="device-list collapsed" id="deviceList">
-                <div style="text-align: center; color: #666;">正在检测音频设备...</div>
-            </div>
-        </div>
+            
+            <!-- 右侧播放面板 -->
+            <div class="right-panel">
+                <!-- 录音播放 -->
+                <div class="audio-player">
+                    <div class="player-title">🎵 录音回放</div>
+                    <div id="noRecordings">暂无录音文件</div>
+                    <div class="recordings-list" id="recordingsList"></div>
+                </div>
 
-        <!-- 录音播放 -->
-        <div class="audio-player">
-            <div class="player-title">🎵 录音回放</div>
-            <div id="noRecordings">暂无录音文件</div>
-            <div class="recordings-list" id="recordingsList"></div>
-        </div>
-
-        <!-- 使用提示 -->
-        <div class="tips">
-            <strong>💡 使用提示：</strong><br>
-            1. 首次使用需要授权麦克风访问权限<br>
-            2. 绿色表示麦克风正常，红色表示无信号或权限被拒绝<br>
-            3. 说话时音量条会实时显示声音强度<br>
-            4. 可以录制音频并回放测试音质效果<br>
-            5. 点击"💾 保存"按钮可将录音下载到本地<br>
-            6. 点击"📋 设备详细信息"可展开/折叠设备列表<br>
-            7. 如果没有声音，请检查系统音频设置和浏览器权限
+                <!-- 使用提示 -->
+                <div class="tips">
+                    <strong>💡 使用提示：</strong><br>
+                    1. 首次使用需要授权麦克风访问权限<br>
+                    2. 绿色表示麦克风正常，红色表示无信号或权限被拒绝<br>
+                    3. 说话时音量条会实时显示声音强度<br>
+                    4. 可以录制音频并回放测试音质效果<br>
+                    5. 点击"💾 保存"按钮可将录音下载到本地<br>
+                    6. 点击"📋 设备详细信息"可展开/折叠设备列表<br>
+                    7. 如果没有声音，请检查系统音频设置和浏览器权限
+                </div>
+            </div>
         </div>
     </div>
 
@@ -657,20 +719,25 @@
 
             noRecordings.style.display = 'none';
 
-            container.innerHTML = recordings.map((recording, index) => `
+            // 倒序显示录音列表（最新的在最上面）
+            const reversedRecordings = [...recordings].reverse();
+            container.innerHTML = reversedRecordings.map((recording, reverseIndex) => {
+                const originalIndex = recordings.length - 1 - reverseIndex;
+                return `
                 <div class="recording-item">
                     <div>
-                        <strong>录音 ${index + 1}</strong>
+                        <strong>录音 ${originalIndex + 1}</strong>
                         <div class="recording-time">${recording.timestamp}</div>
                         <div style="font-size: 0.8em; color: #666;">${recording.mimeType || 'audio/webm'}</div>
                     </div>
                     <div>
-                        <button class="play-btn" onclick="playRecording(${index})">▶️ 播放</button>
-                        <button class="save-btn" onclick="saveRecording(${index})">💾 保存</button>
-                        <button class="delete-btn" onclick="deleteRecording(${index})">🗑️ 删除</button>
+                        <button class="play-btn" onclick="playRecording(${originalIndex})">▶️ 播放</button>
+                        <button class="save-btn" onclick="saveRecording(${originalIndex})">💾 保存</button>
+                        <button class="delete-btn" onclick="deleteRecording(${originalIndex})">🗑️ 删除</button>
                     </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         // 播放录音
