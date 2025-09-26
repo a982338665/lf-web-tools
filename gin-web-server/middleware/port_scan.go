@@ -57,14 +57,20 @@ func checkPort(host string, port int, timeout time.Duration) PortScanResult {
 	}
 
 	address := fmt.Sprintf("%s:%d", host, port)
+	fmt.Printf("[PORT-SCAN] 正在检测端口: %s\n", address)
+	
 	conn, err := net.DialTimeout("tcp", address, timeout)
 
 	if err != nil {
-		if strings.Contains(err.Error(), "timeout") {
+		fmt.Printf("[PORT-SCAN] 端口 %d 连接失败: %v\n", port, err)
+		if strings.Contains(err.Error(), "timeout") || strings.Contains(err.Error(), "i/o timeout") {
 			result.Status = PortStatusTimeout
 			result.Error = "连接超时"
-		} else if strings.Contains(err.Error(), "refused") {
+		} else if strings.Contains(err.Error(), "refused") || strings.Contains(err.Error(), "connection refused") {
 			result.Status = PortStatusClosed
+		} else if strings.Contains(err.Error(), "unreachable") || strings.Contains(err.Error(), "no route") {
+			result.Status = PortStatusError
+			result.Error = "网络不可达"
 		} else {
 			result.Status = PortStatusError
 			result.Error = err.Error()
@@ -73,6 +79,18 @@ func checkPort(host string, port int, timeout time.Duration) PortScanResult {
 	}
 
 	defer conn.Close()
+	
+	// 尝试写入一个字节来验证连接是否真的可用
+	conn.SetWriteDeadline(time.Now().Add(1 * time.Second))
+	_, writeErr := conn.Write([]byte{0x00})
+	
+	if writeErr != nil {
+		fmt.Printf("[PORT-SCAN] 端口 %d 连接建立但写入失败: %v\n", port, writeErr)
+		// 即使写入失败，如果能建立连接，通常还是认为端口开放
+	} else {
+		fmt.Printf("[PORT-SCAN] 端口 %d 连接并写入成功！\n", port)
+	}
+	
 	result.Status = PortStatusOpen
 	return result
 }
@@ -250,7 +268,10 @@ func HandlePortScan(c *gin.Context) {
 	endTimeStr := endTime.Format("2006-01-02 15:04:05")
 
 	// 统计结果
-	var openPorts, closedPorts, timeoutPorts, errorPorts []int
+	openPorts := make([]int, 0)
+	closedPorts := make([]int, 0)
+	timeoutPorts := make([]int, 0)
+	errorPorts := make([]int, 0)
 	for _, result := range results {
 		switch result.Status {
 		case PortStatusOpen:

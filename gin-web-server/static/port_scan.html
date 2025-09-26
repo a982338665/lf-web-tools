@@ -171,8 +171,6 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 6px;
-            max-height: 200px;
-            overflow-y: auto;
         }
 
         .port-shortcut {
@@ -238,10 +236,10 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            height: 300px;
-            flex-shrink: 0;
+            flex: 2;
+            min-height: 0;
         }
-
+        
         /* 右下日志区域 */
         .log-area {
             background: #fff;
@@ -252,6 +250,8 @@
             flex-direction: column;
             overflow: hidden;
             flex: 1;
+            min-height: 0;
+            max-height: 250px;
         }
 
         .panel-header {
@@ -325,9 +325,9 @@
             background: #f8f9fa;
             padding: 15px;
             border-radius: 6px;
-            max-height: 100%;
+            min-height: 0;
         }
-
+        
         .log-content {
             flex: 1;
             overflow-y: auto;
@@ -335,7 +335,9 @@
             background: #f8f9fa;
             padding: 15px;
             border-radius: 6px;
+            min-height: 0;
             max-height: 100%;
+            word-wrap: break-word;
         }
 
         .log-message {
@@ -454,7 +456,12 @@
             }
 
             .result-area {
-                height: 250px;
+                flex: 2;
+            }
+            
+            .log-area {
+                flex: 1;
+                max-height: 200px;
             }
 
             .config-panel {
@@ -494,7 +501,7 @@
 
                     <div class="form-group">
                         <label class="form-label">目标IP地址</label>
-                        <input type="text" class="form-input" id="hostInput" placeholder="请输入IP地址，例如：8.8.8.8" value="115.190.5.236">
+                        <input type="text" class="form-input" id="hostInput" placeholder="请输入IP地址，例如：8.8.8.8" value="127.0.0.1">
                     </div>
 
                     <div class="form-group">
@@ -702,9 +709,9 @@
 
             let host = hostInput.value.trim();
             if (!host) {
-                host = '115.190.5.236';
+                host = '127.0.0.1';
                 hostInput.value = host;
-                logMessage('info', '使用默认IP地址: 115.190.5.236');
+                logMessage('info', '使用默认IP地址: 127.0.0.1');
             }
 
             // IP地址格式验证
@@ -754,8 +761,8 @@
                         host: host,
                         ports: ports,
                         scanAll: scanAllPorts,
-                        timeout: 3000,
-                        batchSize: 100
+                        timeout: 8000,
+                        batchSize: 20
                     })
                 });
 
@@ -764,6 +771,8 @@
                 }
 
                 const result = await response.json();
+                console.log('收到扫描结果:', result);
+                logMessage('info', '收到扫描响应，正在处理结果...');
                 displayScanResult(result);
                 logMessage('success', '扫描完成');
 
@@ -784,10 +793,10 @@
             const statusSummary = document.getElementById('statusSummary');
 
             // 更新统计信息
-            document.getElementById('openCount').textContent = result.openPorts.length;
-            document.getElementById('closedCount').textContent = result.closedPorts.length;
-            document.getElementById('timeoutCount').textContent = result.timeoutPorts.length;
-            document.getElementById('errorCount').textContent = result.errorPorts.length;
+            document.getElementById('openCount').textContent = result.openPorts ? result.openPorts.length : 0;
+            document.getElementById('closedCount').textContent = result.closedPorts ? result.closedPorts.length : 0;
+            document.getElementById('timeoutCount').textContent = result.timeoutPorts ? result.timeoutPorts.length : 0;
+            document.getElementById('errorCount').textContent = result.errorPorts ? result.errorPorts.length : 0;
 
             statusSummary.style.display = 'grid';
 
@@ -799,12 +808,12 @@
             resultText += `总计端口: ${result.totalScanned}\n`;
             resultText += `=========================================\n\n`;
 
-            if (result.openPorts.length > 0) {
+            if (result.openPorts && result.openPorts.length > 0) {
                 resultText += `🟢 开放端口 (${result.openPorts.length} 个):\n`;
                 resultText += `${result.openPorts.join(', ')}\n\n`;
             }
 
-            if (result.closedPorts.length > 0) {
+            if (result.closedPorts && result.closedPorts.length > 0) {
                 resultText += `🔴 关闭端口 (${result.closedPorts.length} 个):\n`;
                 if (result.closedPorts.length > 50) {
                     resultText += `${result.closedPorts.slice(0, 50).join(', ')}... (仅显示前50个)\n\n`;
@@ -813,7 +822,7 @@
                 }
             }
 
-            if (result.timeoutPorts.length > 0) {
+            if (result.timeoutPorts && result.timeoutPorts.length > 0) {
                 resultText += `⏰ 超时端口 (${result.timeoutPorts.length} 个):\n`;
                 if (result.timeoutPorts.length > 50) {
                     resultText += `${result.timeoutPorts.slice(0, 50).join(', ')}... (仅显示前50个)\n\n`;
@@ -822,7 +831,7 @@
                 }
             }
 
-            if (result.errorPorts.length > 0) {
+            if (result.errorPorts && result.errorPorts.length > 0) {
                 resultText += `❌ 错误端口 (${result.errorPorts.length} 个):\n`;
                 if (result.errorPorts.length > 50) {
                     resultText += `${result.errorPorts.slice(0, 50).join(', ')}... (仅显示前50个)\n\n`;
@@ -834,7 +843,12 @@
             resultContent.textContent = resultText;
 
             // 记录详细日志
-            logMessage('success', `扫描完成 - 开放: ${result.openPorts.length}, 关闭: ${result.closedPorts.length}, 超时: ${result.timeoutPorts.length}, 错误: ${result.errorPorts.length}`);
+            const openCount = result.openPorts ? result.openPorts.length : 0;
+            const closedCount = result.closedPorts ? result.closedPorts.length : 0;
+            const timeoutCount = result.timeoutPorts ? result.timeoutPorts.length : 0;
+            const errorCount = result.errorPorts ? result.errorPorts.length : 0;
+            
+            logMessage('success', `扫描完成 - 开放: ${openCount}, 关闭: ${closedCount}, 超时: ${timeoutCount}, 错误: ${errorCount}`);
             logMessage('info', `总耗时: ${result.duration}`);
         }
 
@@ -870,7 +884,10 @@
         // 滚动到底部
         function scrollToBottom() {
             const logContent = document.getElementById('logContent');
-            logContent.scrollTop = logContent.scrollHeight;
+            // 使用setTimeout确保DOM更新后再滚动
+            setTimeout(() => {
+                logContent.scrollTop = logContent.scrollHeight;
+            }, 10);
         }
 
         // 切换自动滚动
