@@ -34,6 +34,9 @@ func main() {
 	
 	// 设置CORS代理路由
 	middleware.RegisterCorsProxyRoutes(r)
+	
+	// 设置端口扫描路由
+	middleware.RegisterPortScanRoutes(r)
 
 	// 启动服务器
 	r.Run(":8080") // 监听并在0.0.0.0:8080上启动服务

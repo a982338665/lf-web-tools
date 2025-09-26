@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公网端口检测</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 8px;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+
+        .container {
+            position: fixed;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            bottom: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        h1::before {
+            content: "🔍";
+            margin-right: 15px;
+        }
+
+        .main-layout {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            grid-template-rows: 1fr;
+            grid-template-areas:
+                "config right";
+            gap: 15px;
+            min-height: 0;
+        }
+
+        .right-panel {
+            grid-area: right;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* 左侧配置区域 */
+        .config-panel {
+            grid-area: config;
+            background: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .config-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .section-title {
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            height: 30px;
+            flex-shrink: 0;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background-color: white;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .radio-option input[type="radio"] {
+            margin: 0;
+        }
+
+        .ports-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .ports-input {
+            flex: 1;
+        }
+
+        .clear-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s;
+        }
+
+        .clear-btn:hover {
+            background: #c82333;
+        }
+
+        .port-shortcuts {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .port-shortcut {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 5px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            text-align: center;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .port-shortcut:hover {
+            background: #e9ecef;
+            transform: translateY(-1px);
+        }
+
+        .port-shortcut.selected {
+            background: #e3f2fd;
+            border-color: #2196f3;
+            color: #1976d2;
+        }
+
+        .scan-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-shrink: 0;
+        }
+
+        .scan-btn {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            flex: 1;
+            transition: all 0.3s;
+        }
+
+        .scan-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+        }
+
+        .scan-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 右上结果区域 */
+        .result-area {
+            background: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            height: 300px;
+            flex-shrink: 0;
+        }
+
+        /* 右下日志区域 */
+        .log-area {
+            background: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            flex: 1;
+        }
+
+        .panel-header {
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            height: 30px;
+            flex-shrink: 0;
+        }
+
+        .panel-title {
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .panel-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .panel-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s;
+        }
+
+        .panel-btn:hover {
+            background: #5a6268;
+        }
+
+        .panel-btn.save {
+            background: #28a745;
+        }
+
+        .panel-btn.save:hover {
+            background: #218838;
+        }
+
+        .panel-btn.clear {
+            background: #dc3545;
+        }
+
+        .panel-btn.clear:hover {
+            background: #c82333;
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .result-content {
+            flex: 1;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            max-height: 100%;
+        }
+
+        .log-content {
+            flex: 1;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            max-height: 100%;
+        }
+
+        .log-message {
+            margin-bottom: 8px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            background: #ffffff;
+            border-left: 3px solid #6c757d;
+        }
+
+        .log-message.info {
+            border-left-color: #17a2b8;
+            background: #e7f3ff;
+        }
+
+        .log-message.success {
+            border-left-color: #28a745;
+            background: #eaf5ea;
+        }
+
+        .log-message.warning {
+            border-left-color: #ffc107;
+            background: #fff8e1;
+        }
+
+        .log-message.error {
+            border-left-color: #dc3545;
+            background: #ffeaea;
+        }
+
+        .log-time {
+            color: #666;
+            font-size: 0.9em;
+            margin-right: 8px;
+        }
+
+        .log-type {
+            font-weight: bold;
+            margin-right: 8px;
+            text-transform: uppercase;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 8px;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            height: 100%;
+            transition: width 0.3s;
+            width: 0%;
+        }
+
+        .status-summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .status-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .status-card.open {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .status-card.closed {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        .status-card.timeout {
+            background: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+
+        .status-card.error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        .status-count {
+            font-size: 18px;
+            font-weight: bold;
+            display: block;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+                grid-template-areas:
+                    "config"
+                    "right";
+            }
+
+            .right-panel {
+                min-height: 600px;
+            }
+
+            .result-area {
+                height: 250px;
+            }
+
+            .config-panel {
+                max-height: none;
+            }
+
+            .port-shortcuts {
+                grid-template-columns: repeat(4, 1fr);
+                max-height: 120px;
+            }
+
+            .status-summary {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .port-shortcuts {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .status-summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>公网端口检测</h1>
+
+        <div class="main-layout">
+            <!-- 左侧配置区域 -->
+            <div class="config-panel">
+                <div class="config-section">
+                    <div class="section-title">⚙️ 扫描配置</div>
+
+                    <div class="form-group">
+                        <label class="form-label">目标IP地址</label>
+                        <input type="text" class="form-input" id="hostInput" placeholder="请输入IP地址，例如：8.8.8.8" value="115.190.5.236">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">扫描范围</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="scanType" value="all" id="scanAll">
+                                <span>全端口 (1-65535)</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="scanType" value="custom" id="scanCustom" checked>
+                                <span>自定义</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="customPortsGroup">
+                        <label class="form-label">端口列表 (用逗号分隔)</label>
+                        <div class="ports-input-group">
+                            <input type="text" class="form-input ports-input" id="portsInput"
+                                   placeholder="例如：22,80,443,8080 或 1000-2000" value="8080,80,3306,6379">
+                            <button class="clear-btn" onclick="clearPorts()">清空</button>
+                        </div>
+
+                        <div class="port-shortcuts" id="portShortcuts">
+                            <div class="port-shortcut" data-port="80" data-name="nginx">nginx:80</div>
+                            <div class="port-shortcut" data-port="8080" data-name="tomcat">tomcat:8080</div>
+                            <div class="port-shortcut" data-port="22" data-name="ssh">ssh:22</div>
+                            <div class="port-shortcut" data-port="6379" data-name="redis">redis:6379</div>
+                            <div class="port-shortcut" data-port="27017" data-name="mongodb">mongodb:27017</div>
+                            <div class="port-shortcut" data-port="3306" data-name="mysql">mysql:3306</div>
+                            <div class="port-shortcut" data-port="5432" data-name="pgsql">pgsql:5432</div>
+                            <div class="port-shortcut" data-port="1521" data-name="oracle">oracle:1521</div>
+                            <div class="port-shortcut" data-port="5236" data-name="dameng">dameng:5236</div>
+                            <div class="port-shortcut" data-port="1433" data-name="sqlserver">sqlserver:1433</div>
+                            <div class="port-shortcut" data-port="9200" data-name="elasticsearch">elasticsearch:9200</div>
+                            <div class="port-shortcut" data-port="9092" data-name="kafka">kafka:9092</div>
+                            <div class="port-shortcut" data-port="5672" data-name="rabbitmq">rabbitmq:5672</div>
+                            <div class="port-shortcut" data-port="9876" data-name="rocketmq">rocketmq:9876</div>
+                            <div class="port-shortcut" data-port="61616" data-name="activemq">activemq:61616</div>
+                            <div class="port-shortcut" data-port="2181" data-name="zookeeper">zookeeper:2181</div>
+                            <div class="port-shortcut" data-port="5601" data-name="kibana">kibana:5601</div>
+                            <div class="port-shortcut" data-port="8500" data-name="consul">consul:8500</div>
+                        </div>
+                    </div>
+
+                    <div class="scan-controls">
+                        <button class="scan-btn" id="scanBtn" onclick="startScan()">🚀 开始扫描</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧面板 -->
+            <div class="right-panel">
+                <!-- 右上结果区域 -->
+                <div class="result-area">
+                    <div class="panel-header">
+                        <div class="panel-title">📊 扫描结果</div>
+                        <div class="panel-actions">
+                            <button class="panel-btn save" onclick="saveResult()">保存</button>
+                            <button class="panel-btn clear" onclick="clearResult()">清空</button>
+                        </div>
+                    </div>
+
+                    <div class="progress-bar" id="progressBar" style="display: none;">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+
+                    <div class="status-summary" id="statusSummary" style="display: none;">
+                        <div class="status-card open">
+                            <span class="status-count" id="openCount">0</span>
+                            开放
+                        </div>
+                        <div class="status-card closed">
+                            <span class="status-count" id="closedCount">0</span>
+                            关闭
+                        </div>
+                        <div class="status-card timeout">
+                            <span class="status-count" id="timeoutCount">0</span>
+                            超时
+                        </div>
+                        <div class="status-card error">
+                            <span class="status-count" id="errorCount">0</span>
+                            错误
+                        </div>
+                    </div>
+
+                    <div class="result-content" id="resultContent">
+                        点击"开始扫描"开始端口检测...
+                    </div>
+                </div>
+
+                <!-- 右下日志区域 -->
+                <div class="log-area">
+                    <div class="panel-header">
+                        <div class="panel-title">📝 扫描日志</div>
+                        <div class="panel-actions">
+                            <button class="panel-btn" id="autoScrollBtn" onclick="toggleAutoScroll()">📜 自动滚动</button>
+                            <button class="panel-btn save" onclick="saveLog()">保存</button>
+                            <button class="panel-btn clear" onclick="clearLog()">清空</button>
+                        </div>
+                    </div>
+
+                    <div class="log-content" id="logContent">
+                        <!-- 日志内容 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let autoScroll = true;
+        let isScanning = false;
+        let selectedPorts = new Set();
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initPortShortcuts();
+            initScanTypeToggle();
+            logMessage('info', '端口扫描工具初始化完成');
+        });
+
+        // 初始化端口快捷方式
+        function initPortShortcuts() {
+            const shortcuts = document.querySelectorAll('.port-shortcut');
+            shortcuts.forEach(shortcut => {
+                shortcut.addEventListener('click', function() {
+                    const port = this.getAttribute('data-port');
+                    const name = this.getAttribute('data-name');
+                    togglePortSelection(port, name, this);
+                });
+            });
+        }
+
+        // 初始化扫描类型切换
+        function initScanTypeToggle() {
+            const scanAll = document.getElementById('scanAll');
+            const scanCustom = document.getElementById('scanCustom');
+            const customPortsGroup = document.getElementById('customPortsGroup');
+
+            scanAll.addEventListener('change', function() {
+                if (this.checked) {
+                    customPortsGroup.style.display = 'none';
+                }
+            });
+
+            scanCustom.addEventListener('change', function() {
+                if (this.checked) {
+                    customPortsGroup.style.display = 'block';
+                }
+            });
+        }
+
+        // 切换端口选择
+        function togglePortSelection(port, name, element) {
+            const portsInput = document.getElementById('portsInput');
+            let currentPorts = portsInput.value.trim();
+
+            if (selectedPorts.has(port)) {
+                // 移除端口
+                selectedPorts.delete(port);
+                element.classList.remove('selected');
+
+                // 从输入框中移除
+                const portsArray = currentPorts.split(',').map(p => p.trim()).filter(p => p !== '' && p !== port);
+                portsInput.value = portsArray.join(',');
+
+                logMessage('info', `已移除端口: ${port} (${name})`);
+            } else {
+                // 添加端口
+                selectedPorts.add(port);
+                element.classList.add('selected');
+
+                // 添加到输入框
+                if (currentPorts === '') {
+                    portsInput.value = port;
+                } else {
+                    portsInput.value = currentPorts + ',' + port;
+                }
+
+                logMessage('info', `已添加端口: ${port} (${name})`);
+            }
+        }
+
+        // 清空端口
+        function clearPorts() {
+            document.getElementById('portsInput').value = '';
+            selectedPorts.clear();
+
+            // 移除所有选中状态
+            document.querySelectorAll('.port-shortcut.selected').forEach(el => {
+                el.classList.remove('selected');
+            });
+
+            logMessage('info', '已清空所有端口');
+        }
+
+        // 开始扫描
+        async function startScan() {
+            const hostInput = document.getElementById('hostInput');
+            const portsInput = document.getElementById('portsInput');
+            const scanAll = document.getElementById('scanAll');
+            const scanBtn = document.getElementById('scanBtn');
+
+            let host = hostInput.value.trim();
+            if (!host) {
+                host = '115.190.5.236';
+                hostInput.value = host;
+                logMessage('info', '使用默认IP地址: 115.190.5.236');
+            }
+
+            // IP地址格式验证
+            const ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+            if (!ipRegex.test(host)) {
+                logMessage('error', '请输入有效的IP地址格式');
+                return;
+            }
+
+            let ports = '';
+            let scanAllPorts = scanAll.checked;
+
+            if (!scanAllPorts) {
+                ports = portsInput.value.trim();
+                if (!ports) {
+                    ports = '8080,80,3306,6379';
+                    portsInput.value = ports;
+                    logMessage('info', '使用默认端口: 8080,80,3306,6379');
+                }
+            }
+
+            // 开始扫描
+            isScanning = true;
+            scanBtn.disabled = true;
+            scanBtn.textContent = '⏳ 扫描中...';
+
+            // 显示进度条
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            progressBar.style.display = 'block';
+            progressFill.style.width = '0%';
+
+            logMessage('info', `开始扫描主机: ${host}`);
+            if (scanAllPorts) {
+                logMessage('info', '扫描类型: 全端口 (1-65535)');
+            } else {
+                logMessage('info', `扫描端口: ${ports}`);
+            }
+
+            try {
+                const response = await fetch('/port-scan', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        host: host,
+                        ports: ports,
+                        scanAll: scanAllPorts,
+                        timeout: 3000,
+                        batchSize: 100
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`请求失败: ${response.status} ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                displayScanResult(result);
+                logMessage('success', '扫描完成');
+
+            } catch (error) {
+                logMessage('error', `扫描失败: ${error.message}`);
+                document.getElementById('resultContent').textContent = `扫描失败: ${error.message}`;
+            } finally {
+                isScanning = false;
+                scanBtn.disabled = false;
+                scanBtn.textContent = '🚀 开始扫描';
+                progressBar.style.display = 'none';
+            }
+        }
+
+        // 显示扫描结果
+        function displayScanResult(result) {
+            const resultContent = document.getElementById('resultContent');
+            const statusSummary = document.getElementById('statusSummary');
+
+            // 更新统计信息
+            document.getElementById('openCount').textContent = result.openPorts.length;
+            document.getElementById('closedCount').textContent = result.closedPorts.length;
+            document.getElementById('timeoutCount').textContent = result.timeoutPorts.length;
+            document.getElementById('errorCount').textContent = result.errorPorts.length;
+
+            statusSummary.style.display = 'grid';
+
+            // 构建结果显示
+            let resultText = '';
+            resultText += `扫描主机: ${result.host}\n`;
+            resultText += `扫描时间: ${result.startTime} - ${result.endTime}\n`;
+            resultText += `扫描耗时: ${result.duration}\n`;
+            resultText += `总计端口: ${result.totalScanned}\n`;
+            resultText += `=========================================\n\n`;
+
+            if (result.openPorts.length > 0) {
+                resultText += `🟢 开放端口 (${result.openPorts.length} 个):\n`;
+                resultText += `${result.openPorts.join(', ')}\n\n`;
+            }
+
+            if (result.closedPorts.length > 0) {
+                resultText += `🔴 关闭端口 (${result.closedPorts.length} 个):\n`;
+                if (result.closedPorts.length > 50) {
+                    resultText += `${result.closedPorts.slice(0, 50).join(', ')}... (仅显示前50个)\n\n`;
+                } else {
+                    resultText += `${result.closedPorts.join(', ')}\n\n`;
+                }
+            }
+
+            if (result.timeoutPorts.length > 0) {
+                resultText += `⏰ 超时端口 (${result.timeoutPorts.length} 个):\n`;
+                if (result.timeoutPorts.length > 50) {
+                    resultText += `${result.timeoutPorts.slice(0, 50).join(', ')}... (仅显示前50个)\n\n`;
+                } else {
+                    resultText += `${result.timeoutPorts.join(', ')}\n\n`;
+                }
+            }
+
+            if (result.errorPorts.length > 0) {
+                resultText += `❌ 错误端口 (${result.errorPorts.length} 个):\n`;
+                if (result.errorPorts.length > 50) {
+                    resultText += `${result.errorPorts.slice(0, 50).join(', ')}... (仅显示前50个)\n\n`;
+                } else {
+                    resultText += `${result.errorPorts.join(', ')}\n\n`;
+                }
+            }
+
+            resultContent.textContent = resultText;
+
+            // 记录详细日志
+            logMessage('success', `扫描完成 - 开放: ${result.openPorts.length}, 关闭: ${result.closedPorts.length}, 超时: ${result.timeoutPorts.length}, 错误: ${result.errorPorts.length}`);
+            logMessage('info', `总耗时: ${result.duration}`);
+        }
+
+        // 记录日志消息
+        function logMessage(type, message) {
+            const logContent = document.getElementById('logContent');
+            const logDiv = document.createElement('div');
+            logDiv.className = `log-message ${type}`;
+
+            const timestamp = new Date().toLocaleTimeString();
+
+            logDiv.innerHTML = `
+                <span class="log-time">[${timestamp}]</span>
+                <span class="log-type">${type.toUpperCase()}</span>
+                ${message}
+            `;
+
+            logContent.appendChild(logDiv);
+
+            // 限制日志数量
+            const maxLogs = 500;
+            const allLogs = logContent.querySelectorAll('.log-message');
+            if (allLogs.length > maxLogs) {
+                allLogs[0].remove();
+            }
+
+            // 自动滚动到底部
+            if (autoScroll) {
+                scrollToBottom();
+            }
+        }
+
+        // 滚动到底部
+        function scrollToBottom() {
+            const logContent = document.getElementById('logContent');
+            logContent.scrollTop = logContent.scrollHeight;
+        }
+
+        // 切换自动滚动
+        function toggleAutoScroll() {
+            autoScroll = !autoScroll;
+            const btn = document.getElementById('autoScrollBtn');
+            btn.textContent = autoScroll ? '📜 自动滚动' : '📜 手动滚动';
+
+            if (autoScroll) {
+                scrollToBottom();
+            }
+
+            logMessage('info', `自动滚动已${autoScroll ? '启用' : '禁用'}`);
+        }
+
+        // 保存结果
+        function saveResult() {
+            const resultContent = document.getElementById('resultContent');
+            const content = `端口扫描结果 - ${new Date().toLocaleString()}\n${'='.repeat(50)}\n\n${resultContent.textContent}`;
+
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `port-scan-result-${new Date().getTime()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            logMessage('info', '扫描结果已保存');
+        }
+
+        // 保存日志
+        function saveLog() {
+            const logMessages = document.querySelectorAll('.log-message');
+            let logContent = `端口扫描日志 - ${new Date().toLocaleString()}\n${'='.repeat(50)}\n\n`;
+
+            logMessages.forEach(msg => {
+                logContent += msg.textContent + '\n';
+            });
+
+            const blob = new Blob([logContent], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `port-scan-log-${new Date().getTime()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            logMessage('info', '扫描日志已保存');
+        }
+
+        // 清空结果
+        function clearResult() {
+            document.getElementById('resultContent').textContent = '点击"开始扫描"开始端口检测...';
+            document.getElementById('statusSummary').style.display = 'none';
+            logMessage('info', '扫描结果已清空');
+        }
+
+        // 清空日志
+        function clearLog() {
+            document.getElementById('logContent').innerHTML = '';
+            logMessage('info', '扫描日志已清空');
+        }
+    </script>
+</body>
+</html>
