@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hello from Gin</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            text-align: center;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        .message {
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hello from Gin Web Server</h1>
+    <div class="message">
+        <p>{{ .message }}</p>
+        <p>Current time: {{ .time }}</p>
+    </div>
+</body>
+</html>

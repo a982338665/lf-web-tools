@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket测试网页</title>
+
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 8px;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            display: grid;
+            grid-template-rows: auto 1fr;
+            min-height: calc(100vh - 16px);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        h1::before {
+            content: "🔌";
+            margin-right: 15px;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            height: 100%;
+        }
+
+        /* 左侧配置面板 */
+        .config-panel {
+            background: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .config-section {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .config-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 0.9em;
+            background-color: white;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 0.8em;
+            background-color: white;
+            resize: vertical;
+            min-height: 80px;
+            font-family: 'Courier New', monospace;
+            transition: border-color 0.3s;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .control-btn {
+            width: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .control-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .control-btn.success {
+            background: linear-gradient(45deg, #28a745, #20c997);
+        }
+
+        .control-btn.danger {
+            background: linear-gradient(45deg, #dc3545, #fd7e14);
+        }
+
+        .connection-status {
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .status-disconnected {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-connecting {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .status-connected {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* 右侧工作区域 */
+        .work-area {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 15px;
+        }
+
+        /* 消息发送区域 */
+        .message-panel {
+            background: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 0.9em;
+            min-height: 40px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .message-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .send-btn {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+        }
+
+        .send-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 日志显示区域 */
+        .log-panel {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            height: 500px; /* 固定高度 */
+        }
+
+        .log-header {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .log-title {
+            font-size: 1em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .log-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .log-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: background 0.3s;
+        }
+
+        .log-btn:hover {
+            background: #5a6268;
+        }
+
+        .log-btn.clear {
+            background: #dc3545;
+        }
+
+        .log-btn.clear:hover {
+            background: #c82333;
+        }
+
+        .log-select {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 0.8em;
+            cursor: pointer;
+            margin-right: 8px;
+            transition: background 0.3s;
+        }
+
+        .log-select:hover {
+            background: #e9ecef;
+        }
+
+        .log-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+
+        .log-content {
+            flex: 1;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .log-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8em;
+            line-height: 1.4;
+            background: #f8f9fa;
+        }
+
+        .log-message {
+            margin-bottom: 8px;
+            padding: 6px 8px;
+            border-radius: 4px;
+            border-left: 3px solid #6c757d;
+            background: white;
+            word-break: break-all;
+        }
+
+        .log-message.info {
+            border-left-color: #17a2b8;
+            background: #e7f3ff;
+        }
+
+        .log-message.success {
+            border-left-color: #28a745;
+            background: #eaf5ea;
+        }
+
+        .log-message.warning {
+            border-left-color: #ffc107;
+            background: #fff8e1;
+        }
+
+        .log-message.error {
+            border-left-color: #dc3545;
+            background: #ffeaea;
+        }
+
+        .log-time {
+            color: #666;
+            font-size: 0.9em;
+            margin-right: 8px;
+        }
+
+        .log-type {
+            font-weight: bold;
+            margin-right: 8px;
+            text-transform: uppercase;
+        }
+
+        .log-type.send {
+            color: #007bff;
+        }
+
+        .log-type.receive {
+            color: #28a745;
+        }
+
+        .log-type.system {
+            color: #6c757d;
+        }
+
+        .log-type.error {
+            color: #dc3545;
+        }
+
+        /* 消息类型选择 */
+        .message-types {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .message-type-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .message-type-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+            background: #f8f9fa;
+            padding: 6px 10px;
+            border-radius: 15px;
+            transition: all 0.3s;
+            border: 1px solid #dee2e6;
+            user-select: none;
+        }
+
+        .message-type-item:hover {
+            background: #e9ecef;
+        }
+
+        .message-type-item input[type="radio"] {
+            margin: 0;
+        }
+
+        .message-type-item input[type="radio"]:checked + span {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .message-type-item.selected {
+            background: #e3f2fd;
+            border-color: #667eea;
+        }
+
+        .file-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px dashed #e9ecef;
+            border-radius: 6px;
+            font-size: 0.9em;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .file-input:hover {
+            border-color: #667eea;
+            background-color: #f0f8ff;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .config-panel {
+                position: static;
+            }
+
+            .message-input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .send-btn {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Socket测试网页</h1>
+
+        <div class="main-layout">
+            <!-- 左侧配置面板 -->
+            <div class="config-panel">
+                <!-- 连接配置 -->
+                <div class="config-section">
+                    <div class="section-title">🌐 连接配置</div>
+
+                    <div class="form-group">
+                        <label class="form-label">协议类型</label>
+                        <select class="form-select" id="protocolSelect">
+                            <option value="ws">ws:// (WebSocket)</option>
+                            <option value="wss">wss:// (WebSocket Secure)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">服务器地址</label>
+                        <input type="text" class="form-input" id="hostInput" value="localhost:3000" placeholder="localhost:3000">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">路径 (可选)</label>
+                        <input type="text" class="form-input" id="pathInput" value="" placeholder="/ws">
+                    </div>
+
+                    <div class="connection-status" id="connectionStatus">
+                        🔴 未连接
+                    </div>
+
+                    <button class="control-btn" id="connectBtn" onclick="toggleConnection()">🔌 连接</button>
+                </div>
+
+                <!-- Headers配置 -->
+                <div class="config-section">
+                    <div class="section-title">📋 全局Headers</div>
+
+                    <div class="form-group">
+                        <label class="form-label">Headers (JSON格式)</label>
+                        <textarea class="form-textarea" id="headersInput" placeholder='{"Authorization": "Bearer token", "Custom-Header": "value"}'></textarea>
+                    </div>
+
+                    <button class="control-btn" onclick="testHeaders()">🧪 验证Headers</button>
+                </div>
+
+
+                <!-- 工具 -->
+                <div class="config-section">
+                    <div class="section-title">🛠️ 工具</div>
+
+                    <button class="control-btn" onclick="exportLogs()">📤 导出日志</button>
+                    <button class="control-btn danger" onclick="clearAll()">🗑️ 清空所有</button>
+                </div>
+            </div>
+
+            <!-- 右侧工作区域 -->
+            <div class="work-area">
+                <!-- 消息发送区域 -->
+                <div class="message-panel">
+                    <div class="section-title">💬 发送消息</div>
+
+                    <form onsubmit="return false;" style="width: 100%;">
+                        <div class="message-input-group">
+                            <textarea class="message-input" id="messageInput" placeholder="输入要发送的消息..." rows="3" style="display: block;"></textarea>
+                            <input type="file" class="file-input" id="fileInput" style="display: none;" accept="*/*">
+                            <button type="button" class="send-btn" id="sendBtn" disabled>📤 发送</button>
+                        </div>
+                    </form>
+
+                    <div class="message-types">
+                        <div class="section-title" style="margin: 10px 0 8px 0; font-size: 0.8em;">消息类型</div>
+                        <div class="message-type-group">
+                            <label class="message-type-item">
+                                <input type="radio" name="messageType" value="ping" onchange="changeMessageType()">
+                                <span>🏓 Ping</span>
+                            </label>
+                            <label class="message-type-item">
+                                <input type="radio" name="messageType" value="hello" onchange="changeMessageType()">
+                                <span>👋 Hello</span>
+                            </label>
+                            <label class="message-type-item">
+                                <input type="radio" name="messageType" value="json" onchange="changeMessageType()">
+                                <span>📋 JSON测试</span>
+                            </label>
+                            <label class="message-type-item">
+                                <input type="radio" name="messageType" value="timestamp" onchange="changeMessageType()">
+                                <span>🕐 时间戳</span>
+                            </label>
+                            <label class="message-type-item">
+                                <input type="radio" name="messageType" value="binary" onchange="changeMessageType()">
+                                <span>📁 二进制测试</span>
+                            </label>
+                            <label class="message-type-item">
+                                <input type="radio" name="messageType" value="custom" onchange="changeMessageType()" checked>
+                                <span>✏️ 自定义</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 日志显示区域 -->
+                <div class="log-panel">
+                    <div class="log-header">
+                        <div class="log-title">📋 连接日志</div>
+                        <div class="log-actions">
+                            <select class="log-select" id="logLinesSelect" onchange="changeLogLines()">
+                                <option value="100" selected>100行</option>
+                                <option value="1000">1000行</option>
+                                <option value="3000">3000行</option>
+                                <option value="5000">5000行</option>
+                            </select>
+                            <button class="log-btn" onclick="toggleLogPause()" id="logPauseBtn">⏸️ 暂停</button>
+                            <button class="log-btn" onclick="toggleAutoScroll()" id="autoScrollBtn">📜 自动滚动</button>
+                            <button class="log-btn" onclick="saveLog()">💾 保存日志</button>
+                            <button class="log-btn clear" onclick="clearLog()">🗑️ 清空</button>
+                        </div>
+                    </div>
+                    <div class="log-content">
+                        <div class="log-messages" id="logMessages">
+                            <!-- 日志消息将通过JavaScript动态添加 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        let socket = null;
+        let isConnected = false;
+        let autoScroll = true;
+        let reconnectAttempts = 0;
+        let maxReconnectAttempts = 5;
+        let pingInterval = null;
+        let connectionStartTime = null;
+        let maxLogLines = 100;
+        let logCounter = 0;
+        let logPaused = false;
+        let pausedMessages = [];
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 监听回车发送消息
+            document.getElementById('messageInput').addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key === 'Enter') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    sendMessage(e);
+                }
+            });
+
+            // 修改发送按钮绑定，彻底阻止默认行为
+            const sendBtn = document.getElementById('sendBtn');
+            sendBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+
+                // 静默发送消息
+                setTimeout(() => {
+                    sendMessage(e);
+                }, 0);
+
+                return false;
+            }, { passive: false });
+
+            // 阻止按钮的所有可能触发声音的事件
+            sendBtn.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }, { passive: false });
+
+            sendBtn.addEventListener('mouseup', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }, { passive: false });
+
+            // 初始化UI状态
+            updateConnectionUI();
+
+            // 初始化消息类型选择状态
+            changeMessageType();
+
+            logMessage('system', 'Socket测试工具已启动，请配置连接参数');
+        });
+
+        // 切换连接状态
+        function toggleConnection() {
+            if (isConnected) {
+                disconnect();
+            } else {
+                connect();
+            }
+        }
+
+        // 建立连接
+        function connect() {
+            const protocol = document.getElementById('protocolSelect').value;
+            const host = document.getElementById('hostInput').value.trim();
+            const path = document.getElementById('pathInput').value.trim();
+
+            if (!host) {
+                logMessage('error', '请输入服务器地址');
+                return;
+            }
+
+            // 构建WebSocket URL
+            const fullPath = path.startsWith('/') ? path : (path ? '/' + path : '');
+            const wsUrl = `${protocol}://${host}${fullPath}`;
+
+            logMessage('system', `正在连接到: ${wsUrl}`);
+            updateConnectionStatus('connecting', '🔄 连接中...');
+
+            try {
+                // 获取Headers配置
+                const headersText = document.getElementById('headersInput').value.trim();
+                let headers = {};
+
+                if (headersText) {
+                    try {
+                        headers = JSON.parse(headersText);
+                        logMessage('info', `使用Headers: ${JSON.stringify(headers)}`);
+                    } catch (e) {
+                        logMessage('warning', `Headers格式错误，将忽略: ${e.message}`);
+                    }
+                }
+
+                // 创建WebSocket连接
+                socket = new WebSocket(wsUrl);
+                connectionStartTime = Date.now();
+
+                // 连接事件处理
+                socket.onopen = function(event) {
+                    isConnected = true;
+                    reconnectAttempts = 0;
+                    const duration = Date.now() - connectionStartTime;
+
+                    logMessage('success', `连接建立成功! 耗时: ${duration}ms`);
+                    logMessage('info', `协议: ${socket.protocol || '未指定'}`);
+                    logMessage('info', `就绪状态: ${getReadyStateText(socket.readyState)}`);
+
+                    updateConnectionStatus('connected', '🟢 已连接');
+                    updateConnectionUI();
+
+                    // 开始ping测试
+                    startPingMonitor();
+                };
+
+                socket.onmessage = function(event) {
+                    const timestamp = new Date().toLocaleTimeString();
+                    let message = '';
+
+                    if (typeof event.data === 'string') {
+                        message = event.data;
+                        logMessage('receive', `📥 [${timestamp}] ${message}`);
+                    } else {
+                        // 二进制数据
+                        message = `二进制数据 (${event.data.byteLength || event.data.size} bytes)`;
+                        logMessage('receive', `📥 [${timestamp}] ${message}`);
+                    }
+                };
+
+                socket.onclose = function(event) {
+                    isConnected = false;
+                    stopPingMonitor();
+
+                    const reason = getCloseReason(event.code);
+                    logMessage('warning', `连接关闭 - 代码: ${event.code}, 原因: ${reason}`);
+                    logMessage('info', `是否为主动关闭: ${event.wasClean ? '是' : '否'}`);
+
+                    updateConnectionStatus('disconnected', '🔴 未连接');
+                    updateConnectionUI();
+
+                    // 自动重连逻辑
+                    if (!event.wasClean && reconnectAttempts < maxReconnectAttempts) {
+                        reconnectAttempts++;
+                        logMessage('info', `${reconnectAttempts}秒后尝试第${reconnectAttempts}次重连...`);
+                        setTimeout(() => {
+                            if (!isConnected) {
+                                connect();
+                            }
+                        }, reconnectAttempts * 1000);
+                    }
+                };
+
+                socket.onerror = function(error) {
+                    logMessage('error', `连接错误: ${error.message || '未知错误'}`);
+                    updateConnectionStatus('error', '❌ 连接错误');
+                };
+
+            } catch (error) {
+                logMessage('error', `创建连接失败: ${error.message}`);
+                updateConnectionStatus('error', '❌ 连接失败');
+            }
+        }
+
+        // 断开连接
+        function disconnect() {
+            if (socket && isConnected) {
+                stopPingMonitor();
+                socket.close(1000, '用户主动断开连接');
+                logMessage('system', '用户主动断开连接');
+            }
+        }
+
+        // 发送消息
+        function sendMessage(event) {
+            // 阻止任何默认行为，确保静默操作
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            if (!isConnected || !socket) {
+                logMessage('error', '未连接到服务器');
+                return false;
+            }
+
+            const selectedType = document.querySelector('input[name="messageType"]:checked').value;
+            let messageToSend = '';
+            let messageDisplay = '';
+
+            try {
+                if (selectedType === 'binary') {
+                    // 二进制文件发送
+                    const fileInput = document.getElementById('fileInput');
+
+                    // 检查WebSocket连接状态
+                    if (!socket || socket.readyState !== WebSocket.OPEN) {
+                        logMessage('error', '连接已断开，无法发送二进制数据');
+                        return;
+                    }
+
+                    // 检查是否选择了文件
+                    if (fileInput.files && fileInput.files.length > 0) {
+                        const file = fileInput.files[0];
+
+                        // 最简化的文件读取方式
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            socket.send(e.target.result);
+                            const timestamp = new Date().toLocaleTimeString();
+                            logMessage('send', `📤 [${timestamp}] 二进制文件: ${file.name} (${file.size} bytes)`);
+                        };
+                        reader.onerror = function() {
+                            logMessage('error', '文件读取失败');
+                        };
+                        reader.readAsArrayBuffer(file);
+
+                        logMessage('info', `开始读取文件: ${file.name} (${file.size} bytes)`);
+                        return false;
+
+                    } else {
+                        // 发送默认二进制数据（最简化版本）
+                        const buffer = new ArrayBuffer(16);
+                        const view = new Uint8Array(buffer);
+                        view.set([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]);
+
+                        socket.send(buffer);
+                        messageDisplay = `默认二进制数据 (16 bytes)`;
+                    }
+                } else {
+                    // 文本消息
+                    const messageInput = document.getElementById('messageInput');
+                    const customMessage = messageInput.value.trim();
+
+                    switch (selectedType) {
+                        case 'ping':
+                            messageToSend = customMessage || 'ping';
+                            break;
+                        case 'hello':
+                            messageToSend = customMessage || 'hello world';
+                            break;
+                        case 'json':
+                            messageToSend = customMessage || '{"type":"test","data":"hello","timestamp":' + Date.now() + '}';
+                            break;
+                        case 'timestamp':
+                            messageToSend = customMessage || 'timestamp:' + Date.now();
+                            break;
+                        case 'custom':
+                        default:
+                            messageToSend = customMessage;
+                            if (!messageToSend) {
+                                logMessage('warning', '自定义消息内容为空');
+                                return;
+                            }
+                            break;
+                    }
+
+                    messageDisplay = messageToSend;
+                    socket.send(messageToSend);
+
+                    // 清空输入框（仅对自定义消息）
+                    if (selectedType === 'custom') {
+                        messageInput.value = '';
+                    }
+                }
+
+                const timestamp = new Date().toLocaleTimeString();
+                logMessage('send', `📤 [${timestamp}] ${messageDisplay}`);
+
+            } catch (error) {
+                logMessage('error', `发送消息失败: ${error.message}`);
+            }
+
+            return false; // 确保完全静默，不触发任何默认行为
+        }
+
+        // 切换消息类型
+        function changeMessageType() {
+            const selectedType = document.querySelector('input[name="messageType"]:checked').value;
+            const messageInput = document.getElementById('messageInput');
+            const fileInput = document.getElementById('fileInput');
+
+            // 更新选中状态的视觉效果
+            document.querySelectorAll('.message-type-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            document.querySelector('input[name="messageType"]:checked').parentElement.classList.add('selected');
+
+            if (selectedType === 'binary') {
+                // 显示文件选择框
+                messageInput.style.display = 'none';
+                fileInput.style.display = 'block';
+                fileInput.parentElement.style.alignItems = 'stretch';
+            } else {
+                // 显示文本输入框
+                messageInput.style.display = 'block';
+                fileInput.style.display = 'none';
+                fileInput.parentElement.style.alignItems = 'flex-end';
+
+                // 设置对应的占位符文本
+                switch (selectedType) {
+                    case 'ping':
+                        messageInput.placeholder = '留空发送默认ping消息，或输入自定义内容...';
+                        break;
+                    case 'hello':
+                        messageInput.placeholder = '留空发送"hello world"，或输入自定义内容...';
+                        break;
+                    case 'json':
+                        messageInput.placeholder = '留空发送默认JSON测试数据，或输入自定义JSON...';
+                        break;
+                    case 'timestamp':
+                        messageInput.placeholder = '留空发送当前时间戳，或输入自定义内容...';
+                        break;
+                    case 'custom':
+                    default:
+                        messageInput.placeholder = '输入要发送的消息...';
+                        break;
+                }
+            }
+        }
+
+
+        // 测试Headers
+        function testHeaders() {
+            const headersText = document.getElementById('headersInput').value.trim();
+
+            if (!headersText) {
+                logMessage('info', 'Headers为空');
+                return;
+            }
+
+            try {
+                const headers = JSON.parse(headersText);
+                logMessage('success', `Headers验证成功: ${JSON.stringify(headers, null, 2)}`);
+            } catch (error) {
+                logMessage('error', `Headers格式错误: ${error.message}`);
+            }
+        }
+
+
+        // 开始Ping监控
+        function startPingMonitor() {
+            if (pingInterval) clearInterval(pingInterval);
+
+            pingInterval = setInterval(() => {
+                if (isConnected && socket && socket.readyState === WebSocket.OPEN) {
+                    const startTime = Date.now();
+                    try {
+                        socket.send(`heartbeat_${startTime}`);
+                    } catch (error) {
+                        logMessage('warning', `心跳发送失败: ${error.message}`);
+                    }
+                }
+            }, 30000); // 每30秒发送一次心跳
+        }
+
+        // 停止Ping监控
+        function stopPingMonitor() {
+            if (pingInterval) {
+                clearInterval(pingInterval);
+                pingInterval = null;
+            }
+        }
+
+        // 导出日志
+        function exportLogs() {
+            const logMessages = document.querySelectorAll('.log-message');
+            let logContent = `Socket测试日志 - 导出时间: ${new Date().toLocaleString()}\n`;
+            logContent += '='.repeat(50) + '\n\n';
+
+            logMessages.forEach(msg => {
+                logContent += msg.textContent + '\n';
+            });
+
+            // 创建下载链接
+            const blob = new Blob([logContent], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `socket_test_log_${Date.now()}.txt`;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            logMessage('system', '日志已导出');
+        }
+
+        // 清空所有
+        function clearAll() {
+            if (confirm('确认要清空所有内容吗？这将断开连接并清空日志。')) {
+                disconnect();
+
+                // 清空日志但不记录新消息
+                const logMessages = document.getElementById('logMessages');
+                logMessages.innerHTML = '';
+                logCounter = 0; // 重置行号计数器
+
+                // 重置暂停状态
+                if (logPaused) {
+                    logPaused = false;
+                    pausedMessages = [];
+                    const pauseBtn = document.getElementById('logPauseBtn');
+                    pauseBtn.textContent = '⏸️ 暂停';
+                    pauseBtn.style.background = '#6c757d';
+                }
+
+                // 清空输入框
+                document.getElementById('messageInput').value = '';
+                document.getElementById('headersInput').value = '';
+
+                // 重新记录系统消息
+                logMessage('system', '所有内容已清空，系统已重置');
+            }
+        }
+
+        // 清空日志
+        function clearLog() {
+            const logMessages = document.getElementById('logMessages');
+            logMessages.innerHTML = '';
+            logCounter = 0; // 重置行号计数器
+
+            // 重置暂停状态
+            if (logPaused) {
+                logPaused = false;
+                pausedMessages = [];
+                const pauseBtn = document.getElementById('logPauseBtn');
+                pauseBtn.textContent = '⏸️ 暂停';
+                pauseBtn.style.background = '#6c757d';
+            }
+
+            logMessage('system', '日志已清空');
+        }
+
+        // 保存日志
+        function saveLog() {
+            exportLogs();
+        }
+
+        // 切换自动滚动
+        function toggleAutoScroll() {
+            autoScroll = !autoScroll;
+            const btn = document.getElementById('autoScrollBtn');
+            btn.textContent = autoScroll ? '📜 自动滚动' : '📜 手动滚动';
+
+            if (autoScroll) {
+                scrollToBottom();
+            }
+
+            logMessage('system', `自动滚动已${autoScroll ? '启用' : '禁用'}`);
+        }
+
+        // 记录日志消息
+        function logMessage(type, message) {
+            logCounter++;
+
+            const logData = {
+                counter: logCounter,
+                type: type,
+                message: message,
+                timestamp: new Date().toLocaleTimeString(),
+                rawTime: Date.now()
+            };
+
+            if (logPaused) {
+                // 如果日志暂停，将消息存入缓存
+                pausedMessages.push(logData);
+
+                // 更新暂停按钮显示缓存数量
+                updatePauseButtonText();
+
+                return;
+            }
+
+            // 显示日志消息
+            displayLogMessage(logData);
+        }
+
+        // 显示单条日志消息
+        function displayLogMessage(logData) {
+            const logMessages = document.getElementById('logMessages');
+            const logDiv = document.createElement('div');
+            logDiv.className = `log-message ${logData.type}`;
+
+            const typeText = logData.type.toUpperCase();
+
+            logDiv.innerHTML = `
+                <span class="log-line-number" style="color: #999; font-size: 0.8em; margin-right: 8px; min-width: 40px; display: inline-block; text-align: right;">[${logData.counter}]</span>
+                <span class="log-time">[${logData.timestamp}]</span>
+                <span class="log-type ${logData.type}">[${typeText}]</span>
+                ${logData.message}
+            `;
+
+            logMessages.appendChild(logDiv);
+
+            // 限制日志数量到用户设置的行数
+            const allLogs = logMessages.querySelectorAll('.log-message');
+            if (allLogs.length > maxLogLines) {
+                // 移除最旧的日志
+                for (let i = 0; i < allLogs.length - maxLogLines; i++) {
+                    allLogs[i].remove();
+                }
+            }
+
+            // 自动滚动到底部
+            if (autoScroll) {
+                scrollToBottom();
+            }
+        }
+
+        // 更新暂停按钮文字
+        function updatePauseButtonText() {
+            const pauseBtn = document.getElementById('logPauseBtn');
+            if (logPaused) {
+                const count = pausedMessages.length;
+                pauseBtn.textContent = count > 0 ? `▶️ 继续 (${count})` : '▶️ 继续';
+            } else {
+                pauseBtn.textContent = '⏸️ 暂停';
+            }
+        }
+
+        // 切换日志暂停状态
+        function toggleLogPause() {
+            logPaused = !logPaused;
+            const pauseBtn = document.getElementById('logPauseBtn');
+
+            if (logPaused) {
+                pauseBtn.style.background = '#ffc107';
+                pauseBtn.style.color = '#333';
+
+                // 记录暂停消息（此消息立即显示）
+                const tempPaused = logPaused;
+                logPaused = false;
+                logMessage('system', `📱 日志显示已暂停，后续消息将被缓存`);
+                logPaused = tempPaused;
+
+                updatePauseButtonText();
+
+            } else {
+                pauseBtn.style.background = '#6c757d';
+                pauseBtn.style.color = 'white';
+
+                // 显示缓存的消息数量
+                const cachedCount = pausedMessages.length;
+
+                // 恢复显示时的系统消息（立即显示）
+                logPaused = false;
+
+                if (cachedCount > 0) {
+                    logMessage('system', `📱 日志显示已恢复，正在显示缓存的 ${cachedCount} 条消息...`);
+
+                    // 按时间顺序显示缓存的消息
+                    pausedMessages.sort((a, b) => a.rawTime - b.rawTime);
+
+                    // 批量显示缓存的消息
+                    pausedMessages.forEach(logData => {
+                        displayLogMessage(logData);
+                    });
+
+                    // 清空缓存
+                    pausedMessages = [];
+
+                    logMessage('system', `✅ 已显示完成 ${cachedCount} 条缓存消息`);
+                } else {
+                    logMessage('system', '📱 日志显示已恢复');
+                }
+
+                updatePauseButtonText();
+            }
+        }
+
+        // 更改日志保留行数
+        function changeLogLines() {
+            const select = document.getElementById('logLinesSelect');
+            maxLogLines = parseInt(select.value);
+
+            // 立即应用新的行数限制
+            const logMessages = document.getElementById('logMessages');
+            const allLogs = logMessages.querySelectorAll('.log-message');
+
+            if (allLogs.length > maxLogLines) {
+                // 移除多余的旧日志
+                for (let i = 0; i < allLogs.length - maxLogLines; i++) {
+                    allLogs[i].remove();
+                }
+                logMessage('system', `日志行数已调整为 ${maxLogLines} 行，已清理旧日志`);
+            } else {
+                logMessage('system', `日志保留行数已设置为 ${maxLogLines} 行`);
+            }
+
+            // 自动滚动到底部
+            if (autoScroll) {
+                scrollToBottom();
+            }
+        }
+
+        // 滚动到底部
+        function scrollToBottom() {
+            const logMessages = document.getElementById('logMessages');
+            logMessages.scrollTop = logMessages.scrollHeight;
+        }
+
+        // 更新连接状态
+        function updateConnectionStatus(status, text) {
+            const statusDiv = document.getElementById('connectionStatus');
+            statusDiv.className = `connection-status status-${status}`;
+            statusDiv.textContent = text;
+        }
+
+        // 更新连接UI
+        function updateConnectionUI() {
+            const connectBtn = document.getElementById('connectBtn');
+            const sendBtn = document.getElementById('sendBtn');
+
+            if (isConnected) {
+                connectBtn.textContent = '🔌 断开连接';
+                connectBtn.classList.add('danger');
+                sendBtn.disabled = false;
+            } else {
+                connectBtn.textContent = '🔌 连接';
+                connectBtn.classList.remove('danger');
+                sendBtn.disabled = true;
+            }
+        }
+
+        // 获取WebSocket就绪状态文本
+        function getReadyStateText(readyState) {
+            switch (readyState) {
+                case WebSocket.CONNECTING: return '正在连接';
+                case WebSocket.OPEN: return '已连接';
+                case WebSocket.CLOSING: return '正在关闭';
+                case WebSocket.CLOSED: return '已关闭';
+                default: return '未知状态';
+            }
+        }
+
+        // 获取关闭原因
+        function getCloseReason(code) {
+            switch (code) {
+                case 1000: return '正常关闭';
+                case 1001: return '端点离开';
+                case 1002: return '协议错误';
+                case 1003: return '不支持的数据类型';
+                case 1005: return '未收到状态码';
+                case 1006: return '异常关闭';
+                case 1007: return '数据格式错误';
+                case 1008: return '策略违反';
+                case 1009: return '消息太大';
+                case 1010: return '扩展协商失败';
+                case 1011: return '服务器内部错误';
+                default: return `未知错误 (${code})`;
+            }
+        }
+
+        // 页面离开时清理资源
+        window.addEventListener('beforeunload', function() {
+            if (isConnected && socket) {
+                socket.close();
+            }
+            stopPingMonitor();
+        });
+
+        // 初始化状态
+        updateConnectionUI();
+
+        // 初始化日志计数器
+        logCounter = 0;
+    </script>
+</body>
+</html>

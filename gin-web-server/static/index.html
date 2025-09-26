@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>计算机信息统计</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            grid-template-rows: 80px 1fr;
+            grid-template-areas: 
+                "header header"
+                "sidebar content";
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.95);
+            margin: 10px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        /* 顶部标题区域 */
+        .header {
+            grid-area: header;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 1.8em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .header h1::before {
+            content: "💻";
+            font-size: 1.2em;
+        }
+        
+        .header-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .header-info .time {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .header-info .time::before {
+            content: "🕐";
+        }
+        
+        .header-info .status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .header-info .status::before {
+            content: "🟢";
+        }
+        
+        /* 左侧导航区域 */
+        .sidebar {
+            grid-area: sidebar;
+            background: #f8f9fa;
+            border-right: 1px solid #e9ecef;
+            padding: 20px 0;
+        }
+        
+        .nav-title {
+            padding: 0 20px 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #495057;
+            border-bottom: 2px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+        
+        .nav-menu {
+            list-style: none;
+        }
+        
+        .nav-item {
+            margin-bottom: 5px;
+        }
+        
+        .nav-link {
+            display: block;
+            padding: 15px 20px;
+            color: #495057;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            position: relative;
+            font-weight: 500;
+        }
+        
+        .nav-link:hover {
+            background: #e3f2fd;
+            color: #1976d2;
+            border-left-color: #2196f3;
+            transform: translateX(3px);
+        }
+        
+        .nav-link.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-left-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+        
+        .nav-link::before {
+            font-size: 1.2em;
+            margin-right: 10px;
+        }
+        
+        .nav-link[data-page="network"]::before {
+            content: "🌐";
+        }
+        
+        .nav-link[data-page="ip"]::before {
+            content: "🖥️";
+        }
+        
+        .nav-link[data-page="microphone"]::before {
+            content: "🎙️";
+        }
+        
+        .nav-link[data-page="voice-debug"]::before {
+            content: "🔧";
+        }
+        
+        .nav-link[data-page="welcome"]::before {
+            content: "🏠";
+        }
+        
+        /* 右侧内容区域 */
+        .content {
+            grid-area: content;
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .content iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: none;
+        }
+        
+        .content iframe.active {
+            display: block;
+        }
+        
+        /* 欢迎页面 */
+        .welcome-page {
+            padding: 40px;
+            text-align: center;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        
+        .welcome-page.active {
+            display: flex;
+        }
+        
+        .welcome-page.hidden {
+            display: none;
+        }
+        
+        .welcome-title {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: #333;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .welcome-subtitle {
+            font-size: 1.3em;
+            color: #666;
+            margin-bottom: 40px;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        
+        .feature-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .feature-desc {
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        /* 加载状态 */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            font-size: 1.2em;
+            color: #666;
+            background: #f8f9fa;
+        }
+        
+        .loading::before {
+            content: "⏳";
+            margin-right: 10px;
+            animation: spin 2s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: 60px auto 1fr;
+                grid-template-areas: 
+                    "header"
+                    "sidebar"
+                    "content";
+                margin: 5px;
+            }
+            
+            .header h1 {
+                font-size: 1.4em;
+            }
+            
+            .header-info {
+                font-size: 0.8em;
+                gap: 10px;
+            }
+            
+            .sidebar {
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+                padding: 10px 0;
+                max-height: 200px;
+                overflow-y: auto;
+            }
+            
+            .nav-menu {
+                display: flex;
+                overflow-x: auto;
+                padding: 0 10px;
+            }
+            
+            .nav-item {
+                margin-bottom: 0;
+                margin-right: 5px;
+                flex-shrink: 0;
+            }
+            
+            .nav-link {
+                padding: 10px 15px;
+                white-space: nowrap;
+                border-radius: 20px;
+                border-left: none;
+            }
+            
+            .nav-link:hover {
+                transform: none;
+            }
+            
+            .welcome-page {
+                padding: 20px;
+            }
+            
+            .welcome-title {
+                font-size: 2em;
+            }
+            
+            .welcome-subtitle {
+                font-size: 1.1em;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+        
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部标题区域 -->
+        <header class="header">
+            <h1>计算机信息统计</h1>
+            <div class="header-info">
+                <div class="status">系统正常</div>
+                <div class="time" id="currentTime">加载中...</div>
+            </div>
+        </header>
+        
+        <!-- 左侧导航区域 -->
+        <nav class="sidebar">
+            <div class="nav-title">🔧 功能导航</div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" data-page="welcome">主页</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="network">网络信息检测器</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="ip">网络IP相关信息</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="microphone">麦克风功能测试</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="voice-debug">麦克风功能诊断</a>
+                </li>
+            </ul>
+        </nav>
+        
+        <!-- 右侧内容区域 -->
+        <main class="content">
+            <!-- 欢迎页面 -->
+            <div class="welcome-page active" id="welcomePage">
+                <div class="welcome-title">🖥️ 计算机信息统计中心</div>
+                <div class="welcome-subtitle">
+                    集成多种系统检测工具，帮助您全面了解计算机的网络状态、硬件信息和功能测试。
+                    选择左侧菜单开始使用各项功能。
+                </div>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🌐</div>
+                        <div class="feature-title">网络信息检测器</div>
+                        <div class="feature-desc">检测IP地址、网络状态、端口信息、WebRTC连接等完整网络信息</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🖥️</div>
+                        <div class="feature-title">网络IP相关信息</div>
+                        <div class="feature-desc">显示所有网络接口和IP配置信息，表格化展示更直观</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎙️</div>
+                        <div class="feature-title">麦克风功能测试</div>
+                        <div class="feature-desc">测试麦克风设备状态、音频输入和录制功能</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔧</div>
+                        <div class="feature-title">麦克风功能诊断</div>
+                        <div class="feature-desc">Chrome浏览器语音聊天调试工具，诊断音频问题</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 网络信息检测器 -->
+            <iframe id="networkFrame" src="network_info_detector.html"></iframe>
+            
+            <!-- IP信息检测器 -->
+            <iframe id="ipFrame" src="ip_info_detector.html"></iframe>
+            
+            <!-- 麦克风功能测试 -->
+            <iframe id="microphoneFrame" src="microphone_test.html"></iframe>
+            
+            <!-- 麦克风功能诊断 -->
+            <iframe id="voiceDebugFrame" src="chrome_voice_chat_debug.html"></iframe>
+            
+            <!-- 加载中页面 -->
+            <div class="loading" id="loadingPage" style="display: none;">
+                正在加载页面内容...
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initNavigation();
+            updateTime();
+            setInterval(updateTime, 1000);
+        });
+        
+        // 初始化导航功能
+        function initNavigation() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const frames = document.querySelectorAll('iframe');
+            const welcomePage = document.getElementById('welcomePage');
+            const loadingPage = document.getElementById('loadingPage');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const page = this.getAttribute('data-page');
+                    
+                    // 更新导航状态
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // 隐藏所有内容
+                    frames.forEach(frame => frame.classList.remove('active'));
+                    welcomePage.classList.remove('active');
+                    welcomePage.classList.add('hidden');
+                    loadingPage.style.display = 'none';
+                    
+                    // 显示对应内容
+                    if (page === 'welcome') {
+                        welcomePage.classList.remove('hidden');
+                        welcomePage.classList.add('active');
+                    } else {
+                        // 显示加载状态
+                        loadingPage.style.display = 'flex';
+                        
+                        // 模拟加载延迟，然后显示对应页面
+                        setTimeout(() => {
+                            loadingPage.style.display = 'none';
+                            const targetFrame = document.getElementById(getFrameId(page));
+                            if (targetFrame) {
+                                targetFrame.classList.add('active');
+                            }
+                        }, 500);
+                    }
+                });
+            });
+        }
+        
+        // 获取页面对应的iframe ID
+        function getFrameId(page) {
+            const frameMap = {
+                'network': 'networkFrame',
+                'ip': 'ipFrame',
+                'microphone': 'microphoneFrame',
+                'voice-debug': 'voiceDebugFrame'
+            };
+            return frameMap[page];
+        }
+        
+        // 更新时间显示
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+            
+            document.getElementById('currentTime').textContent = timeString;
+        }
+        
+        // 监听iframe加载完成事件
+        document.querySelectorAll('iframe').forEach(iframe => {
+            iframe.addEventListener('load', function() {
+                console.log(`页面加载完成: ${this.src}`);
+            });
+            
+            iframe.addEventListener('error', function() {
+                console.error(`页面加载失败: ${this.src}`);
+                // 可以在这里显示错误信息
+            });
+        });
+        
+        // 键盘快捷键支持
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey) {
+                switch(e.key) {
+                    case '1':
+                        e.preventDefault();
+                        document.querySelector('[data-page="welcome"]').click();
+                        break;
+                    case '2':
+                        e.preventDefault();
+                        document.querySelector('[data-page="network"]').click();
+                        break;
+                    case '3':
+                        e.preventDefault();
+                        document.querySelector('[data-page="ip"]').click();
+                        break;
+                    case '4':
+                        e.preventDefault();
+                        document.querySelector('[data-page="microphone"]').click();
+                        break;
+                    case '5':
+                        e.preventDefault();
+                        document.querySelector('[data-page="voice-debug"]').click();
+                        break;
+                }
+            }
+        });
+        
+        // 添加页面可见性检测
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                updateTime();
+            }
+        });
+        
+        // 窗口大小变化时的处理
+        window.addEventListener('resize', function() {
+            // 可以在这里添加响应式处理逻辑
+        });
+    </script>
+</body>
+</html>
