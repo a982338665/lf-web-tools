@@ -22,16 +22,17 @@
 
         .container {
             position: fixed;
-            top: 0px;
-            left: 6px;
-            right: 6px;
-            bottom: 16px;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            bottom: 20px;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 10px;
             padding: 15px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
         h1 {
@@ -48,19 +49,33 @@
         }
 
         .main-content {
-            display: grid;
-            grid-template-columns: 1fr 300px;
+            display: flex;
+            flex: 1;
             gap: 20px;
-            margin-bottom: 20px;
+            min-height: 0;
         }
 
-        /* 左侧预览区域 */
+        .left-section {
+            flex: 0 0 48vw;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .right-section {
+            flex: 0 0 48vw;
+            min-width: 48vw;
+            max-width: 48vw;
+        }
+
+        /* 视频预览区域 - 正方形，占整个屏幕的1/4 */
         .preview-section {
             background: #fff;
             border-radius: 10px;
             padding: 15px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
             position: relative;
+            flex: 0 0 50vh;
         }
 
         .preview-container {
@@ -68,8 +83,9 @@
             background: #000;
             border-radius: 8px;
             overflow: hidden;
-            margin-bottom: 15px;
-            min-height: 300px;
+            width: calc(48vw - 50px);
+            height: calc(48vw - 50px);
+            max-height: calc(50vh - 50px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -77,8 +93,7 @@
 
         .video-preview {
             width: 100%;
-            height: auto;
-            max-height: 400px;
+            height: 100%;
             object-fit: cover;
             border-radius: 8px;
         }
@@ -118,24 +133,37 @@
             50% { opacity: 0.5; }
         }
 
-        /* 右侧控制面板 */
+        /* 控制面板 - 位于视频左下 */
         .control-panel {
             background: #fff;
             border-radius: 10px;
             padding: 15px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            height: fit-content;
+            flex: 1;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
         }
 
         .control-section {
-            margin-bottom: 20px;
-            padding-bottom: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
             border-bottom: 1px solid #e9ecef;
         }
 
         .control-section:last-child {
             border-bottom: none;
             margin-bottom: 0;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            flex: 1;
+            min-width: 200px;
         }
 
         .section-title {
@@ -216,12 +244,16 @@
         .status-disconnected { background-color: #dc3545; }
         .status-recording { background-color: #ffc107; }
 
-        /* 底部媒体库区域 */
+        /* 右侧媒体库区域 - 定长定宽 */
         .media-library {
             background: #fff;
             border-radius: 10px;
-            padding: 15px;
+            padding: 20px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
         .media-tabs {
@@ -257,8 +289,15 @@
 
         .media-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
             gap: 15px;
+            overflow-y: auto;
+            flex: 1;
+            max-height: calc(100vh - 200px);
+            padding: 10px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            background: #f8f9fa;
         }
 
         .media-item {
@@ -407,19 +446,56 @@
         }
 
         /* 响应式设计 */
-        @media (max-width: 768px) {
+        @media (max-width: 1200px) {
             .main-content {
-                grid-template-columns: 1fr;
-                gap: 15px;
+                flex-direction: column;
+            }
+
+            .left-section {
+                flex: none;
+                flex-direction: row;
+                gap: 20px;
+            }
+
+            .right-section {
+                flex: none;
+                min-width: auto;
+                max-width: none;
+                height: 400px;
+            }
+
+            .preview-section {
+                flex: 0 0 auto;
+            }
+
+            .control-panel {
+                flex: 1;
+                min-height: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .left-section {
+                flex-direction: column;
+            }
+
+            .preview-container {
+                width: 280px;
+                height: 280px;
             }
 
             .media-grid {
                 grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
                 gap: 10px;
+                max-height: 300px;
             }
 
             .container {
                 padding: 8px;
+            }
+
+            .right-section {
+                height: 300px;
             }
         }
     </style>
@@ -429,90 +505,104 @@
         <h1>摄像头功能测试</h1>
 
         <div class="main-content">
-            <!-- 左侧预览区域 -->
-            <div class="preview-section">
-                <div class="preview-container">
-                    <video id="videoPreview" class="video-preview" autoplay muted playsinline style="display: none;"></video>
-                    <div id="previewPlaceholder" class="preview-placeholder">
-                        📷 点击"启动摄像头"开始预览
+            <!-- 左侧区域 -->
+            <div class="left-section">
+                <!-- 视频预览区域 - 正方形，占左上1/4 -->
+                <div class="preview-section">
+                    <div class="preview-container">
+                        <video id="videoPreview" class="video-preview" autoplay muted playsinline style="display: none;"></video>
+                        <div id="previewPlaceholder" class="preview-placeholder">
+                            📷 点击"启动摄像头"开始预览
+                        </div>
+                        <div class="preview-overlay">
+                            <span class="status-indicator" id="statusIndicator"></span>
+                            <span id="statusText">未连接</span>
+                        </div>
+                        <div class="recording-indicator" id="recordingIndicator">
+                            🔴 录制中
+                        </div>
                     </div>
-                    <div class="preview-overlay">
-                        <span class="status-indicator" id="statusIndicator"></span>
-                        <span id="statusText">未连接</span>
+                </div>
+
+                <!-- 控制面板 - 位于视频左下 -->
+                <div class="control-panel">
+                    <!-- 设备选择和基本控制横向排列 -->
+                    <div class="control-row">
+                        <!-- 设备选择 -->
+                        <div class="control-group">
+                            <div class="control-section">
+                                <div class="section-title">📹 设备选择</div>
+                                <select id="cameraSelect" class="device-select">
+                                    <option value="">选择摄像头...</option>
+                                </select>
+                                <select id="microphoneSelect" class="device-select">
+                                    <option value="">选择麦克风...</option>
+                                </select>
+                                <select id="resolutionSelect" class="resolution-select">
+                                    <option value="640x480">640x480 (VGA)</option>
+                                    <option value="1280x720" selected>1280x720 (HD)</option>
+                                    <option value="1920x1080">1920x1080 (FHD)</option>
+                                    <option value="3840x2160">3840x2160 (4K)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- 基本控制 -->
+                        <div class="control-group">
+                            <div class="control-section">
+                                <div class="section-title">🎮 基本控制</div>
+                                <button class="control-btn" id="startBtn" onclick="startCamera()">🎬 启动摄像头</button>
+                                <button class="control-btn" id="stopBtn" onclick="stopCamera()" disabled>⏹️ 停止摄像头</button>
+                                <button class="control-btn" onclick="refreshDevices()">🔄 刷新设备</button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="recording-indicator" id="recordingIndicator">
-                        🔴 录制中
+
+                    <!-- 拍照录制 -->
+                    <div class="control-section">
+                        <div class="section-title">📸 拍照录制</div>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button class="control-btn success" id="photoBtn" onclick="takePhoto()" disabled style="flex: 1; min-width: 120px;">📸 拍照</button>
+                            <button class="control-btn warning" id="videoRecordBtn" onclick="toggleVideoRecording()" disabled style="flex: 1; min-width: 120px;">🎥 开始录像</button>
+                            <button class="control-btn warning" id="audioRecordBtn" onclick="toggleAudioRecording()" disabled style="flex: 1; min-width: 120px;">🎙️ 开始录音</button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 右侧控制面板 -->
-            <div class="control-panel">
-                <!-- 设备选择 -->
-                <div class="control-section">
-                    <div class="section-title">📹 设备选择</div>
-                    <select id="cameraSelect" class="device-select">
-                        <option value="">选择摄像头...</option>
-                    </select>
-                    <select id="microphoneSelect" class="device-select">
-                        <option value="">选择麦克风...</option>
-                    </select>
-                    <select id="resolutionSelect" class="resolution-select">
-                        <option value="640x480">640x480 (VGA)</option>
-                        <option value="1280x720" selected>1280x720 (HD)</option>
-                        <option value="1920x1080">1920x1080 (FHD)</option>
-                        <option value="3840x2160">3840x2160 (4K)</option>
-                    </select>
-                </div>
+            <!-- 右侧媒体库区域 - 定长定宽 -->
+            <div class="right-section">
+                <div class="media-library">
+                    <div class="media-tabs">
+                        <div class="media-tab active" onclick="switchTab('all')">📂 全部</div>
+                        <div class="media-tab" onclick="switchTab('photos')">📸 照片</div>
+                        <div class="media-tab" onclick="switchTab('videos')">🎥 录像</div>
+                        <div class="media-tab" onclick="switchTab('audios')">🎙️ 录音</div>
+                    </div>
 
-                <!-- 基本控制 -->
-                <div class="control-section">
-                    <div class="section-title">🎮 基本控制</div>
-                    <button class="control-btn" id="startBtn" onclick="startCamera()">🎬 启动摄像头</button>
-                    <button class="control-btn" id="stopBtn" onclick="stopCamera()" disabled>⏹️ 停止摄像头</button>
-                    <button class="control-btn" onclick="refreshDevices()">🔄 刷新设备</button>
-                </div>
+                    <div id="allContent" class="media-content active">
+                        <div class="media-grid" id="allGrid">
+                            <div class="empty-message">暂无媒体文件</div>
+                        </div>
+                    </div>
 
-                <!-- 拍照录制 -->
-                <div class="control-section">
-                    <div class="section-title">📸 拍照录制</div>
-                    <button class="control-btn success" id="photoBtn" onclick="takePhoto()" disabled>📸 拍照</button>
-                    <button class="control-btn warning" id="videoRecordBtn" onclick="toggleVideoRecording()" disabled>🎥 开始录像</button>
-                    <button class="control-btn warning" id="audioRecordBtn" onclick="toggleAudioRecording()" disabled>🎙️ 开始录音</button>
-                </div>
-            </div>
-        </div>
+                    <div id="photosContent" class="media-content">
+                        <div class="media-grid" id="photosGrid">
+                            <div class="empty-message">暂无照片</div>
+                        </div>
+                    </div>
 
-        <!-- 底部媒体库 -->
-        <div class="media-library">
-            <div class="media-tabs">
-                <div class="media-tab active" onclick="switchTab('all')">📂 全部</div>
-                <div class="media-tab" onclick="switchTab('photos')">📸 照片</div>
-                <div class="media-tab" onclick="switchTab('videos')">🎥 录像</div>
-                <div class="media-tab" onclick="switchTab('audios')">🎙️ 录音</div>
-            </div>
+                    <div id="videosContent" class="media-content">
+                        <div class="media-grid" id="videosGrid">
+                            <div class="empty-message">暂无录像</div>
+                        </div>
+                    </div>
 
-            <div id="allContent" class="media-content active">
-                <div class="media-grid" id="allGrid">
-                    <div class="empty-message">暂无媒体文件</div>
-                </div>
-            </div>
-
-            <div id="photosContent" class="media-content">
-                <div class="media-grid" id="photosGrid">
-                    <div class="empty-message">暂无照片</div>
-                </div>
-            </div>
-
-            <div id="videosContent" class="media-content">
-                <div class="media-grid" id="videosGrid">
-                    <div class="empty-message">暂无录像</div>
-                </div>
-            </div>
-
-            <div id="audiosContent" class="media-content">
-                <div class="media-grid" id="audiosGrid">
-                    <div class="empty-message">暂无录音</div>
+                    <div id="audiosContent" class="media-content">
+                        <div class="media-grid" id="audiosGrid">
+                            <div class="empty-message">暂无录音</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
