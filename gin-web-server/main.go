@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lf-web-tools/gin-web-server/middleware"
 	"github.com/lf-web-tools/gin-web-server/routes"
 )
 
@@ -30,6 +31,9 @@ func main() {
 	
 	// 设置页面路由
 	routes.SetupPageRoutes(r)
+	
+	// 设置CORS代理路由
+	middleware.RegisterCorsProxyRoutes(r)
 
 	// 启动服务器
 	r.Run(":8080") // 监听并在0.0.0.0:8080上启动服务

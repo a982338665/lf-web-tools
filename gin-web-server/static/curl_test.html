@@ -664,14 +664,15 @@
                                     1. 使用支持CORS的API（如httpbin.org）<br>
                                     2. 启动浏览器时添加参数：<br>
                                     &nbsp;&nbsp;<code>--disable-web-security --user-data-dir</code><br>
-                                    3. 使用CORS插件或代理服务器<br>
-                                    4. 勾选右侧"使用CORS代理"选项
+                                    3. 使用CORS插件<br>
+                                    4. <strong>勾选右侧"使用CORS代理"选项（推荐）</strong><br>
+                                    &nbsp;&nbsp;将使用本地内置的CORS代理服务
                                 </div>
                             </div>
-                            <label style="display: inline-flex; align-items: center; color: #495057; font-size: 0.8em;">
-                                <input type="checkbox" id="useCorsProxy" style="margin-right: 4px;">
-                                使用CORS代理
-                            </label>
+                            <span style="display: inline-flex; align-items: center; color: #155724; font-size: 0.8em; background-color: #d4edda; padding: 3px 6px; border-radius: 4px; border: 1px solid #28a745;">
+                                <span style="margin-right: 4px;">✅</span>
+                                已启用CORS代理
+                            </span>
                             <button class="format-btn" onclick="formatInputCommand()" id="formatInputBtn" disabled>🎨 格式化</button>
                         </div>
                     </div>
@@ -946,34 +947,64 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
             const startTime = Date.now();
             
             try {
-                // 解析CURL命令
+                // 直接使用CORS代理服务
+                const proxyResponse = await fetch('/cors-proxy', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        curlParam: command
+                    })
+                });
+                
+                if (!proxyResponse.ok) {
+                    throw new Error(`代理请求失败: ${proxyResponse.status} ${proxyResponse.statusText}`);
+                }
+                
+                const proxyData = await proxyResponse.json();
+                const endTime = Date.now();
+                const duration = endTime - startTime;
+                
+                // 解析CURL命令（仅用于显示）
                 const curlConfig = parseCurlCommand(command);
                 logMessage('success', `命令解析成功 - 方法: ${curlConfig.method}, URL: ${curlConfig.url}`);
                 
-                if (curlConfig.headers && Object.keys(curlConfig.headers).length > 0) {
-                    logMessage('info', `请求Headers: ${JSON.stringify(curlConfig.headers)}`);
-                }
+                // 创建模拟响应对象
+                const response = {
+                    status: proxyData.statusCode,
+                    statusText: proxyData.statusCode === 200 ? 'OK' : 'Error',
+                    headers: proxyData.responseHeaders || {},
+                    body: proxyData.responseBody || '',
+                    bodyType: 'text',
+                    url: curlConfig.url,
+                    redirected: false,
+                    type: 'cors',
+                    ok: proxyData.statusCode >= 200 && proxyData.statusCode < 300,
+                    executionTime: proxyData.executionTime,
+                    proxyUsed: true
+                };
                 
-                if (curlConfig.data) {
-                    logMessage('info', `请求数据: ${curlConfig.data.substring(0, 200)}${curlConfig.data.length > 200 ? '...' : ''}`);
+                // 尝试解析响应体为JSON
+                try {
+                    const jsonBody = JSON.parse(response.body);
+                    response.body = jsonBody;
+                    response.bodyType = 'json';
+                } catch (e) {
+                    // 保持为文本格式
                 }
-                
-                // 执行请求
-                const response = await executeRequest(curlConfig);
-                const endTime = Date.now();
-                const duration = endTime - startTime;
                 
                 // 显示结果
                 await displayResult(response, curlConfig, duration);
                 
-                updateStatus('success', `✅ 执行完成 (${duration}ms)`);
-                logMessage('success', `请求完成 - 状态码: ${response.status}, 耗时: ${duration}ms`);
+                updateStatus('success', `✅ 执行完成 (${proxyData.executionTime || duration + 'ms'})`);
+                logMessage('success', `请求完成 - 状态码: ${response.status}, 耗时: ${proxyData.executionTime || duration + 'ms'}`);
                 
                 // 记录到历史
                 executionHistory.push({
                     command: command,
                     timestamp: new Date().toLocaleString(),
-                    duration: duration,
+                    duration: proxyData.executionTime || duration + 'ms',
                     status: response.status,
                     success: true
                 });
@@ -982,22 +1013,10 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                 const endTime = Date.now();
                 const duration = endTime - startTime;
                 
-                // 检查是否为CORS错误
-                let errorMessage = error.message;
-                let isCorsError = false;
+                logMessage('error', `执行失败: ${error.message} (耗时: ${duration}ms)`);
+                updateStatus('error', `❌ 执行失败`);
                 
-                if (error.message.includes('CORS') || 
-                    error.message.includes('Access-Control-Allow-Origin') ||
-                    error.message.includes('preflight') ||
-                    error.name === 'TypeError' && error.message.includes('fetch')) {
-                    isCorsError = true;
-                    errorMessage = `CORS跨域错误: ${error.message}`;
-                }
-                
-                logMessage('error', `执行失败: ${errorMessage} (耗时: ${duration}ms)`);
-                updateStatus('error', `❌ 执行失败${isCorsError ? ' - CORS错误' : ''}`);
-                
-                displayError(error, duration, isCorsError);
+                displayError(error, duration, false);
                 
                 // 记录到历史
                 executionHistory.push({
@@ -1164,10 +1183,46 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
                 // 检查是否使用CORS代理
                 const useCorsProxy = document.getElementById('useCorsProxy').checked;
                 if (useCorsProxy) {
-                    const corsProxyUrl = 'https://cors-anywhere.herokuapp.com/';
-                    if (!config.url.startsWith(corsProxyUrl)) {
-                        config.url = corsProxyUrl + config.url;
-                        logMessage('info', `使用CORS代理: ${config.url}`);
+                    // 使用本地CORS代理
+                    logMessage('info', `使用本地CORS代理服务`);
+                    
+                    // 保存原始配置用于显示
+                    const originalConfig = {...config};
+                    
+                    // 创建代理请求
+                    try {
+                        const proxyResponse = await fetch('/cors-proxy', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                curlParam: curlCmd
+                            })
+                        });
+                        
+                        if (!proxyResponse.ok) {
+                            throw new Error(`代理请求失败: ${proxyResponse.status} ${proxyResponse.statusText}`);
+                        }
+                        
+                        const proxyData = await proxyResponse.json();
+                        
+                        // 创建模拟响应
+                        return {
+                            status: proxyData.statusCode,
+                            statusText: proxyData.statusCode === 200 ? 'OK' : 'Error',
+                            headers: proxyData.responseHeaders || {},
+                            body: proxyData.responseBody || '',
+                            bodyType: 'text',
+                            url: originalConfig.url,
+                            redirected: false,
+                            type: 'cors',
+                            ok: proxyData.statusCode >= 200 && proxyData.statusCode < 300,
+                            executionTime: proxyData.executionTime,
+                            proxyUsed: true
+                        };
+                    } catch (error) {
+                        throw new Error(`CORS代理请求失败: ${error.message}`);
                     }
                 }
             }
@@ -1249,6 +1304,12 @@ curl -H 'Authorization: Bearer token' https://api.example.com/data">curl -X GET 
             if (response.status >= 300 && response.status < 400) statusClass = 'status-3xx';
             else if (response.status >= 400 && response.status < 500) statusClass = 'status-4xx';
             else if (response.status >= 500) statusClass = 'status-5xx';
+            
+            // 使用代理的情况下，显示代理执行时间
+            if (response.proxyUsed && response.executionTime) {
+                duration = response.executionTime.replace('ms', '');
+                logMessage('info', `代理执行时间: ${response.executionTime}`);
+            }
             
             // 保存当前结果数据供格式化使用
             window.currentResult = {
