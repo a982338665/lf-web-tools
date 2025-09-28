@@ -668,7 +668,7 @@
                     // 更新按钮状态
                     tabBtns.forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
-                    
+
                     // 更新内容显示
                     tabContents.forEach(content => {
                         content.classList.remove('active');
@@ -677,16 +677,22 @@
                         }
                     });
 
+                    // Tab切换时清空右侧显示区域
+                    clearDisplay();
+                    hideStatusMessage();
+
                     // 如果切换到扫描标签页时摄像头正在运行，先停止
                     if (targetTab !== 'scan' && videoStream) {
                         stopCamera();
                     }
+                    
+                    logMessage('info', `切换到${targetTab}标签页`);
                 });
             });
         }
 
-        // 生成二维码
-        function generateQRCode() {
+        // 生成二维码 - 使用后端API
+        async function generateQRCode() {
             const text = document.getElementById('qrText').value.trim();
             const errorLevel = document.getElementById('qrErrorLevel').value;
             const size = parseInt(document.getElementById('qrSize').value);
@@ -699,68 +705,106 @@
             try {
                 showStatusMessage('正在生成二维码...', 'info');
                 
-                // 检查QRCode库是否可用
-                if (typeof QRCode === 'undefined') {
-                    // 如果CDN库未加载，使用fallback方法
-                    generateQRCodeFallback(text, size);
-                    return;
-                }
-                
-                const canvas = document.createElement('canvas');
-                QRCode.toCanvas(canvas, text, {
-                    width: size,
-                    margin: 2,
-                    color: {
-                        dark: '#000000',
-                        light: '#FFFFFF'
+                // 调用后端API生成二维码
+                const response = await fetch('/api/generate-qrcode', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
                     },
-                    errorCorrectionLevel: errorLevel
-                }, function(error) {
-                    if (error) {
-                        showStatusMessage('二维码生成失败: ' + error.message, 'error');
-                        logMessage('error', '二维码生成失败: ' + error.message);
-                    } else {
-                        displayResult(canvas, '二维码', {
-                            '内容': text,
-                            '尺寸': `${size}x${size}`,
-                            '容错级别': errorLevel,
-                            '生成时间': new Date().toLocaleString()
-                        });
-
-                        showStatusMessage('二维码生成成功', 'success');
-                        logMessage('success', `二维码生成成功 - 内容: ${text.substring(0, 50)}${text.length > 50 ? '...' : ''}`);
-                    }
+                    body: JSON.stringify({
+                        text: text,
+                        size: size,
+                        errorLevel: errorLevel
+                    })
                 });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    // 创建图片元素显示二维码
+                    const img = document.createElement('img');
+                    img.src = data.dataUrl;
+                    img.className = 'code-image';
+                    
+                    displayResult(img, '二维码', {
+                        '内容': data.content,
+                        '尺寸': `${data.size}x${data.size}`,
+                        '容错级别': data.errorLevel,
+                        '生成方式': '后端API',
+                        '生成时间': data.timestamp
+                    });
+
+                    showStatusMessage('二维码生成成功', 'success');
+                    logMessage('success', `二维码生成成功 - 内容: ${text.substring(0, 50)}${text.length > 50 ? '...' : ''}`);
+                } else {
+                    throw new Error(data.error || '生成失败');
+                }
                 
             } catch (error) {
                 showStatusMessage('二维码生成失败: ' + error.message, 'error');
                 logMessage('error', '二维码生成失败: ' + error.message);
+                
+                // 网络错误时使用前端fallback
+                if (error.name === 'TypeError' || error.message.includes('fetch')) {
+                    generateQRCodeFallback(text, size);
+                }
             }
         }
         
-        // Fallback方法 - 使用Google Charts API生成二维码
+        // Fallback方法 - 使用前端库生成二维码
         function generateQRCodeFallback(text, size) {
             try {
-                const encodedText = encodeURIComponent(text);
-                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodedText}`;
+                showStatusMessage('网络异常，使用前端生成...', 'warning');
                 
-                const img = document.createElement('img');
-                img.onload = function() {
-                    displayResult(img, '二维码', {
-                        '内容': text,
-                        '尺寸': `${size}x${size}`,
-                        '生成方式': 'API生成',
-                        '生成时间': new Date().toLocaleString()
+                if (typeof QRCode !== 'undefined') {
+                    // 如果QRCode库可用，使用前端生成
+                    const canvas = document.createElement('canvas');
+                    QRCode.toCanvas(canvas, text, {
+                        width: size,
+                        margin: 2,
+                        color: {
+                            dark: '#000000',
+                            light: '#FFFFFF'
+                        }
+                    }, function(error) {
+                        if (error) {
+                            showStatusMessage('二维码生成失败: ' + error.message, 'error');
+                        } else {
+                            displayResult(canvas, '二维码', {
+                                '内容': text,
+                                '尺寸': `${size}x${size}`,
+                                '生成方式': '前端生成',
+                                '生成时间': new Date().toLocaleString()
+                            });
+                            showStatusMessage('二维码生成成功（前端生成）', 'success');
+                        }
                     });
-                    showStatusMessage('二维码生成成功（使用备用方法）', 'success');
-                    logMessage('success', '二维码生成成功（使用备用方法）');
-                };
-                img.onerror = function() {
-                    showStatusMessage('二维码生成失败：无法连接到生成服务', 'error');
-                    logMessage('error', '二维码生成失败：无法连接到生成服务');
-                };
-                img.src = qrUrl;
-                img.className = 'code-image';
+                } else {
+                    // 创建一个简单的提示
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    canvas.width = size;
+                    canvas.height = size;
+                    
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(0, 0, size, size);
+                    
+                    ctx.fillStyle = '#000000';
+                    ctx.font = '16px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('网络异常', size/2, size/2 - 20);
+                    ctx.fillText('无法生成二维码', size/2, size/2);
+                    ctx.fillText('请检查网络连接', size/2, size/2 + 20);
+                    
+                    displayResult(canvas, '生成失败', {
+                        '内容': text,
+                        '状态': '网络异常，无法生成',
+                        '建议': '请检查网络连接后重试'
+                    });
+                    
+                    showStatusMessage('网络异常，无法生成二维码', 'error');
+                }
                 
             } catch (error) {
                 showStatusMessage('二维码生成失败: ' + error.message, 'error');
@@ -898,46 +942,147 @@
         function scanQRCode(video) {
             if (!isScanning) return;
 
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const code = jsQR(imageData.data, imageData.width, imageData.height);
-            
-            if (code) {
-                isScanning = false;
-                showStatusMessage('二维码识别成功！', 'success');
-                
-                const resultInfo = {
-                    '识别内容': code.data,
-                    '识别位置': `(${code.location.topLeftCorner.x}, ${code.location.topLeftCorner.y})`,
-                    '识别时间': new Date().toLocaleString()
-                };
+            // 检查jsQR库是否加载
+            if (typeof jsQR === 'undefined') {
+                showStatusMessage('扫描库未加载，请刷新页面重试', 'error');
+                logMessage('error', 'jsQR库未加载');
+                return;
+            }
 
-                // 在画布上绘制识别结果
-                ctx.strokeStyle = '#FF0000';
-                ctx.lineWidth = 4;
-                ctx.beginPath();
-                ctx.moveTo(code.location.topLeftCorner.x, code.location.topLeftCorner.y);
-                ctx.lineTo(code.location.topRightCorner.x, code.location.topRightCorner.y);
-                ctx.lineTo(code.location.bottomRightCorner.x, code.location.bottomRightCorner.y);
-                ctx.lineTo(code.location.bottomLeftCorner.x, code.location.bottomLeftCorner.y);
-                ctx.closePath();
-                ctx.stroke();
-
-                displayResult(canvas, '二维码识别结果', resultInfo);
-                logMessage('success', `二维码识别成功 - 内容: ${code.data}`);
+            try {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
                 
-                // 停止摄像头
-                setTimeout(() => stopCamera(), 2000);
-            } else {
-                // 继续扫描
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height);
+                
+                if (code) {
+                    // 识别成功，停止扫描但不关闭摄像头
+                    isScanning = false;
+                    showStatusMessage('二维码识别成功！摄像头保持开启，可查看内容', 'success');
+                    
+                    const resultInfo = {
+                        '识别内容': code.data,
+                        '识别位置': `(${code.location.topLeftCorner.x}, ${code.location.topLeftCorner.y})`,
+                        '识别时间': new Date().toLocaleString(),
+                        '摄像头状态': '继续运行中'
+                    };
+
+                    // 在画布上绘制识别结果
+                    ctx.strokeStyle = '#FF0000';
+                    ctx.lineWidth = 4;
+                    ctx.beginPath();
+                    ctx.moveTo(code.location.topLeftCorner.x, code.location.topLeftCorner.y);
+                    ctx.lineTo(code.location.topRightCorner.x, code.location.topRightCorner.y);
+                    ctx.lineTo(code.location.bottomRightCorner.x, code.location.bottomRightCorner.y);
+                    ctx.lineTo(code.location.bottomLeftCorner.x, code.location.bottomLeftCorner.y);
+                    ctx.closePath();
+                    ctx.stroke();
+
+                    // 显示识别结果，并添加重新扫描按钮
+                    displayScanResult(canvas, '二维码识别结果', resultInfo, code.data);
+                    logMessage('success', `二维码识别成功 - 内容: ${code.data}`);
+                    
+                    // 不再自动停止摄像头，让用户手动控制
+                } else {
+                    // 继续扫描
+                    animationId = requestAnimationFrame(() => scanQRCode(video));
+                }
+            } catch (error) {
+                console.error('扫描过程中出错:', error);
+                logMessage('error', '扫描过程中出错: ' + error.message);
+                // 继续扫描，不因为单次错误而停止
                 animationId = requestAnimationFrame(() => scanQRCode(video));
+            }
+        }
+
+        // 专门用于显示扫描结果的函数，包含重新扫描按钮
+        function displayScanResult(canvas, title, info, content) {
+            const resultPanel = document.querySelector('.result-panel .panel-content');
+            
+            resultPanel.innerHTML = `
+                <div class="code-display" id="displayArea" style="text-align: center; margin-bottom: 20px;">
+                    <img src="${canvas.toDataURL()}" class="code-image" style="max-width: 100%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                </div>
+                
+                <div class="code-info" style="background: #f8f9ff; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h3 style="margin: 0 0 10px 0; color: #333; font-size: 16px;">${title}</h3>
+                    ${Object.entries(info).map(([key, value]) => 
+                        `<div style="margin: 5px 0; padding: 3px 0; border-bottom: 1px solid #eee;">
+                            <strong style="color: #666;">${key}:</strong> 
+                            <span style="color: #333; word-break: break-all;">${value}</span>
+                        </div>`
+                    ).join('')}
+                </div>
+                
+                <div style="text-align: center; margin-top: 15px;">
+                    <button class="btn btn-primary" onclick="startRescan()" style="margin: 5px;">
+                        🔄 重新扫描
+                    </button>
+                    <button class="btn btn-secondary" onclick="stopCamera()" style="margin: 5px;">
+                        ⏹️ 停止摄像头
+                    </button>
+                </div>
+                
+                <div style="margin-top: 15px; padding: 10px; background: #e7f3ff; border-radius: 6px; font-size: 13px; color: #0c5460;">
+                    💡 <strong>扫码提示：</strong><br>
+                    • 识别成功后摄像头继续运行<br>
+                    • 点击"重新扫描"可以扫描其他二维码<br>
+                    • 点击"停止摄像头"关闭扫描功能
+                </div>
+                
+                <div id="statusMessage" class="status-message" style="display: none;"></div>
+            `;
+        }
+
+        // 重新开始扫描
+        function startRescan() {
+            if (videoStream) {
+                isScanning = true;
+                showStatusMessage('开始重新扫描，请对准二维码...', 'info');
+                
+                // 先恢复正常的DOM结构，清除识别结果
+                const resultPanel = document.querySelector('.result-panel .panel-content');
+                if (resultPanel) {
+                    resultPanel.innerHTML = `
+                        <div class="code-display" id="displayArea">
+                            <!-- 这里会被displayResult填充 -->
+                        </div>
+                        <div id="statusMessage" class="status-message" style="display: none;"></div>
+                    `;
+                }
+                
+                // 恢复摄像头显示界面
+                const video = document.querySelector('video');
+                if (video) {
+                    // 重新创建摄像头容器显示
+                    const cameraContainer = document.createElement('div');
+                    cameraContainer.className = 'camera-container';
+                    cameraContainer.innerHTML = `
+                        <div class="camera-overlay"></div>
+                    `;
+                    cameraContainer.appendChild(video);
+
+                    displayResult(cameraContainer, '摄像头扫描', {
+                        '状态': '重新扫描中',
+                        '提示': '将二维码对准画面中央的框框内'
+                    });
+                    
+                    // 重新开始扫描动画
+                    animationId = requestAnimationFrame(() => scanQRCode(video));
+                } else {
+                    console.error('未找到video元素');
+                    showStatusMessage('摄像头异常，请重新启动', 'warning');
+                    startCamera();
+                }
+            } else {
+                showStatusMessage('摄像头已断开，请重新启动', 'warning');
+                startCamera();
             }
         }
 
@@ -969,6 +1114,13 @@
             try {
                 showStatusMessage('正在分析图片中的二维码...', 'info');
                 
+                // 检查jsQR库是否加载
+                if (typeof jsQR === 'undefined') {
+                    showStatusMessage('扫描库未加载，请刷新页面重试', 'error');
+                    logMessage('error', 'jsQR库未加载');
+                    return;
+                }
+                
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
                 
@@ -977,41 +1129,46 @@
                 
                 ctx.drawImage(img, 0, 0);
                 
-                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                const code = jsQR(imageData.data, imageData.width, imageData.height);
-                
-                if (code) {
-                    // 在图片上标记识别区域
-                    ctx.strokeStyle = '#FF0000';
-                    ctx.lineWidth = 4;
-                    ctx.beginPath();
-                    ctx.moveTo(code.location.topLeftCorner.x, code.location.topLeftCorner.y);
-                    ctx.lineTo(code.location.topRightCorner.x, code.location.topRightCorner.y);
-                    ctx.lineTo(code.location.bottomRightCorner.x, code.location.bottomRightCorner.y);
-                    ctx.lineTo(code.location.bottomLeftCorner.x, code.location.bottomLeftCorner.y);
-                    ctx.closePath();
-                    ctx.stroke();
+                try {
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const code = jsQR(imageData.data, imageData.width, imageData.height);
+                    
+                    if (code) {
+                        // 在图片上标记识别区域
+                        ctx.strokeStyle = '#FF0000';
+                        ctx.lineWidth = 4;
+                        ctx.beginPath();
+                        ctx.moveTo(code.location.topLeftCorner.x, code.location.topLeftCorner.y);
+                        ctx.lineTo(code.location.topRightCorner.x, code.location.topRightCorner.y);
+                        ctx.lineTo(code.location.bottomRightCorner.x, code.location.bottomRightCorner.y);
+                        ctx.lineTo(code.location.bottomLeftCorner.x, code.location.bottomLeftCorner.y);
+                        ctx.closePath();
+                        ctx.stroke();
 
-                    displayResult(canvas, '图片识别结果', {
-                        '文件名': fileName,
-                        '识别内容': code.data,
-                        '图片尺寸': `${img.width}x${img.height}`,
-                        '识别位置': `(${code.location.topLeftCorner.x}, ${code.location.topLeftCorner.y})`,
-                        '识别时间': new Date().toLocaleString()
-                    });
+                        displayResult(canvas, '图片识别结果', {
+                            '文件名': fileName,
+                            '识别内容': code.data,
+                            '图片尺寸': `${img.width}x${img.height}`,
+                            '识别位置': `(${code.location.topLeftCorner.x}, ${code.location.topLeftCorner.y})`,
+                            '识别时间': new Date().toLocaleString()
+                        });
 
-                    showStatusMessage('二维码识别成功！', 'success');
-                    logMessage('success', `图片二维码识别成功 - 文件: ${fileName}, 内容: ${code.data}`);
-                } else {
-                    displayResult(img, '识别结果', {
-                        '文件名': fileName,
-                        '识别结果': '未找到二维码',
-                        '图片尺寸': `${img.width}x${img.height}`,
-                        '分析时间': new Date().toLocaleString()
-                    });
+                        showStatusMessage('二维码识别成功！', 'success');
+                        logMessage('success', `图片二维码识别成功 - 文件: ${fileName}, 内容: ${code.data}`);
+                    } else {
+                        displayResult(img, '识别结果', {
+                            '文件名': fileName,
+                            '识别结果': '未找到二维码',
+                            '图片尺寸': `${img.width}x${img.height}`,
+                            '分析时间': new Date().toLocaleString()
+                        });
 
-                    showStatusMessage('图片中未找到二维码', 'error');
-                    logMessage('warning', `图片中未找到二维码 - 文件: ${fileName}`);
+                        showStatusMessage('图片中未找到二维码', 'warning');
+                        logMessage('warning', `图片中未找到二维码 - 文件: ${fileName}`);
+                    }
+                } catch (jsqrError) {
+                    showStatusMessage('二维码解析失败: ' + jsqrError.message, 'error');
+                    logMessage('error', `jsQR解析失败: ${jsqrError.message}`);
                 }
                 
             } catch (error) {
@@ -1072,28 +1229,62 @@
         // 清空显示
         function clearDisplay() {
             const displayArea = document.getElementById('displayArea');
-            displayArea.innerHTML = `
-                <div style="color: #666;">
-                    📱 请在左侧选择功能开始使用<br><br>
-                    • 生成二维码或条形码<br>
-                    • 扫描识别二维码内容<br>
-                    • 上传图片进行识别
-                </div>
-            `;
+            if (displayArea) {
+                displayArea.innerHTML = `
+                    <div style="color: #666;">
+                        📱 请在左侧选择功能开始使用<br><br>
+                        • 生成二维码或条形码<br>
+                        • 扫描识别二维码内容<br>
+                        • 上传图片进行识别
+                    </div>
+                `;
+            } else {
+                // 如果找不到displayArea，重新创建整个结构
+                const resultPanel = document.querySelector('.result-panel .panel-content');
+                if (resultPanel) {
+                    resultPanel.innerHTML = `
+                        <div class="code-display" id="displayArea">
+                            <div style="color: #666;">
+                                📱 请在左侧选择功能开始使用<br><br>
+                                • 生成二维码或条形码<br>
+                                • 扫描识别二维码内容<br>
+                                • 上传图片进行识别
+                            </div>
+                        </div>
+                        <div id="statusMessage" class="status-message" style="display: none;"></div>
+                    `;
+                }
+            }
             hideStatusMessage();
             logMessage('info', '显示区域已清空');
         }
 
         // 显示状态消息
         function showStatusMessage(message, type) {
-            const statusDiv = document.getElementById('statusMessage');
+            let statusDiv = document.getElementById('statusMessage');
+            
+            // 如果找不到状态消息元素，尝试创建一个
+            if (!statusDiv) {
+                const resultPanel = document.querySelector('.result-panel .panel-content');
+                if (resultPanel) {
+                    statusDiv = document.createElement('div');
+                    statusDiv.id = 'statusMessage';
+                    statusDiv.className = 'status-message';
+                    statusDiv.style.display = 'none';
+                    resultPanel.appendChild(statusDiv);
+                } else {
+                    console.warn('无法找到状态消息容器');
+                    return;
+                }
+            }
+            
             statusDiv.textContent = message;
             statusDiv.className = `status-message status-${type}`;
             statusDiv.style.display = 'block';
 
             // 3秒后自动隐藏
             setTimeout(() => {
-                if (statusDiv.textContent === message) {
+                if (statusDiv && statusDiv.textContent === message) {
                     hideStatusMessage();
                 }
             }, 3000);
@@ -1101,7 +1292,10 @@
 
         // 隐藏状态消息
         function hideStatusMessage() {
-            document.getElementById('statusMessage').style.display = 'none';
+            const statusDiv = document.getElementById('statusMessage');
+            if (statusDiv) {
+                statusDiv.style.display = 'none';
+            }
         }
 
         // 记录日志消息（简化版，可以根据需要扩展）
