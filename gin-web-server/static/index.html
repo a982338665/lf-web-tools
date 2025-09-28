@@ -422,6 +422,92 @@
             }
         }
 
+        /* 缓存控制面板样式 */
+        .cache-control-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 2px solid #667eea;
+            max-width: 800px;
+            transition: all 0.3s ease;
+        }
+
+        .cache-control-panel h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-size: 1.1em;
+            text-align: center;
+        }
+
+        .cache-controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .cache-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .cache-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .cache-btn:active {
+            transform: translateY(0);
+        }
+
+        .cache-info {
+            text-align: center;
+            color: #666;
+            font-size: 0.8em;
+            line-height: 1.4;
+        }
+
+        .cache-control-panel.hidden {
+            display: none;
+        }
+
+        /* 响应式缓存面板 */
+        @media (max-width: 768px) {
+            .cache-control-panel {
+                margin: 0 10px 20px 10px;
+                padding: 15px;
+            }
+
+            .cache-controls {
+                gap: 8px;
+            }
+
+            .cache-btn {
+                min-width: 100px;
+                padding: 8px 12px;
+                font-size: 0.8em;
+            }
+
+            .cache-info {
+                font-size: 0.7em;
+            }
+        }
+
         /* 滚动条样式 */
         ::-webkit-scrollbar {
             width: 6px;
@@ -487,6 +573,28 @@
         <main class="content">
             <!-- 欢迎页面 -->
             <div class="welcome-page active" id="welcomePage">
+                <!-- 缓存控制面板 -->
+                <div class="cache-control-panel" id="cacheControlPanel">
+                    <h3>🛠️ 缓存控制面板</h3>
+                    <div class="cache-controls">
+                        <button class="cache-btn" onclick="clearServiceWorkerCache()" title="清理所有缓存数据">
+                            🗑️ 清理缓存
+                        </button>
+                        <button class="cache-btn" onclick="forceUpdateServiceWorkerCache()" title="强制更新缓存内容">
+                            🔄 更新缓存
+                        </button>
+                        <button class="cache-btn" onclick="checkForUpdates()" title="检查是否有新版本">
+                            🔍 检查更新
+                        </button>
+                        <button class="cache-btn" onclick="toggleCachePanel()" title="隐藏缓存控制面板">
+                            ❌ 隐藏面板
+                        </button>
+                    </div>
+                    <div class="cache-info">
+                        <small>💡 快捷键: Ctrl+Shift+C (清理) | Ctrl+Shift+R (更新) | Ctrl+U (检查更新)</small>
+                    </div>
+                </div>
+
                 <div class="feature-grid">
                     <div class="feature-card">
                         <div class="feature-icon">🌐</div>
@@ -1177,7 +1285,7 @@
         // 每30分钟检查一次更新
         setInterval(checkForUpdates, 30 * 60 * 1000);
 
-        // 添加键盘快捷键：Ctrl+U 检查更新
+        // 添加键盘快捷键：Ctrl+U 检查更新，Ctrl+Shift+C 清理缓存
         document.addEventListener('keydown', function(e) {
             if (e.ctrlKey && e.key.toLowerCase() === 'u' && !e.altKey && !e.shiftKey) {
                 e.preventDefault();
@@ -1185,6 +1293,137 @@
                 checkForUpdates();
                 showToast('正在检查更新...', 'info');
             }
+            
+            // Ctrl+Shift+C 清理缓存
+            if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'c') {
+                e.preventDefault();
+                console.log('清理缓存...');
+                clearServiceWorkerCache();
+            }
+
+            // Ctrl+Shift+R 强制更新缓存
+            if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'r') {
+                e.preventDefault();
+                console.log('强制更新缓存...');
+                forceUpdateServiceWorkerCache();
+            }
+        });
+
+        // 清理Service Worker缓存
+        async function clearServiceWorkerCache() {
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                try {
+                    const messageChannel = new MessageChannel();
+                    
+                    messageChannel.port1.onmessage = function(event) {
+                        if (event.data.type === 'CACHE_CLEARED') {
+                            showToast('缓存已清理，页面将重新加载', 'success');
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
+                        }
+                    };
+
+                    navigator.serviceWorker.controller.postMessage(
+                        { type: 'CLEAR_CACHE' }, 
+                        [messageChannel.port2]
+                    );
+                    
+                    showToast('正在清理缓存...', 'info');
+                } catch (error) {
+                    console.error('清理缓存失败:', error);
+                    showToast('清理缓存失败', 'warning');
+                }
+            } else {
+                // 如果没有Service Worker，清理浏览器缓存
+                if ('caches' in window) {
+                    caches.keys().then(cacheNames => {
+                        return Promise.all(
+                            cacheNames.map(cacheName => caches.delete(cacheName))
+                        );
+                    }).then(() => {
+                        showToast('缓存已清理，页面将重新加载', 'success');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    });
+                } else {
+                    showToast('您的浏览器不支持缓存清理功能', 'warning');
+                }
+            }
+        }
+
+        // 强制更新Service Worker缓存
+        async function forceUpdateServiceWorkerCache() {
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                try {
+                    const messageChannel = new MessageChannel();
+                    
+                    messageChannel.port1.onmessage = function(event) {
+                        if (event.data.type === 'CACHE_UPDATED') {
+                            showToast('缓存已更新', 'success');
+                        }
+                    };
+
+                    navigator.serviceWorker.controller.postMessage(
+                        { type: 'FORCE_UPDATE' }, 
+                        [messageChannel.port2]
+                    );
+                    
+                    showToast('正在强制更新缓存...', 'info');
+                } catch (error) {
+                    console.error('更新缓存失败:', error);
+                    showToast('更新缓存失败', 'warning');
+                }
+            } else {
+                showToast('Service Worker未运行', 'warning');
+            }
+        }
+
+        // 切换缓存控制面板显示状态
+        function toggleCachePanel() {
+            const panel = document.getElementById('cacheControlPanel');
+            const isHidden = panel.classList.contains('hidden');
+            
+            if (isHidden) {
+                panel.classList.remove('hidden');
+                showToast('缓存控制面板已显示', 'info');
+                // 保存显示状态
+                localStorage.setItem('cachePanelHidden', 'false');
+            } else {
+                panel.classList.add('hidden');
+                showToast('缓存控制面板已隐藏 (双击页面标题可重新显示)', 'info');
+                // 保存隐藏状态
+                localStorage.setItem('cachePanelHidden', 'true');
+            }
+        }
+
+        // 初始化缓存面板状态
+        function initCachePanel() {
+            const panel = document.getElementById('cacheControlPanel');
+            const isHidden = localStorage.getItem('cachePanelHidden') === 'true';
+            
+            if (isHidden) {
+                panel.classList.add('hidden');
+            }
+
+            // 添加双击标题显示面板的功能
+            const headerTitle = document.querySelector('.header h1');
+            if (headerTitle) {
+                headerTitle.style.cursor = 'pointer';
+                headerTitle.addEventListener('dblclick', function() {
+                    if (panel.classList.contains('hidden')) {
+                        panel.classList.remove('hidden');
+                        showToast('缓存控制面板已显示', 'success');
+                        localStorage.setItem('cachePanelHidden', 'false');
+                    }
+                });
+            }
+        }
+
+        // 页面加载时初始化缓存面板
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(initCachePanel, 100); // 延迟执行确保DOM已完全加载
         });
     </script>
 </body>

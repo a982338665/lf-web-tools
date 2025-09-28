@@ -41,3 +41,5 @@ sizes.forEach((size, index) => {
 });
 
 console.log('图标生成完成，请将下载的PNG文件放入 static/icons/ 目录');
+
+

@@ -206,3 +206,5 @@ if (require.main === module) {
 }
 
 module.exports = { generateIcons, createIcon };
+
+

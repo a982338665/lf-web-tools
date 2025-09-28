@@ -1,6 +1,10 @@
 // Service Worker 版本号 - 更新此版本号以触发更新
-const CACHE_VERSION = 'v1.0.0';
+const CACHE_VERSION = 'v1.0.1';
 const CACHE_NAME = 'web-tools-cache-' + CACHE_VERSION;
+const RUNTIME_CACHE = 'runtime-cache-' + CACHE_VERSION;
+
+// 检查是否为开发环境
+const isDevelopment = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 
 // 需要缓存的资源列表
 const CACHE_URLS = [
@@ -82,57 +86,94 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // 如果缓存中有，先返回缓存的版本
-        if (response) {
-          // 异步更新缓存
-          fetch(event.request)
-            .then(fetchResponse => {
-              if (fetchResponse && fetchResponse.status === 200) {
-                const responseClone = fetchResponse.clone();
-                caches.open(CACHE_NAME)
-                  .then(cache => {
-                    cache.put(event.request, responseClone);
-                  });
-              }
-            })
-            .catch(() => {
-              // 网络错误时忽略
-            });
-          
-          return response;
-        }
+  // 开发环境直接使用网络请求，不缓存
+  if (isDevelopment) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
 
-        // 缓存中没有，尝试网络请求
-        return fetch(event.request)
-          .then(fetchResponse => {
-            // 检查是否是有效的响应
-            if (!fetchResponse || fetchResponse.status !== 200 || fetchResponse.type !== 'basic') {
-              return fetchResponse;
-            }
-
-            // 克隆响应，因为响应流只能使用一次
-            const responseToCache = fetchResponse.clone();
-
-            // 将响应添加到缓存
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                cache.put(event.request, responseToCache);
-              });
-
-            return fetchResponse;
-          })
-          .catch(() => {
-            // 网络失败时，如果是HTML页面请求，返回离线页面
-            if (event.request.destination === 'document') {
-              return caches.match('/static/index.html');
-            }
-          });
-      })
-  );
+  const url = new URL(event.request.url);
+  
+  // HTML文件使用Network First策略（优先网络）
+  if (event.request.destination === 'document' || 
+      url.pathname.endsWith('.html') || 
+      url.pathname === '/' || 
+      url.pathname === '/static/') {
+    event.respondWith(networkFirstStrategy(event.request));
+  }
+  // 静态资源使用Cache First策略
+  else {
+    event.respondWith(cacheFirstStrategy(event.request));
+  }
 });
+
+// Network First 策略 - 优先使用网络，失败时使用缓存
+async function networkFirstStrategy(request) {
+  try {
+    // 首先尝试网络请求
+    const networkResponse = await fetch(request);
+    
+    if (networkResponse && networkResponse.status === 200) {
+      // 成功获取网络响应，更新缓存
+      const cache = await caches.open(RUNTIME_CACHE);
+      cache.put(request, networkResponse.clone());
+      return networkResponse;
+    }
+  } catch (error) {
+    console.log('网络请求失败，尝试使用缓存:', request.url);
+  }
+  
+  // 网络失败，使用缓存
+  const cachedResponse = await caches.match(request);
+  if (cachedResponse) {
+    return cachedResponse;
+  }
+  
+  // 缓存也没有，返回离线页面
+  if (request.destination === 'document') {
+    const offlineResponse = await caches.match('/static/index.html');
+    return offlineResponse || new Response('离线模式 - 请检查网络连接', {
+      status: 503,
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+    });
+  }
+  
+  return new Response('资源不可用', { status: 404 });
+}
+
+// Cache First 策略 - 优先使用缓存
+async function cacheFirstStrategy(request) {
+  // 先检查缓存
+  const cachedResponse = await caches.match(request);
+  if (cachedResponse) {
+    // 异步更新缓存（可选）
+    fetch(request).then(response => {
+      if (response && response.status === 200) {
+        caches.open(RUNTIME_CACHE).then(cache => {
+          cache.put(request, response.clone());
+        });
+      }
+    }).catch(() => {});
+    
+    return cachedResponse;
+  }
+
+  // 缓存中没有，尝试网络请求
+  try {
+    const networkResponse = await fetch(request);
+    
+    if (networkResponse && networkResponse.status === 200) {
+      // 将响应添加到缓存
+      const cache = await caches.open(RUNTIME_CACHE);
+      cache.put(request, networkResponse.clone());
+      return networkResponse;
+    }
+    
+    return networkResponse;
+  } catch (error) {
+    return new Response('网络错误', { status: 503 });
+  }
+}
 
 // 监听消息事件
 self.addEventListener('message', event => {
@@ -146,7 +187,66 @@ self.addEventListener('message', event => {
       version: CACHE_VERSION
     });
   }
+
+  // 清理所有缓存
+  if (event.data && event.data.type === 'CLEAR_CACHE') {
+    event.waitUntil(clearAllCaches().then(() => {
+      event.ports[0].postMessage({
+        type: 'CACHE_CLEARED',
+        success: true
+      });
+    }));
+  }
+
+  // 强制更新缓存
+  if (event.data && event.data.type === 'FORCE_UPDATE') {
+    event.waitUntil(forceUpdateCache().then(() => {
+      event.ports[0].postMessage({
+        type: 'CACHE_UPDATED',
+        success: true
+      });
+    }));
+  }
 });
+
+// 清理所有缓存
+async function clearAllCaches() {
+  try {
+    const cacheNames = await caches.keys();
+    await Promise.all(cacheNames.map(cacheName => caches.delete(cacheName)));
+    console.log('所有缓存已清理');
+    return true;
+  } catch (error) {
+    console.error('清理缓存失败:', error);
+    return false;
+  }
+}
+
+// 强制更新缓存
+async function forceUpdateCache() {
+  try {
+    const cache = await caches.open(CACHE_NAME);
+    
+    // 删除旧缓存并重新获取
+    for (const url of CACHE_URLS) {
+      await cache.delete(url);
+      try {
+        const response = await fetch(url + '?t=' + Date.now()); // 添加时间戳防止浏览器缓存
+        if (response.ok) {
+          await cache.put(url, response);
+        }
+      } catch (fetchError) {
+        console.warn('无法更新缓存:', url, fetchError);
+      }
+    }
+    
+    console.log('缓存强制更新完成');
+    return true;
+  } catch (error) {
+    console.error('强制更新缓存失败:', error);
+    return false;
+  }
+}
 
 // 后台同步（如果支持）
 if ('sync' in self.registration) {
@@ -209,3 +309,5 @@ self.addEventListener('notificationclick', event => {
 });
 
 console.log('Service Worker 脚本已加载，版本:', CACHE_VERSION);
+
+
