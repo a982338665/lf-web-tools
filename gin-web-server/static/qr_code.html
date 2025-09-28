@@ -677,8 +677,8 @@
                         }
                     });
 
-                    // Tab切换时清空右侧显示区域
-                    clearDisplay();
+                    // Tab切换时完全重置右侧面板
+                    resetRightPanel();
                     hideStatusMessage();
 
                     // 如果切换到扫描标签页时摄像头正在运行，先停止
@@ -933,7 +933,8 @@
             document.getElementById('startCameraBtn').disabled = false;
             document.getElementById('stopCameraBtn').disabled = true;
 
-            clearDisplay();
+            // 完全重置右侧面板到初始状态
+            resetRightPanel();
             showStatusMessage('摄像头已停止', 'info');
             logMessage('info', '摄像头已停止');
         }
@@ -1024,16 +1025,13 @@
                     <button class="btn btn-primary" onclick="startRescan()" style="margin: 5px;">
                         🔄 重新扫描
                     </button>
-                    <button class="btn btn-secondary" onclick="stopCamera()" style="margin: 5px;">
-                        ⏹️ 停止摄像头
-                    </button>
                 </div>
                 
                 <div style="margin-top: 15px; padding: 10px; background: #e7f3ff; border-radius: 6px; font-size: 13px; color: #0c5460;">
                     💡 <strong>扫码提示：</strong><br>
                     • 识别成功后摄像头继续运行<br>
                     • 点击"重新扫描"可以扫描其他二维码<br>
-                    • 点击"停止摄像头"关闭扫描功能
+                    • 使用左侧"停止摄像头"按钮关闭扫描功能
                 </div>
                 
                 <div id="statusMessage" class="status-message" style="display: none;"></div>
@@ -1239,24 +1237,29 @@
                     </div>
                 `;
             } else {
-                // 如果找不到displayArea，重新创建整个结构
-                const resultPanel = document.querySelector('.result-panel .panel-content');
-                if (resultPanel) {
-                    resultPanel.innerHTML = `
-                        <div class="code-display" id="displayArea">
-                            <div style="color: #666;">
-                                📱 请在左侧选择功能开始使用<br><br>
-                                • 生成二维码或条形码<br>
-                                • 扫描识别二维码内容<br>
-                                • 上传图片进行识别
-                            </div>
-                        </div>
-                        <div id="statusMessage" class="status-message" style="display: none;"></div>
-                    `;
-                }
+                resetRightPanel();
             }
             hideStatusMessage();
             logMessage('info', '显示区域已清空');
+        }
+
+        // 完全重置右侧面板到初始状态
+        function resetRightPanel() {
+            const resultPanel = document.querySelector('.result-panel .panel-content');
+            if (resultPanel) {
+                resultPanel.innerHTML = `
+                    <div class="code-display" id="displayArea">
+                        <div style="color: #666;">
+                            📱 请在左侧选择功能开始使用<br><br>
+                            • 生成二维码或条形码<br>
+                            • 扫描识别二维码内容<br>
+                            • 上传图片进行识别
+                        </div>
+                    </div>
+                    <div id="statusMessage" class="status-message" style="display: none;"></div>
+                `;
+                logMessage('info', '右侧面板已完全重置');
+            }
         }
 
         // 显示状态消息
