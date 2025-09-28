@@ -192,6 +192,10 @@
             content: "🏠";
         }
 
+        .nav-link[data-page="qrcode"]::before {
+            content: "📱";
+        }
+
         /* 右侧内容区域 */
         .content {
             grid-area: content;
@@ -481,6 +485,9 @@
                 <li class="nav-item">
                     <a href="#" class="nav-link" data-page="portscan">公网端口检测</a>
                 </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="qrcode">二维码&条形码</a>
+                </li>
             </ul>
         </nav>
 
@@ -524,6 +531,11 @@
                         <div class="feature-title">公网端口检测</div>
                         <div class="feature-desc">检测公网IP的端口开放状态，支持全端口扫描和自定义端口列表</div>
                     </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📱</div>
+                        <div class="feature-title">二维码&条形码</div>
+                        <div class="feature-desc">生成和解析二维码、条形码，支持摄像头扫描、图片上传解析等功能</div>
+                    </div>
                 </div>
             </div>
 
@@ -547,6 +559,9 @@
 
             <!-- 公网端口检测 -->
             <iframe id="portscanFrame" src="port_scan.html"></iframe>
+
+            <!-- 二维码&条形码 -->
+            <iframe id="qrcodeFrame" src="qr_code.html"></iframe>
 
             <!-- 加载中页面 -->
             <div class="loading" id="loadingPage" style="display: none;">
@@ -859,7 +874,8 @@
                 'camera': 'cameraFrame',
                 'socket': 'socketFrame',
                 'curl': 'curlFrame',
-                'portscan': 'portscanFrame'
+                'portscan': 'portscanFrame',
+                'qrcode': 'qrcodeFrame'
             };
             return frameMap[page];
         }
@@ -927,6 +943,10 @@
                     case '8':
                         e.preventDefault();
                         document.querySelector('[data-page="portscan"]').click();
+                        break;
+                    case '9':
+                        e.preventDefault();
+                        document.querySelector('[data-page="qrcode"]').click();
                         break;
                 }
             }
