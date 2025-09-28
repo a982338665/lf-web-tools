@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWA快速设置</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+        }
+        .step {
+            background: rgba(255,255,255,0.1);
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        button {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .success {
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin: 10px 0;
+            display: none;
+        }
+        .warning {
+            background: #ffc107;
+            color: #333;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 PWA快速设置向导</h1>
+    
+    <div class="step">
+        <h3>步骤1: 生成必需的图标文件</h3>
+        <p>点击下面的按钮生成PWA所需的图标文件，然后将下载的PNG文件放入 <code>static/icons/</code> 目录</p>
+        <button onclick="generateIcons()">🎨 生成并下载图标</button>
+        <div id="iconSuccess" class="success">✅ 图标已生成！请查看下载文件夹并将PNG文件复制到 static/icons/ 目录</div>
+    </div>
+
+    <div class="step">
+        <h3>步骤2: 访问正确的URL</h3>
+        <p>PWA功能需要访问主页面，不是static目录</p>
+        <button onclick="goToMain()">🏠 前往主页面</button>
+    </div>
+
+    <div class="step">
+        <h3>步骤3: 验证PWA功能</h3>
+        <p>完成前两步后，您应该看到：</p>
+        <ul>
+            <li>地址栏右侧出现安装图标（➕ 或 📱）</li>
+            <li>5秒后自动显示安装提示</li>
+            <li>可以安装到桌面使用</li>
+        </ul>
+        <button onclick="checkPWA()">🔍 检查PWA状态</button>
+    </div>
+
+    <div class="warning">
+        <strong>注意:</strong> 如果图标生成失败，请手动创建以下文件并放入 static/icons/ 目录：
+        <br>• icon-192x192.png (最重要)
+        <br>• icon-512x512.png (最重要)
+        <br>• icon-72x72.png, icon-96x96.png, icon-128x128.png, icon-144x144.png, icon-152x152.png, icon-384x384.png
+    </div>
+
+    <script>
+        function createIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // 渐变背景
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            
+            // 圆角处理
+            ctx.globalCompositeOperation = 'destination-in';
+            ctx.beginPath();
+            ctx.roundRect(0, 0, size, size, size * 0.15);
+            ctx.fill();
+            ctx.globalCompositeOperation = 'source-over';
+            
+            // 电脑图标
+            ctx.fillStyle = 'rgba(255,255,255,0.95)';
+            const screenW = size * 0.5;
+            const screenH = size * 0.35;
+            const x = (size - screenW) / 2;
+            const y = (size - screenH) / 2;
+            ctx.fillRect(x, y, screenW, screenH);
+            
+            // 屏幕内容
+            ctx.fillStyle = '#667eea';
+            const padding = size * 0.02;
+            ctx.fillRect(x + padding, y + padding, screenW - padding*2, screenH - padding*2);
+            
+            // 内容线条
+            ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+            ctx.lineWidth = Math.max(1, size * 0.006);
+            for(let i = 0; i < 3; i++) {
+                const lineY = y + screenH * (0.3 + i * 0.2);
+                const lineW = screenW * (0.6 + Math.random() * 0.3);
+                ctx.beginPath();
+                ctx.moveTo(x + padding*2, lineY);
+                ctx.lineTo(x + lineW, lineY);
+                ctx.stroke();
+            }
+            
+            // 底座
+            ctx.fillStyle = 'rgba(255,255,255,0.9)';
+            const standW = screenW * 0.3;
+            const standH = size * 0.04;
+            const standX = (size - standW) / 2;
+            const standY = y + screenH + size * 0.03;
+            ctx.fillRect(standX, standY, standW, standH);
+            
+            // 底座基座
+            const baseW = screenW * 0.6;
+            const baseH = size * 0.02;
+            const baseX = (size - baseW) / 2;
+            const baseY = standY + standH;
+            ctx.fillRect(baseX, baseY, baseW, baseH);
+            
+            return canvas;
+        }
+        
+        function downloadIcon(size) {
+            const canvas = createIcon(size);
+            canvas.toBlob(blob => {
+                const link = document.createElement('a');
+                link.download = `icon-${size}x${size}.png`;
+                link.href = URL.createObjectURL(blob);
+                link.click();
+            });
+        }
+        
+        function generateIcons() {
+            const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+            sizes.forEach((size, index) => {
+                setTimeout(() => downloadIcon(size), index * 300);
+            });
+            
+            document.getElementById('iconSuccess').style.display = 'block';
+            
+            // 提示用户接下来的操作
+            setTimeout(() => {
+                alert('🎉 图标已生成完成！\n\n请执行以下步骤：\n1. 检查浏览器的下载文件夹\n2. 将所有 icon-*.png 文件复制到项目的 static/icons/ 目录\n3. 然后点击"前往主页面"按钮');
+            }, 2000);
+        }
+        
+        function goToMain() {
+            window.location.href = '/static/index.html';
+        }
+        
+        function checkPWA() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistration().then(registration => {
+                    if (registration) {
+                        alert('✅ Service Worker 已注册\n' + 
+                              '✅ 支持PWA功能\n\n' +
+                              '请确保已将图标文件放入 static/icons/ 目录，然后访问主页面查看安装功能');
+                    } else {
+                        alert('❌ Service Worker 未注册\n请前往主页面以启用PWA功能');
+                    }
+                });
+            } else {
+                alert('❌ 浏览器不支持 Service Worker\n请使用Chrome浏览器');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- 背景圆角矩形 -->
+  <rect width="512" height="512" rx="75" ry="75" fill="url(#grad)"/>
+  
+  <!-- 主图标 - 电脑屏幕 -->
+  <rect x="128" y="180" width="256" height="180" rx="12" ry="12" fill="white" opacity="0.95"/>
+  <rect x="140" y="192" width="232" height="144" rx="4" ry="4" fill="#667eea"/>
+  
+  <!-- 屏幕内容线条 -->
+  <line x1="156" y1="212" x2="300" y2="212" stroke="white" stroke-width="3" opacity="0.8"/>
+  <line x1="156" y1="228" x2="350" y2="228" stroke="white" stroke-width="3" opacity="0.6"/>
+  <line x1="156" y1="244" x2="280" y2="244" stroke="white" stroke-width="3" opacity="0.6"/>
+  <line x1="156" y1="260" x2="320" y2="260" stroke="white" stroke-width="3" opacity="0.4"/>
+  
+  <!-- 网络图标 -->
+  <circle cx="320" cy="280" r="8" fill="white" opacity="0.9"/>
+  <circle cx="340" cy="280" r="6" fill="white" opacity="0.7"/>
+  <circle cx="300" cy="280" r="6" fill="white" opacity="0.7"/>
+  <line x1="312" y1="280" x2="328" y2="280" stroke="white" stroke-width="2" opacity="0.6"/>
+  
+  <!-- 底座 -->
+  <rect x="240" y="360" width="32" height="20" fill="white" opacity="0.9"/>
+  <rect x="200" y="380" width="112" height="8" rx="4" ry="4" fill="white" opacity="0.8"/>
+  
+  <!-- 工具图标们 -->
+  <g opacity="0.3">
+    <!-- 扳手 -->
+    <path d="M 180 120 L 200 140 L 190 150 L 170 130 Z" fill="white"/>
+    <!-- 齿轮 -->
+    <circle cx="320" cy="130" r="15" fill="none" stroke="white" stroke-width="3"/>
+    <circle cx="320" cy="130" r="8" fill="white"/>
+  </g>
+</svg>

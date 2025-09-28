@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>生成占位图标</title>
+</head>
+<body>
+    <h1>图标生成器</h1>
+    <p>点击按钮生成基本图标文件</p>
+    <button onclick="generateIcons()">生成图标</button>
+    
+    <script>
+        function createIconDataURL(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // 渐变背景
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            
+            // 简单的电脑图标
+            ctx.fillStyle = 'white';
+            ctx.globalAlpha = 0.9;
+            
+            // 屏幕
+            const screenSize = size * 0.6;
+            const x = (size - screenSize) / 2;
+            const y = (size - screenSize) / 2;
+            ctx.fillRect(x, y, screenSize, screenSize * 0.7);
+            
+            // 底座
+            ctx.fillRect(x + screenSize * 0.3, y + screenSize * 0.7, screenSize * 0.4, size * 0.1);
+            ctx.fillRect(x + screenSize * 0.1, y + screenSize * 0.8, screenSize * 0.8, size * 0.05);
+            
+            return canvas.toDataURL();
+        }
+        
+        function downloadIcon(size) {
+            const link = document.createElement('a');
+            link.download = `icon-${size}x${size}.png`;
+            link.href = createIconDataURL(size);
+            link.click();
+        }
+        
+        function generateIcons() {
+            const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+            sizes.forEach((size, index) => {
+                setTimeout(() => downloadIcon(size), index * 100);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -4,6 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>计算机网页工具</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="集成多种计算机网络测试和诊断工具的Web应用">
+    <meta name="theme-color" content="#667eea">
+    <meta name="msapplication-TileColor" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="网页工具">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="/static/manifest.json">
+    
+    <!-- Icons for different platforms -->
+    <link rel="icon" type="image/svg+xml" href="/static/icons/icon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/icons/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/icon.svg">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/icon.svg">
+    <link rel="mask-icon" href="/static/icons/icon.svg" color="#667eea">
     <style>
         * {
             margin: 0;
@@ -536,10 +554,253 @@
         </main>
     </div>
 
+    <!-- 更新通知栏 -->
+    <div id="updateNotification" class="update-notification" style="display: none;">
+        <div class="update-content">
+            <span class="update-icon">🔄</span>
+            <div class="update-text">
+                <div class="update-title">发现新版本</div>
+                <div class="update-message">有新版本可用，立即更新以获得最新功能</div>
+            </div>
+            <div class="update-actions">
+                <button id="updateBtn" class="update-btn primary">立即更新</button>
+                <button id="dismissBtn" class="update-btn secondary">稍后提醒</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 安装提示 -->
+    <div id="installPrompt" class="install-prompt" style="display: none;">
+        <div class="install-content">
+            <span class="install-icon">📱</span>
+            <div class="install-text">
+                <div class="install-title">安装应用到桌面</div>
+                <div class="install-message">将此应用安装到您的设备以便快速访问</div>
+            </div>
+            <div class="install-actions">
+                <button id="installBtn" class="install-btn primary">安装</button>
+                <button id="installDismissBtn" class="install-btn secondary">不了，谢谢</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* 更新通知样式 */
+        .update-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            z-index: 10000;
+            max-width: 400px;
+            border-left: 4px solid #667eea;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .update-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .update-icon {
+            font-size: 1.5em;
+            animation: rotate 2s linear infinite;
+        }
+
+        .update-text {
+            flex: 1;
+        }
+
+        .update-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .update-message {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .update-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .update-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .update-btn.primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .update-btn.primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+        }
+
+        .update-btn.secondary {
+            background: #f8f9fa;
+            color: #666;
+            border: 1px solid #e9ecef;
+        }
+
+        .update-btn.secondary:hover {
+            background: #e9ecef;
+        }
+
+        /* 安装提示样式 */
+        .install-prompt {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            z-index: 10000;
+            max-width: 400px;
+            margin: 0 auto;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .install-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .install-icon {
+            font-size: 1.5em;
+        }
+
+        .install-text {
+            flex: 1;
+        }
+
+        .install-title {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .install-message {
+            opacity: 0.9;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .install-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .install-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .install-btn.primary {
+            background: white;
+            color: #667eea;
+        }
+
+        .install-btn.primary:hover {
+            background: #f8f9fa;
+            transform: translateY(-1px);
+        }
+
+        .install-btn.secondary {
+            background: transparent;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .install-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .update-notification {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+
+            .install-prompt {
+                bottom: 10px;
+                left: 10px;
+                right: 10px;
+                max-width: none;
+            }
+
+            .update-content, .install-content {
+                padding: 15px;
+                gap: 12px;
+            }
+
+            .update-actions, .install-actions {
+                flex-direction: row;
+            }
+        }
+    </style>
+
     <script>
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', function() {
             initNavigation();
+            initPWA();
             updateTime();
             setInterval(updateTime, 1000);
         });
@@ -680,6 +941,250 @@
         // 窗口大小变化时的处理
         window.addEventListener('resize', function() {
             // 可以在这里添加响应式处理逻辑
+        });
+
+        // PWA 相关功能初始化
+        function initPWA() {
+            // 注册 Service Worker
+            if ('serviceWorker' in navigator) {
+                registerServiceWorker();
+            }
+            
+            // 处理安装提示
+            handleInstallPrompt();
+            
+            // 处理离线/在线状态
+            handleOnlineStatus();
+        }
+
+        // Service Worker 注册
+        async function registerServiceWorker() {
+            try {
+                const registration = await navigator.serviceWorker.register('/static/sw.js');
+                console.log('Service Worker 注册成功:', registration.scope);
+                
+                // 监听更新
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            // 新版本可用
+                            showUpdateNotification(newWorker);
+                        }
+                    });
+                });
+                
+                // 监听来自 Service Worker 的消息
+                navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage);
+                
+            } catch (error) {
+                console.error('Service Worker 注册失败:', error);
+            }
+        }
+
+        // 处理 Service Worker 消息
+        function handleServiceWorkerMessage(event) {
+            const { type, version } = event.data;
+            
+            switch (type) {
+                case 'NEW_VERSION_AVAILABLE':
+                    console.log('收到新版本通知:', version);
+                    showUpdateNotification();
+                    break;
+                case 'VERSION_INFO':
+                    console.log('当前版本:', version);
+                    break;
+            }
+        }
+
+        // 显示更新通知
+        function showUpdateNotification(newWorker = null) {
+            const notification = document.getElementById('updateNotification');
+            const updateBtn = document.getElementById('updateBtn');
+            const dismissBtn = document.getElementById('dismissBtn');
+            
+            notification.style.display = 'block';
+            
+            // 立即更新按钮事件
+            updateBtn.onclick = () => {
+                if (newWorker) {
+                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                    window.location.reload();
+                } else {
+                    window.location.reload();
+                }
+            };
+            
+            // 稍后提醒按钮事件
+            dismissBtn.onclick = () => {
+                notification.style.display = 'none';
+                // 30分钟后再次提醒
+                setTimeout(() => {
+                    showUpdateNotification(newWorker);
+                }, 30 * 60 * 1000);
+            };
+            
+            // 10秒后自动隐藏
+            setTimeout(() => {
+                if (notification.style.display !== 'none') {
+                    notification.style.display = 'none';
+                }
+            }, 10000);
+        }
+
+        // 处理应用安装提示
+        let deferredPrompt = null;
+        
+        function handleInstallPrompt() {
+            const installPrompt = document.getElementById('installPrompt');
+            const installBtn = document.getElementById('installBtn');
+            const installDismissBtn = document.getElementById('installDismissBtn');
+            
+            // 监听安装提示事件
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                
+                // 检查是否已经安装
+                if (!window.matchMedia('(display-mode: standalone)').matches) {
+                    // 延迟一会再显示安装提示
+                    setTimeout(() => {
+                        installPrompt.style.display = 'block';
+                    }, 5000);
+                }
+            });
+            
+            // 安装按钮事件
+            installBtn.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    
+                    if (outcome === 'accepted') {
+                        console.log('用户接受了安装提示');
+                    } else {
+                        console.log('用户拒绝了安装提示');
+                    }
+                    
+                    deferredPrompt = null;
+                    installPrompt.style.display = 'none';
+                }
+            });
+            
+            // 不安装按钮事件
+            installDismissBtn.addEventListener('click', () => {
+                installPrompt.style.display = 'none';
+                deferredPrompt = null;
+                
+                // 记住用户选择，24小时内不再提示
+                localStorage.setItem('installDismissed', Date.now().toString());
+            });
+            
+            // 检查是否已经拒绝过安装
+            const installDismissed = localStorage.getItem('installDismissed');
+            if (installDismissed) {
+                const dismissTime = parseInt(installDismissed);
+                const now = Date.now();
+                const dayInMs = 24 * 60 * 60 * 1000;
+                
+                if (now - dismissTime < dayInMs) {
+                    // 24小时内不显示安装提示
+                    return;
+                }
+            }
+            
+            // 监听应用安装事件
+            window.addEventListener('appinstalled', () => {
+                console.log('应用已安装');
+                installPrompt.style.display = 'none';
+                
+                // 显示安装成功提示
+                showToast('应用已成功安装到您的设备！', 'success');
+            });
+        }
+
+        // 处理在线/离线状态
+        function handleOnlineStatus() {
+            function updateOnlineStatus() {
+                const status = navigator.onLine ? '在线' : '离线';
+                const statusElement = document.querySelector('.header-info .status');
+                const isOnline = navigator.onLine;
+                
+                statusElement.textContent = isOnline ? '系统正常' : '离线模式';
+                statusElement.style.color = isOnline ? '#28a745' : '#ffc107';
+                
+                if (!isOnline) {
+                    showToast('您现在处于离线模式，某些功能可能无法使用', 'warning');
+                } else {
+                    showToast('网络连接已恢复', 'success');
+                }
+            }
+            
+            window.addEventListener('online', updateOnlineStatus);
+            window.addEventListener('offline', updateOnlineStatus);
+            
+            // 初始状态检查
+            updateOnlineStatus();
+        }
+
+        // 简单的 Toast 通知函数
+        function showToast(message, type = 'info') {
+            // 创建 toast 元素
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            
+            // 添加样式
+            Object.assign(toast.style, {
+                position: 'fixed',
+                bottom: '100px',
+                right: '20px',
+                background: type === 'success' ? '#28a745' : type === 'warning' ? '#ffc107' : '#17a2b8',
+                color: 'white',
+                padding: '12px 20px',
+                borderRadius: '6px',
+                zIndex: '10001',
+                maxWidth: '300px',
+                fontSize: '14px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                animation: 'slideIn 0.3s ease-out',
+                cursor: 'pointer'
+            });
+            
+            document.body.appendChild(toast);
+            
+            // 点击关闭
+            toast.addEventListener('click', () => {
+                toast.remove();
+            });
+            
+            // 自动移除
+            setTimeout(() => {
+                if (document.body.contains(toast)) {
+                    toast.style.animation = 'fadeOut 0.3s ease-out';
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, 4000);
+        }
+
+        // 检查更新函数（定期调用）
+        function checkForUpdates() {
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({ type: 'GET_VERSION' });
+            }
+        }
+        
+        // 每30分钟检查一次更新
+        setInterval(checkForUpdates, 30 * 60 * 1000);
+
+        // 添加键盘快捷键：Ctrl+U 检查更新
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key.toLowerCase() === 'u' && !e.altKey && !e.shiftKey) {
+                e.preventDefault();
+                console.log('手动检查更新...');
+                checkForUpdates();
+                showToast('正在检查更新...', 'info');
+            }
         });
     </script>
 </body>

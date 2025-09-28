@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图标生成器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .icon-preview {
+            display: inline-block;
+            margin: 10px;
+            text-align: center;
+        }
+        canvas {
+            border: 1px solid #ccc;
+            margin-bottom: 5px;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #5a6fd8;
+        }
+    </style>
+</head>
+<body>
+    <h1>PWA图标生成器</h1>
+    <p>点击下面的按钮生成并下载不同尺寸的应用图标</p>
+    
+    <div id="icons-container"></div>
+    
+    <button onclick="generateAllIcons()">生成所有图标</button>
+    <button onclick="downloadAll()">下载全部</button>
+
+    <script>
+        const ICON_SIZES = [72, 96, 128, 144, 152, 192, 384, 512];
+        const canvases = {};
+
+        function createIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            // 创建渐变背景
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+
+            // 绘制圆角矩形背景
+            ctx.fillStyle = gradient;
+            const radius = size * 0.15;
+            ctx.beginPath();
+            ctx.roundRect(0, 0, size, size, radius);
+            ctx.fill();
+
+            // 绘制电脑屏幕图标
+            const screenWidth = size * 0.5;
+            const screenHeight = size * 0.35;
+            const screenX = (size - screenWidth) / 2;
+            const screenY = (size - screenHeight) / 2;
+
+            // 屏幕外框
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+            ctx.fillRect(screenX, screenY, screenWidth, screenHeight);
+
+            // 屏幕内容区
+            ctx.fillStyle = '#667eea';
+            const padding = size * 0.02;
+            ctx.fillRect(
+                screenX + padding, 
+                screenY + padding, 
+                screenWidth - padding * 2, 
+                screenHeight - padding * 2
+            );
+
+            // 绘制屏幕内容线条
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.lineWidth = Math.max(1, size * 0.006);
+            
+            const lineSpacing = screenHeight * 0.2;
+            const startY = screenY + screenHeight * 0.3;
+            
+            for (let i = 0; i < 3; i++) {
+                const y = startY + i * lineSpacing;
+                const lineWidth = screenWidth * (0.6 + Math.random() * 0.3);
+                
+                ctx.beginPath();
+                ctx.moveTo(screenX + padding * 2, y);
+                ctx.lineTo(screenX + lineWidth, y);
+                ctx.stroke();
+            }
+
+            // 绘制网络连接点
+            const dotSize = size * 0.02;
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.beginPath();
+            ctx.arc(screenX + screenWidth * 0.75, screenY + screenHeight * 0.7, dotSize, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // 底座
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            const standWidth = screenWidth * 0.25;
+            const standHeight = size * 0.04;
+            const standX = (size - standWidth) / 2;
+            const standY = screenY + screenHeight + size * 0.03;
+            ctx.fillRect(standX, standY, standWidth, standHeight);
+
+            // 底座基座
+            const baseWidth = screenWidth * 0.55;
+            const baseHeight = size * 0.02;
+            const baseX = (size - baseWidth) / 2;
+            const baseY = standY + standHeight;
+            ctx.fillRect(baseX, baseY, baseWidth, baseHeight);
+
+            return canvas;
+        }
+
+        function generateAllIcons() {
+            const container = document.getElementById('icons-container');
+            container.innerHTML = '';
+
+            ICON_SIZES.forEach(size => {
+                const canvas = createIcon(size);
+                canvases[size] = canvas;
+                
+                const preview = document.createElement('div');
+                preview.className = 'icon-preview';
+                preview.innerHTML = `
+                    <div>${canvas.width}x${canvas.height}</div>
+                    <div><a href="#" onclick="downloadIcon(${size})" download="icon-${size}x${size}.png">下载</a></div>
+                `;
+                preview.insertBefore(canvas, preview.firstChild);
+                container.appendChild(preview);
+            });
+        }
+
+        function downloadIcon(size) {
+            const canvas = canvases[size];
+            if (canvas) {
+                const link = document.createElement('a');
+                link.download = `icon-${size}x${size}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            }
+        }
+
+        function downloadAll() {
+            ICON_SIZES.forEach(size => {
+                setTimeout(() => downloadIcon(size), size * 10);
+            });
+        }
+
+        // 页面加载时自动生成
+        window.addEventListener('load', generateAllIcons);
+    </script>
+</body>
+</html>
