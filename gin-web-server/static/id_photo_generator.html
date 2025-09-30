@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>证件照生成工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 8px;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+
+        .container {
+            position: fixed;
+            top: 0px;
+            left: 6px;
+            right: 6px;
+            bottom: 0px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        h1::before {
+            content: "📸";
+            margin-right: 15px;
+        }
+
+        .main-layout {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            grid-template-rows: 1fr;
+            grid-template-areas:
+                "config preview";
+            gap: 15px;
+            min-height: 0;
+        }
+
+        /* 左侧配置区域 */
+        .config-panel {
+            grid-area: config;
+            background: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto auto;
+            grid-template-areas:
+                "upload upload"
+                "background size"
+                "quality buttons";
+            gap: 15px;
+            align-content: start;
+        }
+
+        .upload-section {
+            grid-area: upload;
+        }
+
+        .background-section {
+            grid-area: background;
+        }
+
+        .size-section {
+            grid-area: size;
+        }
+
+        .quality-section {
+            grid-area: quality;
+        }
+
+        .buttons-section {
+            grid-area: buttons;
+        }
+
+        /* 右侧预览区域 */
+        .preview-panel {
+            grid-area: preview;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .preview-area {
+            background: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .result-area {
+            background: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            flex: 0 0 200px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section-title {
+            font-size: 0.85em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #495057;
+            font-size: 12px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background-color: white;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .upload-area {
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #e3f2fd;
+        }
+
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #e3f2fd;
+            transform: scale(1.02);
+        }
+
+        .upload-text {
+            color: #666;
+            font-size: 12px;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+
+        .upload-icon {
+            font-size: 2em;
+            color: #ccc;
+            margin-bottom: 8px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s;
+            text-align: center;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+        }
+
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .color-option {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid #dee2e6;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .color-option.selected {
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+        }
+
+        .preview-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            border-radius: 8px;
+            position: relative;
+            overflow: auto;
+            min-height: 300px;
+            max-height: 400px;
+        }
+
+        .preview-image {
+            max-width: 300px;
+            max-height: 400px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            object-fit: contain;
+        }
+
+        .preview-placeholder {
+            text-align: center;
+            color: #999;
+            font-size: 16px;
+        }
+
+        .preview-placeholder-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .size-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .size-option {
+            padding: 6px 8px;
+            border: 2px solid #dee2e6;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-size: 11px;
+            background: white;
+            line-height: 1.2;
+        }
+
+        .size-option:hover {
+            border-color: #667eea;
+            background: #e3f2fd;
+        }
+
+        .size-option.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .panel-header {
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            height: 30px;
+            flex-shrink: 0;
+        }
+
+        .panel-title {
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .panel-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .panel-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s;
+        }
+
+        .panel-btn:hover {
+            background: #5a6268;
+        }
+
+        .panel-btn.save {
+            background: #28a745;
+        }
+
+        .panel-btn.save:hover {
+            background: #218838;
+        }
+
+        .processing-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            border-radius: 8px;
+            z-index: 10;
+        }
+
+        .processing-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .processing-text {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .download-list {
+            max-height: 150px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        .download-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            font-size: 12px;
+        }
+
+        .download-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .download-filename {
+            flex: 1;
+            margin-right: 10px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .download-btn {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: background 0.3s;
+        }
+
+        .download-btn:hover {
+            background: #138496;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+                grid-template-areas:
+                    "config"
+                    "preview";
+            }
+
+            .config-panel {
+                max-height: 400px;
+                grid-template-columns: 1fr;
+                grid-template-areas:
+                    "upload"
+                    "background"
+                    "size"
+                    "quality"
+                    "process"
+                    "buttons";
+            }
+
+            .preview-panel {
+                min-height: 500px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .color-palette {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .size-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>证件照生成工具</h1>
+
+        <div class="main-layout">
+            <!-- 左侧配置区域 -->
+            <div class="config-panel">
+                <!-- 上传照片 -->
+                <div class="upload-section">
+                    <div class="section-title">📤 上传照片</div>
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📷</div>
+                        <div class="upload-text">
+                            点击或拖拽图片到此处上传<br>
+                            支持 JPG、PNG 格式，文件大小不超过 10MB
+                        </div>
+                        <input type="file" id="fileInput" class="file-input" accept="image/*">
+                    </div>
+                </div>
+
+                <!-- 背景设置 -->
+                <div class="background-section">
+                    <div class="section-title">🎨 背景设置</div>
+                    <div class="form-group">
+                        <label class="form-label">背景颜色</label>
+                        <div class="color-palette">
+                            <div class="color-option selected" data-color="#FFFFFF" style="background: #FFFFFF;" title="白色"></div>
+                            <div class="color-option" data-color="#FF0000" style="background: #FF0000;" title="红色"></div>
+                            <div class="color-option" data-color="#0066CC" style="background: #0066CC;" title="蓝色"></div>
+                            <div class="color-option" data-color="#FFD700" style="background: #FFD700;" title="金色"></div>
+                            <div class="color-option" data-color="#32CD32" style="background: #32CD32;" title="绿色"></div>
+                            <div class="color-option" data-color="#F0F0F0" style="background: #F0F0F0;" title="淡灰色"></div>
+                        </div>
+                        <div style="margin-top: 8px;">
+                            <input type="color" class="form-input" id="customColor" value="#FFFFFF" style="height: 32px;">
+                            <label class="form-label" style="margin-top: 4px; margin-bottom: 0;">自定义颜色</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 尺寸设置 -->
+                <div class="size-section">
+                    <div class="section-title">📏 尺寸设置</div>
+                    <div class="form-group">
+                        <label class="form-label">标准尺寸</label>
+                        <div class="size-options">
+                            <div class="size-option selected" data-size="295x413" data-name="一寸">一寸<br>295×413</div>
+                            <div class="size-option" data-size="413x579" data-name="二寸">二寸<br>413×579</div>
+                            <div class="size-option" data-size="390x567" data-name="小二寸">小二寸<br>390×567</div>
+                            <div class="size-option" data-size="260x378" data-name="小一寸">小一寸<br>260×378</div>
+                            <div class="size-option" data-size="358x441" data-name="护照">护照<br>358×441</div>
+                            <div class="size-option" data-size="480x640" data-name="大一寸">大一寸<br>480×640</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">自定义尺寸 (像素)</label>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <input type="number" class="form-input" id="customWidth" placeholder="宽度" min="100" max="2000" value="295">
+                            <span style="font-size: 12px;">×</span>
+                            <input type="number" class="form-input" id="customHeight" placeholder="高度" min="100" max="2000" value="413">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 质量设置 -->
+                <div class="quality-section">
+                    <div class="section-title">⚙️ 质量设置</div>
+                    <div class="form-group">
+                        <label class="form-label">输出质量</label>
+                        <select class="form-select" id="qualitySelect">
+                            <option value="0.9">高质量 (90%)</option>
+                            <option value="0.8" selected>标准质量 (80%)</option>
+                            <option value="0.7">压缩质量 (70%)</option>
+                        </select>
+                    </div>
+                </div>
+
+
+                <!-- 操作按钮 -->
+                <div class="buttons-section">
+                    <div class="btn-group" style="flex-direction: column; gap: 8px;">
+                        <button class="btn btn-primary" id="generateBtn" disabled>🎯 生成证件照</button>
+                        <button class="btn btn-success" id="downloadBtn" disabled>📥 下载照片</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧预览区域 -->
+            <div class="preview-panel">
+                <!-- 预览区域 -->
+                <div class="preview-area">
+                    <div class="panel-header">
+                        <div class="panel-title">👀 预览效果</div>
+                        <div class="panel-actions">
+                            <button class="panel-btn" id="resetBtn">重置</button>
+                        </div>
+                    </div>
+
+                    <div class="preview-container" id="previewContainer">
+                        <div class="preview-placeholder" id="previewPlaceholder">
+                            <div class="preview-placeholder-icon">🖼️</div>
+                            <div>请上传照片以预览效果</div>
+                        </div>
+                        <canvas id="previewCanvas" style="display: none;"></canvas>
+                    </div>
+                </div>
+
+                <!-- 下载区域 -->
+                <div class="result-area">
+                    <div class="panel-header">
+                        <div class="panel-title">📦 生成结果</div>
+                        <div class="panel-actions">
+                            <button class="panel-btn save" id="saveAllBtn" disabled>全部保存</button>
+                        </div>
+                    </div>
+
+                    <div class="download-list" id="downloadList">
+                        <div style="text-align: center; color: #999; padding: 20px; font-size: 14px;">
+                            生成证件照后，下载链接将显示在这里
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let uploadedImage = null;
+        let currentBackgroundColor = '#FFFFFF';
+        let currentSize = { width: 295, height: 413, name: '一寸' };
+        let currentQuality = 0.8;
+        let generatedResults = [];
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM Content Loaded, starting initialization...');
+            try {
+                initUploadArea();
+                initColorPalette();
+                initSizeOptions();
+                initCustomSize();
+                initButtons();
+                logMessage('证件照生成工具初始化完成');
+                console.log('All initialization complete');
+            } catch (error) {
+                console.error('Initialization error:', error);
+                alert('初始化失败: ' + error.message);
+            }
+        });
+
+        // 初始化上传区域
+        function initUploadArea() {
+            console.log('Initializing upload area...');
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+
+            if (!uploadArea) {
+                console.error('Upload area not found!');
+                return;
+            }
+            if (!fileInput) {
+                console.error('File input not found!');
+                return;
+            }
+
+            console.log('Upload area and file input found, adding event listeners...');
+            
+            uploadArea.addEventListener('click', () => {
+                console.log('Upload area clicked');
+                fileInput.click();
+            });
+            
+            uploadArea.addEventListener('dragover', handleDragOver);
+            uploadArea.addEventListener('drop', handleDrop);
+            uploadArea.addEventListener('dragleave', handleDragLeave);
+            fileInput.addEventListener('change', handleFileSelect);
+            
+            console.log('Upload area initialization complete');
+        }
+
+        // 处理拖拽事件
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileUpload(files[0]);
+            }
+        }
+
+        // 处理文件选择
+        function handleFileSelect(e) {
+            console.log('File select event triggered');
+            const file = e.target.files[0];
+            if (file) {
+                console.log('File selected:', file.name, 'Size:', file.size, 'Type:', file.type);
+                handleFileUpload(file);
+            } else {
+                console.log('No file selected');
+            }
+        }
+
+        // 处理文件上传
+        function handleFileUpload(file) {
+            console.log('handleFileUpload called with file:', file);
+            
+            // 验证文件类型
+            if (!file.type.startsWith('image/')) {
+                alert('请选择图片文件！');
+                console.error('Invalid file type:', file.type);
+                return;
+            }
+
+            // 验证文件大小 (10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('文件大小不能超过 10MB！');
+                console.error('File too large:', file.size);
+                return;
+            }
+
+            console.log('File validation passed, starting to read...');
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                console.log('FileReader loaded successfully');
+                const img = new Image();
+                img.onload = function() {
+                    console.log('Image loaded successfully, dimensions:', this.width, 'x', this.height);
+                    uploadedImage = img;
+                    updatePreviewRealtime();
+                    document.getElementById('generateBtn').disabled = false;
+                    logMessage('照片上传成功: ' + file.name);
+                };
+                img.onerror = function() {
+                    console.error('Failed to load image');
+                    alert('图片加载失败，请检查图片格式！');
+                };
+                img.src = e.target.result;
+            };
+            reader.onerror = function() {
+                console.error('FileReader error');
+                alert('文件读取失败，请重试！');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 初始化颜色选择
+        function initColorPalette() {
+            const colorOptions = document.querySelectorAll('.color-option');
+            const customColor = document.getElementById('customColor');
+
+            colorOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    colorOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    currentBackgroundColor = this.getAttribute('data-color');
+                    customColor.value = currentBackgroundColor;
+                    updatePreviewRealtime();
+                    logMessage('背景色已设置为: ' + currentBackgroundColor);
+                });
+            });
+
+            customColor.addEventListener('input', function() {
+                currentBackgroundColor = this.value;
+                colorOptions.forEach(opt => opt.classList.remove('selected'));
+                updatePreviewRealtime();
+            });
+
+            customColor.addEventListener('change', function() {
+                logMessage('自定义背景色: ' + currentBackgroundColor);
+            });
+        }
+
+        // 初始化尺寸选择
+        function initSizeOptions() {
+            const sizeOptions = document.querySelectorAll('.size-option');
+
+            sizeOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    sizeOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    
+                    const sizeStr = this.getAttribute('data-size');
+                    const [width, height] = sizeStr.split('x').map(Number);
+                    const name = this.getAttribute('data-name');
+                    
+                    currentSize = { width, height, name };
+                    
+                    // 更新自定义尺寸输入框
+                    document.getElementById('customWidth').value = width;
+                    document.getElementById('customHeight').value = height;
+                    
+                    updatePreviewRealtime();
+                    logMessage(`尺寸已设置为: ${name} (${width}×${height})`);
+                });
+            });
+        }
+
+        // 初始化自定义尺寸
+        function initCustomSize() {
+            const customWidth = document.getElementById('customWidth');
+            const customHeight = document.getElementById('customHeight');
+
+            function updateCustomSize() {
+                const width = parseInt(customWidth.value) || 295;
+                const height = parseInt(customHeight.value) || 413;
+                
+                currentSize = { width, height, name: '自定义' };
+                
+                // 移除标准尺寸的选中状态
+                document.querySelectorAll('.size-option').forEach(opt => opt.classList.remove('selected'));
+                
+                updatePreviewRealtime();
+            }
+
+            function logCustomSize() {
+                logMessage(`自定义尺寸: ${currentSize.width}×${currentSize.height}`);
+            }
+
+            customWidth.addEventListener('input', updateCustomSize);
+            customHeight.addEventListener('input', updateCustomSize);
+            customWidth.addEventListener('change', logCustomSize);
+            customHeight.addEventListener('change', logCustomSize);
+        }
+
+        // 初始化按钮事件
+        function initButtons() {
+            document.getElementById('generateBtn').addEventListener('click', generateIdPhoto);
+            document.getElementById('downloadBtn').addEventListener('click', downloadCurrentPhoto);
+            document.getElementById('resetBtn').addEventListener('click', resetAll);
+            document.getElementById('saveAllBtn').addEventListener('click', saveAllResults);
+            
+            document.getElementById('qualitySelect').addEventListener('change', function() {
+                currentQuality = parseFloat(this.value);
+                updatePreviewRealtime();
+                logMessage('输出质量设置为: ' + (currentQuality * 100) + '%');
+            });
+
+
+        }
+
+        // 实时更新预览（防抖）
+        let updateTimer = null;
+        function updatePreviewRealtime() {
+            clearTimeout(updateTimer);
+            updateTimer = setTimeout(updatePreview, 100); // 100ms防抖
+        }
+
+        // 更新预览
+        function updatePreview() {
+            if (!uploadedImage) return;
+
+            const canvas = document.getElementById('previewCanvas');
+            const ctx = canvas.getContext('2d');
+            const placeholder = document.getElementById('previewPlaceholder');
+
+            // 设置画布尺寸（保持固定的显示尺寸）
+            const displayWidth = Math.min(300, currentSize.width);
+            const displayHeight = Math.min(400, currentSize.height);
+            const scale = Math.min(displayWidth / currentSize.width, displayHeight / currentSize.height);
+            
+            canvas.width = currentSize.width;
+            canvas.height = currentSize.height;
+            canvas.style.width = (currentSize.width * scale) + 'px';
+            canvas.style.height = (currentSize.height * scale) + 'px';
+
+            // 简单预览模式（实际处理在服务端）
+            processImageSimple(canvas, ctx);
+
+            // 显示预览
+            placeholder.style.display = 'none';
+            canvas.style.display = 'block';
+        }
+
+        // 简单背景替换
+        function processImageSimple(canvas, ctx) {
+            // 计算图片缩放和位置
+            const imgAspect = uploadedImage.width / uploadedImage.height;
+            const canvasAspect = canvas.width / canvas.height;
+
+            let drawWidth, drawHeight, offsetX, offsetY;
+
+            if (imgAspect > canvasAspect) {
+                // 图片宽度比例更大，以高度为准
+                drawHeight = canvas.height;
+                drawWidth = drawHeight * imgAspect;
+                offsetX = (canvas.width - drawWidth) / 2;
+                offsetY = 0;
+            } else {
+                // 图片高度比例更大，以宽度为准
+                drawWidth = canvas.width;
+                drawHeight = drawWidth / imgAspect;
+                offsetX = 0;
+                offsetY = (canvas.height - drawHeight) / 2;
+            }
+
+            // 绘制背景
+            ctx.fillStyle = currentBackgroundColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制图片
+            ctx.drawImage(uploadedImage, offsetX, offsetY, drawWidth, drawHeight);
+        }
+
+
+        // 生成证件照（服务端处理）
+        function generateIdPhoto() {
+            if (!uploadedImage) {
+                alert('请先上传照片！');
+                return;
+            }
+
+            generateIdPhotoServer();
+        }
+
+
+        // 服务端生成证件照
+        async function generateIdPhotoServer() {
+            showProcessing('正在上传图片并生成证件照...');
+
+            try {
+                // 准备请求数据
+                const originalCanvas = document.createElement('canvas');
+                const originalCtx = originalCanvas.getContext('2d');
+                
+                originalCanvas.width = uploadedImage.width;
+                originalCanvas.height = uploadedImage.height;
+                originalCtx.drawImage(uploadedImage, 0, 0);
+                
+                const originalDataUrl = originalCanvas.toDataURL('image/jpeg', 0.9);
+
+                const requestData = {
+                    imageData: originalDataUrl,
+                    backgroundColor: currentBackgroundColor,
+                    width: currentSize.width,
+                    height: currentSize.height,
+                    quality: currentQuality,
+                    format: 'jpeg',
+                    backgroundMode: 'auto'
+                };
+
+                logMessage('正在发送请求到服务端...');
+
+                // 发送到服务端处理
+                const response = await fetch('/api/id-photo/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                logMessage('收到服务端响应...');
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+
+                const serverResult = await response.json();
+
+                if (!serverResult.success) {
+                    throw new Error(serverResult.message || '服务端处理失败');
+                }
+
+                const result = {
+                    id: Date.now(),
+                    dataUrl: serverResult.dataUrl,
+                    filename: `证件照_${currentSize.name}_${currentSize.width}x${currentSize.height}_${new Date().getTime()}.jpg`,
+                    size: currentSize,
+                    backgroundColor: currentBackgroundColor,
+                    quality: currentQuality,
+                    timestamp: new Date().toLocaleString(),
+                    fileSize: serverResult.size
+                };
+
+                generatedResults.push(result);
+                addDownloadItem(result);
+                
+                document.getElementById('downloadBtn').disabled = false;
+                document.getElementById('saveAllBtn').disabled = false;
+                
+                logMessage(`证件照生成成功: ${result.filename}`);
+                logMessage(`文件大小: ${(result.fileSize / 1024).toFixed(2)} KB`);
+                hideProcessing();
+
+                // 更新预览
+                updatePreviewFromDataUrl(result.dataUrl);
+                
+            } catch (error) {
+                logMessage(`服务端生成失败: ${error.message}`);
+                hideProcessing();
+                alert(`生成失败: ${error.message}\n\n请检查网络连接或联系管理员。`);
+            }
+        }
+
+        // 从数据URL更新预览
+        function updatePreviewFromDataUrl(dataUrl) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.getElementById('previewCanvas');
+                const ctx = canvas.getContext('2d');
+                
+                canvas.width = this.width;
+                canvas.height = this.height;
+                ctx.drawImage(this, 0, 0);
+            };
+            img.src = dataUrl;
+        }
+
+        // 添加下载项
+        function addDownloadItem(result) {
+            const downloadList = document.getElementById('downloadList');
+            
+            // 如果是第一次添加，清空提示文本
+            if (generatedResults.length === 1) {
+                downloadList.innerHTML = '';
+            }
+
+            const item = document.createElement('div');
+            item.className = 'download-item';
+            item.innerHTML = `
+                <div class="download-filename" title="${result.filename}">${result.filename}</div>
+                <button class="download-btn" onclick="downloadResult('${result.id}')">下载</button>
+            `;
+
+            downloadList.appendChild(item);
+        }
+
+        // 下载指定结果
+        function downloadResult(resultId) {
+            const result = generatedResults.find(r => r.id == resultId);
+            if (result) {
+                downloadImage(result.dataUrl, result.filename);
+                logMessage(`已下载: ${result.filename}`);
+            }
+        }
+
+        // 下载当前照片
+        function downloadCurrentPhoto() {
+            if (generatedResults.length === 0) {
+                alert('请先生成证件照！');
+                return;
+            }
+
+            const latestResult = generatedResults[generatedResults.length - 1];
+            downloadImage(latestResult.dataUrl, latestResult.filename);
+            logMessage(`已下载: ${latestResult.filename}`);
+        }
+
+        // 保存所有结果
+        function saveAllResults() {
+            if (generatedResults.length === 0) {
+                alert('没有可保存的结果！');
+                return;
+            }
+
+            generatedResults.forEach((result, index) => {
+                setTimeout(() => {
+                    downloadImage(result.dataUrl, result.filename);
+                }, index * 500); // 间隔500ms下载，避免浏览器限制
+            });
+
+            logMessage(`批量下载开始，共 ${generatedResults.length} 个文件`);
+        }
+
+        // 下载图片
+        function downloadImage(dataUrl, filename) {
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = dataUrl;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // 重置所有设置
+        function resetAll() {
+            uploadedImage = null;
+            generatedResults = [];
+            
+            document.getElementById('fileInput').value = '';
+            document.getElementById('previewCanvas').style.display = 'none';
+            document.getElementById('previewPlaceholder').style.display = 'block';
+            document.getElementById('downloadList').innerHTML = `
+                <div style="text-align: center; color: #999; padding: 20px; font-size: 14px;">
+                    生成证件照后，下载链接将显示在这里
+                </div>
+            `;
+            
+            document.getElementById('generateBtn').disabled = true;
+            document.getElementById('downloadBtn').disabled = true;
+            document.getElementById('saveAllBtn').disabled = true;
+            
+            // 重置为默认设置
+            currentBackgroundColor = '#FFFFFF';
+            currentSize = { width: 295, height: 413, name: '一寸' };
+            currentQuality = 0.8;
+            
+            // 重置UI
+            document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelector('.color-option[data-color="#FFFFFF"]').classList.add('selected');
+            document.getElementById('customColor').value = '#FFFFFF';
+            
+            document.querySelectorAll('.size-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelector('.size-option[data-size="295x413"]').classList.add('selected');
+            
+            document.getElementById('customWidth').value = 295;
+            document.getElementById('customHeight').value = 413;
+            document.getElementById('qualitySelect').value = '0.8';
+            
+            
+            logMessage('已重置所有设置');
+        }
+
+        // 显示处理中状态
+        function showProcessing(message) {
+            const container = document.getElementById('previewContainer');
+            let overlay = container.querySelector('.processing-overlay');
+            
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.className = 'processing-overlay';
+                container.appendChild(overlay);
+            }
+            
+            overlay.innerHTML = `
+                <div class="processing-spinner"></div>
+                <div class="processing-text">${message}</div>
+            `;
+            overlay.style.display = 'flex';
+        }
+
+        // 隐藏处理中状态
+        function hideProcessing() {
+            const overlay = document.querySelector('.processing-overlay');
+            if (overlay) {
+                overlay.style.display = 'none';
+            }
+        }
+
+        // 简单的日志功能
+        function logMessage(message) {
+            console.log(`[${new Date().toLocaleTimeString()}] ${message}`);
+        }
+    </script>
+</body>
+</html>

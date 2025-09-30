@@ -196,6 +196,10 @@
             content: "📱";
         }
 
+        .nav-link[data-page="idphoto"]::before {
+            content: "📸";
+        }
+
         /* 右侧内容区域 */
         .content {
             grid-area: content;
@@ -488,6 +492,9 @@
                 <li class="nav-item">
                     <a href="#" class="nav-link" data-page="qrcode">二维码&条形码</a>
                 </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="idphoto">证件照生成工具</a>
+                </li>
             </ul>
         </nav>
 
@@ -536,6 +543,11 @@
                         <div class="feature-title">二维码&条形码</div>
                         <div class="feature-desc">生成和解析二维码、条形码，支持摄像头扫描、图片上传解析等功能</div>
                     </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📸</div>
+                        <div class="feature-title">证件照生成工具</div>
+                        <div class="feature-desc">智能生成标准证件照，支持背景替换、尺寸调整、美颜修饰等功能</div>
+                    </div>
                 </div>
             </div>
 
@@ -562,6 +574,9 @@
 
             <!-- 二维码&条形码 -->
             <iframe id="qrcodeFrame" src="qr_code.html"></iframe>
+
+            <!-- 证件照生成工具 -->
+            <iframe id="idphotoFrame" src="id_photo_generator.html"></iframe>
 
             <!-- 加载中页面 -->
             <div class="loading" id="loadingPage" style="display: none;">
@@ -875,7 +890,8 @@
                 'socket': 'socketFrame',
                 'curl': 'curlFrame',
                 'portscan': 'portscanFrame',
-                'qrcode': 'qrcodeFrame'
+                'qrcode': 'qrcodeFrame',
+                'idphoto': 'idphotoFrame'
             };
             return frameMap[page];
         }
@@ -947,6 +963,10 @@
                     case '9':
                         e.preventDefault();
                         document.querySelector('[data-page="qrcode"]').click();
+                        break;
+                    case '0':
+                        e.preventDefault();
+                        document.querySelector('[data-page="idphoto"]').click();
                         break;
                 }
             }
