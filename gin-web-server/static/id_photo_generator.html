@@ -51,7 +51,7 @@
         .main-layout {
             flex: 1;
             display: grid;
-            grid-template-columns: 2fr 1fr;
+            grid-template-columns: 1.5fr 1fr;
             grid-template-rows: 1fr;
             grid-template-areas:
                 "config preview";
@@ -76,11 +76,149 @@
                 "quality buttons";
             gap: 15px;
             align-content: start;
+            max-height: 100vh;
         }
 
         .upload-section {
             grid-area: upload;
         }
+
+        /* 标签页样式 */
+        .upload-tabs {
+            display: flex;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 8px 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            color: #666;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            font-weight: 500;
+        }
+
+        .tab-btn:hover {
+            color: #667eea;
+            background: #f8f9fa;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 摄像头样式 */
+        .camera-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .camera-video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+        }
+
+        .camera-canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .camera-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+        }
+
+        .camera-guide {
+            text-align: center;
+            color: white;
+        }
+
+        .guide-text {
+            font-size: 14px;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            font-weight: 500;
+        }
+
+        .guide-frame {
+            width: 160px;
+            height: 220px;
+            border: 2px solid #fff;
+            border-radius: 8px;
+            position: relative;
+            margin: 0 auto;
+            box-shadow: 0 0 0 2000px rgba(0, 0, 0, 0.3);
+        }
+
+        .guide-frame::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            bottom: -1px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .camera-controls {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .camera-controls .btn {
+            flex: 1;
+            padding: 6px;
+            font-size: 10px;
+            min-width: 70px;
+        }
+
+        .camera-status {
+            font-size: 11px;
+            color: #666;
+            text-align: center;
+            padding: 5px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+
 
         .background-section {
             grid-area: background;
@@ -542,20 +680,68 @@
             <div class="config-panel">
                 <!-- 上传照片 -->
                 <div class="upload-section">
-                    <div class="section-title">📤 上传照片</div>
-                    <div class="upload-area" id="uploadArea">
-                        <div class="upload-icon">📷</div>
-                        <div class="upload-text">
-                            点击或拖拽图片到此处上传<br>
-                            支持 JPG、PNG 格式，文件大小不超过 10MB
+                    <div class="section-title">📁 获取照片</div>
+                    <div class="form-group">
+                        <div class="upload-tabs">
+                            <button class="tab-btn active" data-tab="upload">📁 上传照片</button>
+                            <button class="tab-btn" data-tab="camera">📷 拍照</button>
                         </div>
-                        <input type="file" id="fileInput" class="file-input" accept="image/*">
+                        
+                        <!-- 上传标签页 -->
+                        <div class="tab-content active" id="uploadTab">
+                            <div class="upload-area" id="uploadArea">
+                                <div class="upload-icon">📷</div>
+                                <div class="upload-text">
+                                    点击或拖拽图片到此处上传<br>
+                                    支持 JPG、PNG 格式，文件大小不超过 10MB
+                                </div>
+                                <input type="file" id="fileInput" class="file-input" accept="image/*">
+                            </div>
+                        </div>
+                        
+                        <!-- 拍照标签页 -->
+                        <div class="tab-content" id="cameraTab">
+                            <div class="camera-container">
+                                <video id="cameraVideo" class="camera-video" autoplay playsinline></video>
+                                <canvas id="cameraCanvas" class="camera-canvas" style="display: none;"></canvas>
+                                <div class="camera-overlay">
+                                    <div class="camera-guide">
+                                        <div class="guide-text">请将上半身对准框内拍照</div>
+                                        <div class="guide-frame"></div>
+                                        <div class="guide-hint" style="color: #fff; font-size: 12px; margin-top: 10px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);">
+                                            📷 确保头部和肩膀都在框内<br>
+                                            🔍 可使用全屏模式调整角度
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="camera-controls">
+                                <button class="btn btn-secondary" id="startCameraBtn">🔄 重启摄像头</button>
+                                <button class="btn btn-primary" id="takePictureBtn" disabled>📸 拍照</button>
+                                <button class="btn btn-warning" id="stopCameraBtn" disabled>⏹️ 关闭摄像头</button>
+                                <button class="btn btn-info" id="fullscreenBtn" disabled>🔍 全屏预览</button>
+                            </div>
+                            <div class="camera-status" id="cameraStatus">正在检查摄像头支持...</div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- 背景设置 -->
                 <div class="background-section">
                     <div class="section-title">🎨 背景设置</div>
+                    <div class="form-group">
+                        <label class="form-label">AI美化模式</label>
+                        <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px;">
+                            <label class="radio-option" style="cursor: pointer; font-size: 12px;">
+                                <input type="radio" name="aiMode" value="basic" checked>
+                                <span>🔧 基础处理</span>
+                            </label>
+                            <label class="radio-option" style="cursor: pointer; font-size: 12px;">
+                                <input type="radio" name="aiMode" value="enhance">
+                                <span>✨ AI美化增强</span>
+                            </label>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label class="form-label">背景颜色</label>
                         <div class="color-palette">
@@ -665,7 +851,9 @@
         let currentBackgroundColor = '#FFFFFF';
         let currentSize = { width: 295, height: 413, name: '一寸' };
         let currentQuality = 0.8;
+        let currentAIMode = 'basic';
         let generatedResults = [];
+        let cameraStream = null;
 
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', function() {
@@ -676,6 +864,8 @@
                 initSizeOptions();
                 initCustomSize();
                 initButtons();
+                initTabs();
+                initCamera();
                 logMessage('证件照生成工具初始化完成');
                 console.log('All initialization complete');
             } catch (error) {
@@ -884,6 +1074,385 @@
 
         }
 
+        // 初始化标签页
+        function initTabs() {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    
+                    // 更新标签按钮状态
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // 更新标签内容显示
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === tabName + 'Tab') {
+                            content.classList.add('active');
+                        }
+                    });
+                    
+                    // 切换标签时的摄像头管理
+                    if (tabName === 'camera') {
+                        // 切换到拍照标签，自动启动摄像头
+                        setTimeout(() => {
+                            startCamera();
+                        }, 100);
+                        logMessage('切换到拍照模式，正在启动摄像头...');
+                    } else {
+                        // 切换到其他标签，自动关闭摄像头
+                        if (cameraStream) {
+                            stopCamera();
+                            logMessage('切换到上传模式，摄像头已关闭');
+                        } else {
+                            logMessage('切换到上传模式');
+                        }
+                    }
+                });
+            });
+        }
+
+        // 初始化摄像头功能
+        function initCamera() {
+            const startCameraBtn = document.getElementById('startCameraBtn');
+            const takePictureBtn = document.getElementById('takePictureBtn');
+            const stopCameraBtn = document.getElementById('stopCameraBtn');
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+            // 先检查基础支持
+            const supportCheck = checkCameraSupport();
+            if (!supportCheck.supported) {
+                updateCameraStatus('❌ ' + supportCheck.reason + (supportCheck.suggestion ? '\n💡 ' + supportCheck.suggestion : ''));
+                startCameraBtn.disabled = true;
+                return;
+            }
+
+            startCameraBtn.addEventListener('click', startCamera);
+            takePictureBtn.addEventListener('click', takePicture);
+            stopCameraBtn.addEventListener('click', stopCamera);
+            fullscreenBtn.addEventListener('click', toggleFullscreen);
+            
+            // AI模式切换
+            document.querySelectorAll('input[name="aiMode"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    currentAIMode = this.value;
+                    updatePreviewRealtime();
+                    logMessage('AI模式已切换为: ' + (this.value === 'basic' ? '基础处理' : 'AI美化增强'));
+                });
+            });
+            
+            logMessage('摄像头功能初始化完成');
+        }
+
+        // 检查摄像头API支持
+        function checkCameraSupport() {
+            console.log('检查摄像头支持情况...');
+            console.log('navigator:', typeof navigator);
+            console.log('navigator.mediaDevices:', typeof navigator.mediaDevices);
+            console.log('location.protocol:', location.protocol);
+            console.log('location.hostname:', location.hostname);
+            
+            // 检查基础API
+            if (typeof navigator === 'undefined') {
+                return { supported: false, reason: 'navigator对象不存在' };
+            }
+            
+            // 检查mediaDevices
+            if (typeof navigator.mediaDevices === 'undefined') {
+                // 检查是否是安全上下文问题
+                if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+                    return { 
+                        supported: false, 
+                        reason: '需要HTTPS或localhost访问',
+                        suggestion: '请使用 https:// 或 localhost 访问此页面'
+                    };
+                }
+                return { 
+                    supported: false, 
+                    reason: '浏览器不支持mediaDevices API',
+                    suggestion: '请使用Chrome 53+、Firefox 36+、Safari 11+或Edge 79+'
+                };
+            }
+            
+            // 检查getUserMedia
+            if (typeof navigator.mediaDevices.getUserMedia !== 'function') {
+                return { 
+                    supported: false, 
+                    reason: '浏览器不支持getUserMedia',
+                    suggestion: '请升级浏览器到最新版本'
+                };
+            }
+            
+            return { supported: true };
+        }
+
+        // 启动摄像头
+        async function startCamera() {
+            // 如果已经有摄像头流在运行，先停止
+            if (cameraStream) {
+                stopCamera();
+            }
+
+            try {
+                updateCameraStatus('正在检查摄像头支持...');
+                
+                // 首先检查API支持
+                const supportCheck = checkCameraSupport();
+                if (!supportCheck.supported) {
+                    throw new Error(supportCheck.reason + (supportCheck.suggestion ? '\n建议: ' + supportCheck.suggestion : ''));
+                }
+                
+                updateCameraStatus('正在启动摄像头...');
+                
+                // 尝试获取摄像头权限
+                const constraints = {
+                    video: {
+                        width: { ideal: 1280, min: 640 },
+                        height: { ideal: 720, min: 480 },
+                        facingMode: 'user', // 优先使用前置摄像头
+                        frameRate: { ideal: 30, min: 15 }
+                    }
+                };
+
+                console.log('请求摄像头权限...', constraints);
+                cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+                console.log('摄像头权限获取成功', cameraStream);
+                
+                const video = document.getElementById('cameraVideo');
+                video.srcObject = cameraStream;
+                
+                // 等待视频加载完成
+                await new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => {
+                        reject(new Error('视频加载超时'));
+                    }, 5000);
+                    
+                    video.onloadedmetadata = () => {
+                        clearTimeout(timeout);
+                        console.log('视频元数据加载完成:', video.videoWidth + 'x' + video.videoHeight);
+                        resolve();
+                    };
+                });
+
+                // 更新按钮状态
+                document.getElementById('startCameraBtn').disabled = true;
+                document.getElementById('takePictureBtn').disabled = false;
+                document.getElementById('stopCameraBtn').disabled = false;
+                document.getElementById('fullscreenBtn').disabled = false;
+
+                updateCameraStatus('✅ 摄像头已就绪，可以拍照了！');
+                logMessage('摄像头启动成功: ' + video.videoWidth + 'x' + video.videoHeight);
+
+            } catch (error) {
+                console.error('摄像头启动失败:', error);
+                
+                let errorMsg = '摄像头启动失败';
+                let suggestion = '';
+                
+                // 详细错误分析
+                if (error.message.includes('HTTPS') || error.message.includes('localhost')) {
+                    errorMsg = '🔐 需要安全连接';
+                    suggestion = '请使用 https:// 或 localhost 访问';
+                } else if (error.message.includes('mediaDevices')) {
+                    errorMsg = '🌐 浏览器API不支持';
+                    suggestion = '请使用最新版Chrome、Firefox、Safari或Edge';
+                } else if (error.name === 'NotAllowedError') {
+                    errorMsg = '❌ 摄像头权限被拒绝';
+                    suggestion = '请点击地址栏的摄像头图标允许访问';
+                } else if (error.name === 'NotFoundError') {
+                    errorMsg = '📷 未找到摄像头设备';
+                    suggestion = '请检查摄像头是否连接并正常工作';
+                } else if (error.name === 'NotSupportedError') {
+                    errorMsg = '🚫 浏览器不支持摄像头';
+                    suggestion = '请升级浏览器或使用其他浏览器';
+                } else if (error.name === 'NotReadableError') {
+                    errorMsg = '🔒 摄像头被其他程序占用';
+                    suggestion = '请关闭其他视频应用后重试';
+                } else if (error.name === 'OverconstrainedError') {
+                    errorMsg = '⚙️ 摄像头参数不支持';
+                    suggestion = '设备摄像头不支持当前配置';
+                } else if (error.message.includes('超时')) {
+                    errorMsg = '⏱️ 摄像头启动超时';
+                    suggestion = '请检查摄像头连接后重试';
+                } else {
+                    errorMsg = '⚠️ 摄像头启动异常';
+                    suggestion = '错误: ' + error.message;
+                }
+                
+                updateCameraStatus(errorMsg + (suggestion ? '\n💡 ' + suggestion : ''));
+                logMessage(errorMsg + ' - ' + error.message);
+                
+                // 重置按钮状态
+                document.getElementById('startCameraBtn').disabled = false;
+                document.getElementById('takePictureBtn').disabled = true;
+                document.getElementById('stopCameraBtn').disabled = true;
+                document.getElementById('fullscreenBtn').disabled = true;
+            }
+        }
+
+        // 拍照
+        function takePicture() {
+            try {
+                const video = document.getElementById('cameraVideo');
+                const canvas = document.getElementById('cameraCanvas');
+                const ctx = canvas.getContext('2d');
+
+                // 检查视频是否准备就绪
+                if (video.readyState !== 4) {
+                    updateCameraStatus('摄像头还未就绪，请稍后再试');
+                    return;
+                }
+
+                // 设置画布尺寸 - 保持高分辨率
+                const actualWidth = video.videoWidth || 1280;
+                const actualHeight = video.videoHeight || 720;
+                
+                canvas.width = actualWidth;
+                canvas.height = actualHeight;
+
+                console.log(`拍照分辨率: ${actualWidth}x${actualHeight}`);
+
+                // 绘制当前视频帧到画布
+                ctx.drawImage(video, 0, 0, actualWidth, actualHeight);
+
+                // 添加拍照闪光效果
+                showCameraFlash();
+
+                // 转换为高质量图片
+                canvas.toBlob((blob) => {
+                    if (!blob) {
+                        throw new Error('无法生成图片数据');
+                    }
+
+                    console.log(`拍照文件大小: ${(blob.size / 1024 / 1024).toFixed(2)}MB`);
+
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            uploadedImage = img;
+                            console.log(`加载的图片尺寸: ${img.width}x${img.height}`);
+                            updatePreview();
+                            document.getElementById('generateBtn').disabled = false;
+                            logMessage(`📸 拍照成功！原始尺寸: ${img.width}x${img.height}`);
+                        };
+                        img.onerror = () => {
+                            throw new Error('图片加载失败');
+                        };
+                        img.src = e.target.result;
+                    };
+                    reader.onerror = () => {
+                        throw new Error('图片数据读取失败');
+                    };
+                    reader.readAsDataURL(blob);
+                }, 'image/jpeg', 0.95);
+
+                updateCameraStatus('📸 拍照成功！可以继续拍照或切换到生成');
+
+            } catch (error) {
+                console.error('拍照失败:', error);
+                updateCameraStatus('拍照失败: ' + error.message + ' - 请重试');
+                logMessage('拍照失败: ' + error.message);
+            }
+        }
+
+        // 拍照闪光效果
+        function showCameraFlash() {
+            const overlay = document.querySelector('.camera-overlay');
+            if (overlay) {
+                overlay.style.background = 'rgba(255, 255, 255, 0.8)';
+                setTimeout(() => {
+                    overlay.style.background = 'rgba(0, 0, 0, 0.3)';
+                }, 100);
+            }
+        }
+
+        // 停止摄像头
+        function stopCamera() {
+            try {
+                if (cameraStream) {
+                    cameraStream.getTracks().forEach(track => track.stop());
+                    cameraStream = null;
+                }
+
+                const video = document.getElementById('cameraVideo');
+                video.srcObject = null;
+
+                // 更新按钮状态
+                document.getElementById('startCameraBtn').disabled = false;
+                document.getElementById('takePictureBtn').disabled = true;
+                document.getElementById('stopCameraBtn').disabled = true;
+                document.getElementById('fullscreenBtn').disabled = true;
+
+                updateCameraStatus('摄像头已关闭');
+                logMessage('摄像头已关闭');
+
+            } catch (error) {
+                console.error('关闭摄像头时出错:', error);
+                updateCameraStatus('关闭摄像头时出错');
+            }
+        }
+
+        // 更新摄像头状态
+        function updateCameraStatus(message) {
+            document.getElementById('cameraStatus').textContent = message;
+        }
+
+        // 全屏预览功能
+        function toggleFullscreen() {
+            const video = document.getElementById('cameraVideo');
+            const container = document.querySelector('.camera-container');
+            
+            if (!document.fullscreenElement) {
+                // 进入全屏
+                if (container.requestFullscreen) {
+                    container.requestFullscreen();
+                } else if (container.webkitRequestFullscreen) {
+                    container.webkitRequestFullscreen();
+                } else if (container.msRequestFullscreen) {
+                    container.msRequestFullscreen();
+                }
+                
+                // 全屏时隐藏指导框
+                const overlay = document.querySelector('.camera-overlay');
+                if (overlay) overlay.style.display = 'none';
+                
+                document.getElementById('fullscreenBtn').textContent = '🔍 退出全屏';
+                logMessage('进入全屏预览模式');
+            } else {
+                // 退出全屏
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
+
+        // 监听全屏状态变化
+        document.addEventListener('fullscreenchange', function() {
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            const overlay = document.querySelector('.camera-overlay');
+            
+            if (!document.fullscreenElement) {
+                fullscreenBtn.textContent = '🔍 全屏预览';
+                if (overlay) overlay.style.display = 'flex';
+                logMessage('退出全屏预览模式');
+            }
+        });
+
+        // 页面卸载时清理摄像头资源
+        window.addEventListener('beforeunload', function() {
+            if (cameraStream) {
+                stopCamera();
+            }
+        });
+
         // 实时更新预览（防抖）
         let updateTimer = null;
         function updatePreviewRealtime() {
@@ -968,11 +1537,18 @@
                 const originalCanvas = document.createElement('canvas');
                 const originalCtx = originalCanvas.getContext('2d');
                 
-                originalCanvas.width = uploadedImage.width;
-                originalCanvas.height = uploadedImage.height;
-                originalCtx.drawImage(uploadedImage, 0, 0);
+                // 保持原始高分辨率
+                const sourceWidth = uploadedImage.width;
+                const sourceHeight = uploadedImage.height;
                 
-                const originalDataUrl = originalCanvas.toDataURL('image/jpeg', 0.9);
+                originalCanvas.width = sourceWidth;
+                originalCanvas.height = sourceHeight;
+                originalCtx.drawImage(uploadedImage, 0, 0, sourceWidth, sourceHeight);
+                
+                const originalDataUrl = originalCanvas.toDataURL('image/jpeg', 0.95);
+                
+                    console.log(`📷 原始图片: ${sourceWidth}×${sourceHeight} (${((sourceWidth*sourceHeight)/1000000).toFixed(1)}MP)`);
+                    console.log(`🎯 目标尺寸: ${currentSize.width}×${currentSize.height} (${currentSize.name})`);
 
                 const requestData = {
                     imageData: originalDataUrl,
@@ -981,7 +1557,7 @@
                     height: currentSize.height,
                     quality: currentQuality,
                     format: 'jpeg',
-                    backgroundMode: 'auto'
+                    backgroundMode: currentAIMode === 'enhance' ? 'enhance' : 'auto'
                 };
 
                 logMessage('正在发送请求到服务端...');

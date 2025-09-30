@@ -567,8 +567,97 @@ func getBackgroundColor(img image.Image) color.RGBA {
 
 // processIDPhoto 处理证件照 - 使用AI服务
 func processIDPhoto(req IDPhotoRequest) (string, int64, error) {
-	// 优先使用AI服务
+	// 检查是否需要AI美化
+	if req.BackgroundMode == "enhance" {
+		return processIDPhotoEnhanced(req)
+	}
+
+	// 普通处理
 	return processIDPhotoAI(req)
+}
+
+// processIDPhotoEnhanced 处理增强版证件照
+func processIDPhotoEnhanced(req IDPhotoRequest) (string, int64, error) {
+	// 检查Python AI美化服务
+	pythonPath := "python"
+	scriptPath := "./photo_enhance_api.py"
+
+	// 尝试python3
+	if _, err := exec.LookPath("python3"); err == nil {
+		pythonPath = "python3"
+	} else if _, err := exec.LookPath("python"); err != nil {
+		// 回退到普通处理
+		return processIDPhotoAI(req)
+	}
+
+	// 检查脚本是否存在
+	if _, err := os.Stat(scriptPath); os.IsNotExist(err) {
+		return processIDPhotoAI(req)
+	}
+
+	// 准备AI美化请求
+	enhanceReq := map[string]interface{}{
+		"imageData": req.ImageData,
+		"enhanceOptions": map[string]interface{}{
+			"method":          "basic", // 可选: basic, aliyun, tencent, local
+			"skin_smooth":     true,
+			"brightness":      1.1,
+			"contrast":        1.2,
+			"saturation":      1.1,
+			"sharpness":       1.2,
+			"beautify_degree": 0.7,
+		},
+		"clothingType": nil, // 可选: male_suit_black, female_suit_black 等
+	}
+
+	// 序列化请求
+	reqJSON, err := json.Marshal(enhanceReq)
+	if err != nil {
+		fmt.Printf("AI美化请求序列化失败: %v\n", err)
+		return processIDPhotoAI(req)
+	}
+
+	// 调用AI美化服务
+	cmd := exec.Command(pythonPath, scriptPath)
+	cmd.Stdin = strings.NewReader(string(reqJSON))
+
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	err = cmd.Run()
+	if err != nil {
+		fmt.Printf("AI美化服务调用失败: %s\n错误输出: %s\n", err.Error(), stderr.String())
+		return processIDPhotoAI(req)
+	}
+
+	// 解析AI美化响应
+	var enhanceResp map[string]interface{}
+	if err := json.Unmarshal(stdout.Bytes(), &enhanceResp); err != nil {
+		fmt.Printf("AI美化响应解析失败: %v\n响应内容: %s\n", err, stdout.String())
+		return processIDPhotoAI(req)
+	}
+
+	if !enhanceResp["success"].(bool) {
+		fmt.Printf("AI美化处理失败: %s\n", enhanceResp["error"])
+		return processIDPhotoAI(req)
+	}
+
+	// 获取美化后的图片
+	enhancedImageData := enhanceResp["imageData"].(string)
+
+	// 进行背景替换和尺寸调整
+	finalReq := req
+	finalReq.ImageData = enhancedImageData
+	finalReq.BackgroundMode = "auto" // 使用智能抠图
+
+	dataURL, fileSize, err := processIDPhotoAI(finalReq)
+	if err != nil {
+		return "", 0, err
+	}
+
+	fmt.Printf("✨ AI美化证件照成功! 大小: %d bytes\n", fileSize)
+	return dataURL, fileSize, nil
 }
 
 // processIDPhotoAI 使用AI服务处理

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>证件照尺寸对比表</title>
+    <style>
+        body { font-family: 'Microsoft YaHei', sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #333; margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        th, td { padding: 12px; text-align: center; border: 1px solid #ddd; }
+        th { background: #667eea; color: white; font-weight: 600; }
+        .size-name { font-weight: 600; color: #333; }
+        .pixels { color: #666; }
+        .megapixels { color: #007bff; font-weight: 600; }
+        .file-size { color: #28a745; }
+        .standard { background: #fff3cd; }
+        .hd { background: #d1ecf1; }
+        .uhd { background: #d4edda; }
+        .comparison { display: flex; gap: 20px; margin-top: 20px; }
+        .comparison div { flex: 1; padding: 20px; border-radius: 8px; text-align: center; }
+        .original { background: #e9ecef; }
+        .output { background: #f8f9fa; }
+        .highlight { color: #dc3545; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📏 证件照尺寸对比表</h1>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>规格名称</th>
+                    <th>尺寸 (像素)</th>
+                    <th>像素数量</th>
+                    <th>预估文件大小</th>
+                    <th>适用场景</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="standard">
+                    <td class="size-name">一寸</td>
+                    <td class="pixels">295×413</td>
+                    <td class="megapixels">0.12MP</td>
+                    <td class="file-size">15-25KB</td>
+                    <td>标准证件照</td>
+                </tr>
+                <tr class="hd">
+                    <td class="size-name">一寸(高清)</td>
+                    <td class="pixels">590×826</td>
+                    <td class="megapixels">0.49MP</td>
+                    <td class="file-size">45-75KB</td>
+                    <td>高清打印、线上申请</td>
+                </tr>
+                <tr class="standard">
+                    <td class="size-name">二寸</td>
+                    <td class="pixels">413×579</td>
+                    <td class="megapixels">0.24MP</td>
+                    <td class="file-size">25-40KB</td>
+                    <td>标准二寸证件</td>
+                </tr>
+                <tr class="hd">
+                    <td class="size-name">二寸(高清)</td>
+                    <td class="pixels">826×1158</td>
+                    <td class="megapixels">0.96MP</td>
+                    <td class="file-size">80-120KB</td>
+                    <td>高清二寸、专业用途</td>
+                </tr>
+                <tr class="standard">
+                    <td class="size-name">护照</td>
+                    <td class="pixels">358×441</td>
+                    <td class="megapixels">0.16MP</td>
+                    <td class="file-size">18-30KB</td>
+                    <td>护照申请</td>
+                </tr>
+                <tr class="hd">
+                    <td class="size-name">护照(高清)</td>
+                    <td class="pixels">716×882</td>
+                    <td class="megapixels">0.63MP</td>
+                    <td class="file-size">55-85KB</td>
+                    <td>高清护照、签证</td>
+                </tr>
+                <tr class="uhd">
+                    <td class="size-name">超高清证件照</td>
+                    <td class="pixels">1200×1600</td>
+                    <td class="megapixels">1.92MP</td>
+                    <td class="file-size">150-250KB</td>
+                    <td>专业打印、存档</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="comparison">
+            <div class="original">
+                <h3>📷 拍照原图</h3>
+                <p><strong>1280×720</strong></p>
+                <p>约 <span class="megapixels">0.92MP</span></p>
+                <p>文件大小: 200-500KB</p>
+            </div>
+            <div class="output">
+                <h3>📐 证件照输出</h3>
+                <p><strong>295×413 (标准一寸)</strong></p>
+                <p>约 <span class="megapixels">0.12MP</span></p>
+                <p>压缩比: <span class="highlight">87%压缩</span></p>
+                <p>文件大小: 15-25KB</p>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; padding: 20px; background: #fff3cd; border-radius: 8px;">
+            <h3>💡 建议</h3>
+            <ul style="text-align: left; margin-left: 20px;">
+                <li><strong>日常使用</strong>：选择标准尺寸即可</li>
+                <li><strong>高清打印</strong>：选择"高清"版本</li>
+                <li><strong>专业存档</strong>：选择"超高清证件照"</li>
+                <li><strong>在线申请</strong>：根据要求选择对应尺寸</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
