@@ -20,3 +20,12 @@ cd gin-web-server
 if ($?) { ./build.bat }
    
 
+服务器启动：
+nohup ./app-linux-amd64 >> mss.log  2>& 1 &
+
+
+本地启动
+cd gin-web-server
+#go mod tidy
+go run main.go
+

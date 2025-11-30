@@ -834,6 +834,7 @@
             const welcomePage = document.getElementById('welcomePage');
             const loadingPage = document.getElementById('loadingPage');
 
+            // 导航链接点击事件
             navLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -866,6 +867,51 @@
                                 targetFrame.classList.add('active');
                             }
                         }, 500);
+                    }
+                });
+            });
+
+            // 功能卡片点击事件
+            const featureCards = document.querySelectorAll('.feature-card');
+            featureCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const featureTitle = this.querySelector('.feature-title').textContent;
+                    let page = '';
+
+                    // 根据卡片标题映射到对应的page值
+                    switch(featureTitle) {
+                        case '网络信息检测器':
+                            page = 'network';
+                            break;
+                        case '网络IP相关信息':
+                            page = 'ip';
+                            break;
+                        case '麦克风功能测试':
+                            page = 'microphone';
+                            break;
+                        case '摄像头功能测试':
+                            page = 'camera';
+                            break;
+                        case 'Socket测试网页':
+                            page = 'socket';
+                            break;
+                        case 'CURL测试网页':
+                            page = 'curl';
+                            break;
+                        case '公网端口检测':
+                            page = 'portscan';
+                            break;
+                        case '二维码&条形码':
+                            page = 'qrcode';
+                            break;
+                        default:
+                            return;
+                    }
+
+                    // 触发对应导航链接的点击事件
+                    const navLink = document.querySelector(`[data-page="${page}"]`);
+                    if (navLink) {
+                        navLink.click();
                     }
                 });
             });

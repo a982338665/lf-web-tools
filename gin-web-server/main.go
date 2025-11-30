@@ -52,5 +52,5 @@ func main() {
 	middleware.RegisterPortScanRoutes(r)
 
 	// 启动服务器
-	r.Run(":8080") // 监听并在0.0.0.0:8080上启动服务
+	r.Run(":8081") // 监听并在0.0.0.0:8081上启动服务
 }
