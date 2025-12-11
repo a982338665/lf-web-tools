@@ -31,10 +31,54 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #111827 100%);
             height: 100vh;
             overflow: hidden;
             font-size: 14px;
+        }
+
+        /* 皇夜 Logo */
+        .huangye-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .huangye-logo:hover {
+            transform: translateY(-2px);
+        }
+
+        .huangye-logo-icon {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+        }
+
+        .huangye-logo-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .huangye-logo-main {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 0.05em;
+        }
+
+        .huangye-logo-sub {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #9ca3af;
+            letter-spacing: 0.1em;
+            text-transform: lowercase;
         }
 
         .container {
@@ -45,17 +89,17 @@
                 "header header"
                 "sidebar content";
             height: calc(100vh - 20px);
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(18, 24, 40, 0.9);
             margin: 10px 10px 20px 10px;
             border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
             overflow: hidden;
         }
 
         /* 顶部标题区域 */
         .header {
             grid-area: header;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1f2937 0%, #0ea5e9 100%);
             color: white;
             display: flex;
             align-items: center;
@@ -64,24 +108,23 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-        .header h1 {
-            font-size: 1.4em;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-        }
-
-        .header h1::before {
-            content: "💻";
-            font-size: 1.2em;
-        }
-
         .header-right {
             display: flex;
             align-items: center;
             gap: 18px;
+        }
+
+        #themeSelector {
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            background: rgba(17, 24, 39, 0.9);
+            color: #e5e7eb;
+        }
+
+        #themeSelector option {
+            background: #0f172a;
+            color: #e5e7eb;
         }
 
         .header-info {
@@ -114,8 +157,8 @@
         /* 左侧导航区域 */
         .sidebar {
             grid-area: sidebar;
-            background: #f8f9fa;
-            border-right: 1px solid #e9ecef;
+            background: #0f172a;
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
             padding: 10px 10px 10px 10px;
             overflow-y: auto;
         }
@@ -123,8 +166,8 @@
             padding: 0 20px 15px;
             font-size: 0.9em;
             font-weight: bold;
-            color: #495057;
-            border-bottom: 2px solid #e9ecef;
+            color: #e5e7eb;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.08);
             margin-bottom: 20px;
         }
 
@@ -141,7 +184,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 15px 20px;
-            color: #495057;
+            color: #cbd5e1;
             text-decoration: none;
             transition: all 0.3s ease;
             border-left: 4px solid transparent;
@@ -151,17 +194,17 @@
         }
 
         .nav-link:hover {
-            background: #e3f2fd;
-            color: #1976d2;
-            border-left-color: #2196f3;
+            background: rgba(255, 255, 255, 0.06);
+            color: #38bdf8;
+            border-left-color: #38bdf8;
             transform: translateX(3px);
         }
 
         .nav-link.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
             color: white;
-            border-left-color: #667eea;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            border-left-color: #38bdf8;
+            box-shadow: 0 2px 8px rgba(56, 189, 248, 0.35);
         }
 
         .nav-link::before {
@@ -230,7 +273,7 @@
         /* 右侧内容区域 */
         .content {
             grid-area: content;
-            background: white;
+            background: #0b1224;
             position: relative;
             overflow: hidden;
         }
@@ -255,7 +298,7 @@
             flex-direction: column;
             justify-content: flex-start;
             align-items: center;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, #0b1224 0%, #111827 100%);
             overflow-y: auto;
             box-sizing: border-box;
         }
@@ -294,10 +337,10 @@
         }
 
         .feature-card {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(17, 24, 39, 0.9);
             padding: 20px 15px;
             border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
             transition: transform 0.3s ease;
             text-align: center;
             min-height: 180px;
@@ -309,20 +352,21 @@
         .feature-card.locked {
             position: relative;
             overflow: hidden;
-            border: 1px dashed #c53030;
+            border: 1px dashed rgba(239, 68, 68, 0.5);
         }
 
         .feature-card.locked::after {
             content: "🔒 登录后可用";
             position: absolute;
             inset: 0;
-            background: rgba(255, 255, 255, 0.85);
-            color: #c53030;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.92), rgba(30, 41, 59, 0.9));
+            color: #f8fafc;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 700;
-            font-size: 0.9em;
+            font-weight: 800;
+            font-size: 0.95em;
+            letter-spacing: 0.05em;
         }
 
         .feature-card:hover {
@@ -338,11 +382,11 @@
             font-size: 0.85em;
             font-weight: bold;
             margin-bottom: 8px;
-            color: #333;
+            color: #e5e7eb;
         }
 
         .feature-desc {
-            color: #666;
+            color: #cbd5e1;
             line-height: 1.4;
             font-size: 0.75em;
             flex: 1;
@@ -559,6 +603,214 @@
             animation: slideUp 0.25s ease;
         }
 
+        /* 主题覆盖 */
+        .theme-dark body {
+            background: linear-gradient(135deg, #0f172a 0%, #0b1224 100%);
+        }
+        .theme-dark .container {
+            background: rgba(15, 23, 42, 0.92);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        .theme-dark .header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0ea5e9 100%);
+        }
+        .theme-dark .content {
+            background: #0b1224;
+        }
+        .theme-dark .feature-card {
+            background: rgba(17, 24, 39, 0.92);
+        }
+        .theme-dark .auth-modal {
+            background: #0f172a;
+            border-color: rgba(255,255,255,0.08);
+            color: #e5e7eb;
+        }
+        .theme-dark .auth-modal-header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0ea5e9 100%);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .theme-dark .auth-modal-body {
+            background: #0b1224;
+        }
+        .theme-dark .auth-btn {
+            border-color: rgba(255,255,255,0.2);
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: #f8fafc;
+        }
+        .theme-dark .auth-btn.auth-primary {
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            border-color: transparent;
+            color: #f8fafc;
+        }
+        .theme-dark .form-group input {
+            background: #0b1224;
+            border-color: rgba(255,255,255,0.12);
+            color: #e5e7eb;
+        }
+        .theme-dark .form-group input::placeholder {
+            color: #94a3b8;
+        }
+        .theme-dark .form-group label {
+            color: #e5e7eb;
+        }
+
+        .theme-light body {
+            background: linear-gradient(135deg, #e5e7eb 0%, #f8fafc 100%);
+        }
+        .theme-light .container {
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        .theme-light .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        }
+        .theme-light .sidebar {
+            background: #f8fafc;
+            border-right: 1px solid #e5e7eb;
+        }
+        .theme-light .nav-link {
+            color: #475569;
+        }
+        .theme-light .nav-link:hover {
+            background: #e3f2fd;
+            color: #2563eb;
+            border-left-color: #2563eb;
+        }
+        .theme-light .nav-link.active {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        }
+        .theme-light .content {
+            background: #ffffff;
+        }
+        .theme-light .feature-card {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        .theme-light .feature-title { color: #1f2937; }
+        .theme-light .feature-desc { color: #475569; }
+        .theme-light .auth-modal {
+            background: #ffffff;
+            color: #1f2937;
+            border-color: #e5e7eb;
+        }
+        .theme-light .auth-modal-header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            border-bottom: 1px solid rgba(255,255,255,0.25);
+        }
+        .theme-light .form-group input {
+            background: #f8fafc;
+            border-color: #e5e7eb;
+            color: #1f2937;
+        }
+        .theme-light .form-group label {
+            color: #111827;
+        }
+
+        .theme-eye body {
+            background: linear-gradient(135deg, #d1fae5 0%, #ecfdf3 100%);
+        }
+        .theme-eye .container {
+            background: rgba(240, 253, 244, 0.95);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        }
+        .theme-eye .header {
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+        }
+        .theme-eye .sidebar {
+            background: #ecfdf3;
+            border-right: 1px solid #d1fae5;
+        }
+        .theme-eye .nav-link {
+            color: #065f46;
+        }
+        .theme-eye .nav-link:hover {
+            background: #d1fae5;
+            color: #0f766e;
+            border-left-color: #0ea5e9;
+        }
+        .theme-eye .nav-link.active {
+            background: linear-gradient(135deg, #10b981 0%, #22c55e 100%);
+        }
+        .theme-eye .content {
+            background: #f8fffb;
+        }
+        .theme-eye .feature-card {
+            background: rgba(240, 253, 244, 0.95);
+            color: #065f46;
+        }
+        .theme-eye .feature-title { color: #065f46; }
+        .theme-eye .feature-desc { color: #0f766e; }
+        .theme-eye .auth-modal {
+            background: #f0fdf4;
+            border-color: #d1fae5;
+            color: #065f46;
+        }
+        .theme-eye .auth-modal-header {
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            border-bottom: 1px solid rgba(16,185,129,0.25);
+        }
+        .theme-eye .form-group input {
+            background: #ecfdf3;
+            border-color: #bbf7d0;
+            color: #065f46;
+        }
+        .theme-eye .form-group label {
+            color: #065f46;
+        }
+
+        .theme-tech body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .theme-tech .container {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        .theme-tech .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .theme-tech .sidebar {
+            background: #f8f9fa;
+            border-right: 1px solid #e9ecef;
+        }
+        .theme-tech .nav-link {
+            color: #495057;
+        }
+        .theme-tech .nav-link:hover {
+            background: #e3f2fd;
+            color: #1976d2;
+            border-left-color: #2196f3;
+        }
+        .theme-tech .nav-link.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-left-color: #667eea;
+        }
+        .theme-tech .content {
+            background: white;
+        }
+        .theme-tech .feature-card {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+        .theme-tech .feature-title { color: #1f2937; }
+        .theme-tech .feature-desc { color: #475569; }
+        .theme-tech .auth-modal {
+            background: #ffffff;
+            color: #1f2937;
+            border-color: #e5e7eb;
+        }
+        .theme-tech .auth-modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-bottom: 1px solid rgba(255,255,255,0.25);
+        }
+        .theme-tech .form-group input {
+            background: #f8fafc;
+            border-color: #e5e7eb;
+            color: #1f2937;
+        }
+        .theme-tech .form-group label {
+            color: #111827;
+        }
+
         .auth-modal-header {
             padding: 16px 20px;
             display: flex;
@@ -654,11 +906,49 @@
     <div class="container">
         <!-- 顶部标题区域 -->
         <header class="header">
-            <h1>计算机网页工具</h1>
+            <a href="/" class="huangye-logo">
+                <svg class="huangye-logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 28L12 20L16 24L20 12L24 24L28 20L32 28H8Z" fill="url(#crownGradient)" stroke="url(#crownStroke)" stroke-width="1.5"/>
+                    <circle cx="12" cy="20" r="2" fill="#fbbf24"/>
+                    <circle cx="20" cy="12" r="2.5" fill="#f59e0b"/>
+                    <circle cx="28" cy="20" r="2" fill="#fbbf24"/>
+                    <path d="M30 8C30 10.2091 28.2091 12 26 12C23.7909 12 22 10.2091 22 8C22 5.79086 23.7909 4 26 4C28.2091 4 30 5.79086 30 8Z" fill="url(#moonGradient)"/>
+                    <defs>
+                        <linearGradient id="crownGradient" x1="20" y1="12" x2="20" y2="28" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#fbbf24"/>
+                            <stop offset="50%" stop-color="#f59e0b"/>
+                            <stop offset="100%" stop-color="#d97706"/>
+                        </linearGradient>
+                        <linearGradient id="crownStroke" x1="8" y1="28" x2="32" y2="28" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#fbbf24"/>
+                            <stop offset="50%" stop-color="#f59e0b"/>
+                            <stop offset="100%" stop-color="#d97706"/>
+                        </linearGradient>
+                        <linearGradient id="moonGradient" x1="22" y1="4" x2="30" y2="12" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#e0e7ff"/>
+                            <stop offset="100%" stop-color="#c7d2fe"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <div class="huangye-logo-text">
+                    <span class="huangye-logo-main">皇夜_</span>
+                    <span class="huangye-logo-sub">huangye</span>
+                </div>
+                <span style="margin-left:12px;font-size:1.2rem;font-weight:700;color:#e5e7eb;">计算机网页工具</span>
+            </a>
             <div class="header-right">
                 <div class="header-info">
                     <div class="status">系统正常</div>
                     <div class="time" id="currentTime">加载中...</div>
+                </div>
+                <div class="header-info">
+                    <label for="themeSelector" style="font-weight:600;">主题</label>
+                    <select id="themeSelector" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.1);color:#fff;">
+                        <option value="dark">暗色</option>
+                        <option value="light">亮色</option>
+                        <option value="eye">护眼</option>
+                        <option value="tech">科技</option>
+                    </select>
                 </div>
                 <div class="auth-actions">
                     <div id="guestActions">
@@ -1153,9 +1443,128 @@
             initAuth();
             initNavigation();
             initPWA();
+            initTheme();
             updateTime();
             setInterval(updateTime, 1000);
         });
+
+        function initTheme() {
+            const selector = document.getElementById('themeSelector');
+            const saved = localStorage.getItem('appTheme') || 'dark';
+            applyTheme(saved);
+            selector.value = saved;
+            selector.addEventListener('change', (e) => {
+                applyTheme(e.target.value);
+            });
+        }
+
+        function applyTheme(theme) {
+            const bodyEl = document.body;
+            bodyEl.classList.remove('theme-dark', 'theme-light', 'theme-eye', 'theme-tech');
+            switch(theme) {
+                case 'light':
+                    bodyEl.classList.add('theme-light');
+                    break;
+                case 'eye':
+                    bodyEl.classList.add('theme-eye');
+                    break;
+                case 'tech':
+                    bodyEl.classList.add('theme-tech');
+                    break;
+                default:
+                    bodyEl.classList.add('theme-dark');
+                    theme = 'dark';
+            }
+            localStorage.setItem('appTheme', theme);
+            applyThemeToIframes(theme);
+        }
+
+        const iframeThemeCss = {
+            dark: `
+                html,body{background:#0b1224 !important;color:#f8fafc !important;}
+                *, div, section, main, header, footer, nav, article, aside {color:#f8fafc !important;background-color:transparent !important;}
+                a{color:#38bdf8 !important;}
+                h1,h2,h3,h4,h5,.title,.header,.panel-title,.section-title{color:#ffffff !important;}
+                table{border-collapse:collapse !important;width:100%;}
+                th,td{border:1px solid rgba(255,255,255,0.6) !important;color:#f8fafc !important;background-color:#0f172a !important;}
+                thead tr,tbody tr{background:#0f172a !important;border-color:rgba(255,255,255,0.6) !important;}
+                .table, .table-striped tr, .table-striped th, .table-striped td {background:#0b1224 !important;color:#f8fafc !important;border:1px solid rgba(255,255,255,0.6) !important;}
+                .panel, .panel-heading, .panel-body, .list-group-item, .well, .alert {background:#0b1224 !important;color:#f8fafc !important;border:1px solid rgba(255,255,255,0.6) !important;}
+                button,input[type=button],input[type=submit],input[type=reset],.btn{
+                    color:#ffffff !important;
+                    background: linear-gradient(135deg, #6ea8ff 0%, #7c4dff 100%) !important;
+                    border: none !important;
+                    border-radius: 999px !important;
+                    box-shadow: 0 8px 20px rgba(124, 77, 255, 0.25) !important;
+                    padding: 8px 18px !important;
+                    font-weight: 700 !important;
+                }
+                button:hover,input[type=button]:hover,input[type=submit]:hover,input[type=reset]:hover,.btn:hover{
+                    filter: brightness(1.05);
+                }
+                select,textarea,.form-control,input:not([type=button]):not([type=submit]):not([type=reset]){
+                    color:#f8fafc !important;
+                    background:#111827 !important;
+                    border:1px solid rgba(255,255,255,0.6) !important;
+                }
+                fieldset, .form-group, .form-control, .input-group, .input-group-addon, .input-group-text {
+                    border:1px solid rgba(255,255,255,0.6) !important;
+                    color:#f8fafc !important;
+                }
+                .card,.panel,.box,.container,.section,.content,.wrapper,.inner,.area,.modal-content,.tab-content {background:#0f172a !important;color:#f8fafc !important;border:1px solid rgba(255,255,255,0.6) !important;}
+                .nav-tabs>li>a{background:#0f172a !important;color:#f8fafc !important;border:1px solid rgba(255,255,255,0.6) !important;}
+                .dashed,.dash,.dotted,.preview,.result,.scan,.qr,.border,.outline {border-color:rgba(255,255,255,0.6) !important;border-style:dashed !important;}
+                .bg-white,.bg-light,.bg-default {background:#0f172a !important;color:#f8fafc !important;}
+                .success,.ok,.online,.text-success{color:#22c55e !important;}
+                .primary{color:#38bdf8 !important;}
+                .muted{color:#cbd5e1 !important;}
+            `,
+            light: `
+                body{background:#f8fafc;color:#1f2937;}
+                a{color:#2563eb;}
+                table{border-collapse:collapse;}
+                th,td{border:1px solid #e5e7eb;color:#1f2937;background-color:#ffffff;}
+                button,input,select,textarea{color:#1f2937;background:#ffffff;border:1px solid #e5e7eb;}
+                .card,.panel,.box,.container{background:#ffffff;color:#1f2937;border:1px solid #e5e7eb;}
+            `,
+            eye: `
+                body{background:#ecfdf3;color:#064e3b;}
+                a{color:#0f766e;}
+                table{border-collapse:collapse;}
+                th,td{border:1px solid #bbf7d0;color:#064e3b;background-color:#f0fdf4;}
+                button,input,select,textarea{color:#064e3b;background:#ecfdf3;border:1px solid #bbf7d0;}
+                .card,.panel,.box,.container{background:#f0fdf4;color:#064e3b;border:1px solid #bbf7d0;}
+            `,
+            tech: `
+                body{background:#ffffff;color:#1f2937;}
+                a{color:#2563eb;}
+                table{border-collapse:collapse;}
+                th,td{border:1px solid #e5e7eb;color:#1f2937;background-color:#ffffff;}
+                button,input,select,textarea{color:#1f2937;background:#ffffff;border:1px solid #e5e7eb;}
+                .card,.panel,.box,.container{background:#ffffff;color:#1f2937;border:1px solid #e5e7eb;}
+            `
+        };
+
+        function injectThemeStyle(doc, theme) {
+            if (!doc) return;
+            const id = 'embedded-theme-style';
+            let style = doc.getElementById(id);
+            if (!style) {
+                style = doc.createElement('style');
+                style.id = id;
+                doc.head.appendChild(style);
+            }
+            style.textContent = iframeThemeCss[theme] || iframeThemeCss.dark;
+        }
+
+        function applyThemeToIframes(theme) {
+            document.querySelectorAll('iframe').forEach((f) => {
+                if (f.contentDocument) {
+                    injectThemeStyle(f.contentDocument, theme);
+                }
+                f.addEventListener('load', () => injectThemeStyle(f.contentDocument, theme), { once: true });
+            });
+        }
 
         function initAuth() {
             const loginBtn = document.getElementById('loginBtn');
