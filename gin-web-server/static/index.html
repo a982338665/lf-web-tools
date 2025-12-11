@@ -78,6 +78,12 @@
             font-size: 1.2em;
         }
 
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
         .header-info {
             display: flex;
             align-items: center;
@@ -131,7 +137,9 @@
         }
 
         .nav-link {
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             padding: 15px 20px;
             color: #495057;
             text-decoration: none;
@@ -139,6 +147,7 @@
             border-left: 4px solid transparent;
             position: relative;
             font-weight: 500;
+            gap: 8px;
         }
 
         .nav-link:hover {
@@ -158,6 +167,26 @@
         .nav-link::before {
             font-size: 1.2em;
             margin-right: 10px;
+        }
+
+        .nav-text {
+            flex: 1;
+            display: inline-block;
+        }
+
+        .lock-icon {
+            font-size: 0.95em;
+            color: #c53030;
+            display: none;
+        }
+
+        .nav-link.locked {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .nav-link.locked .lock-icon {
+            display: inline;
         }
 
         .nav-link[data-page="network"]::before {
@@ -275,6 +304,25 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+        }
+
+        .feature-card.locked {
+            position: relative;
+            overflow: hidden;
+            border: 1px dashed #c53030;
+        }
+
+        .feature-card.locked::after {
+            content: "🔒 登录后可用";
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.85);
+            color: #c53030;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9em;
         }
 
         .feature-card:hover {
@@ -447,6 +495,159 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #a1a1a1;
         }
+
+        /* 登录注册区域 */
+        .auth-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .auth-btn {
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            background: linear-gradient(135deg, #8b9dfd 0%, #7c8cf4 100%);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+        }
+
+        .auth-btn:hover {
+            background: rgba(255, 255, 255, 0.18);
+            transform: translateY(-1px);
+        }
+
+        .auth-btn.secondary {
+            background: transparent;
+            border-color: rgba(255, 255, 255, 0.6);
+            color: #e5e7eb;
+        }
+
+        .auth-btn.danger {
+            border-color: rgba(239, 68, 68, 0.7);
+            color: #fee2e2;
+        }
+
+        .auth-status {
+            font-weight: 600;
+            color: #d1d5db;
+        }
+
+        .auth-modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 12000;
+        }
+
+        .auth-modal {
+            width: 480px;
+            max-width: calc(100% - 24px);
+            background: #f8fafc;
+            border-radius: 14px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            border: 1px solid #e5e7eb;
+            color: #111827;
+            overflow: hidden;
+            animation: slideUp 0.25s ease;
+        }
+
+        .auth-modal-header {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .auth-modal-body {
+            padding: 18px 18px 20px 18px;
+            background: #ffffff;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .form-group input {
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            background: #f8fafc;
+            transition: border 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .captcha-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .captcha-image {
+            height: 40px;
+            width: 120px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            cursor: pointer;
+            background: #f8fafc;
+            object-fit: cover;
+        }
+
+        .auth-actions-row {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .auth-primary {
+            flex: 1 1 260px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: transparent;
+            color: #fff;
+            font-weight: 700;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.25);
+        }
+
+        .auth-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6b46c1 100%);
+        }
+
+        .auth-error {
+            margin-bottom: 6px;
+            text-align: center;
+            font-weight: 700;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -454,9 +655,23 @@
         <!-- 顶部标题区域 -->
         <header class="header">
             <h1>计算机网页工具</h1>
-            <div class="header-info">
-                <div class="status">系统正常</div>
-                <div class="time" id="currentTime">加载中...</div>
+            <div class="header-right">
+                <div class="header-info">
+                    <div class="status">系统正常</div>
+                    <div class="time" id="currentTime">加载中...</div>
+                </div>
+                <div class="auth-actions">
+                    <div id="guestActions">
+                        <span class="auth-status" id="authStatus">未登录</span>
+                        <button class="auth-btn secondary" id="loginBtn">登录</button>
+                        <button class="auth-btn secondary" id="registerBtn">注册</button>
+                    </div>
+                    <div id="userActions" class="hidden">
+                        <span class="auth-status" id="currentUser"></span>
+                        <button class="auth-btn secondary" id="changePasswordBtn">修改密码</button>
+                        <button class="auth-btn danger" id="logoutBtn">退出</button>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -464,31 +679,31 @@
         <nav class="sidebar">
             <ul class="nav-menu">
                 <li class="nav-item">
-                    <a href="#" class="nav-link active" data-page="welcome">主页</a>
+                    <a href="#" class="nav-link active" data-page="welcome"><span class="nav-text">主页</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link" data-page="network">网络信息检测器</a>
+                    <a href="#" class="nav-link" data-page="network"><span class="nav-text">网络信息检测器</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link" data-page="ip">网络IP相关信息</a>
+                    <a href="#" class="nav-link" data-page="ip"><span class="nav-text">网络IP相关信息</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link" data-page="microphone">麦克风功能测试</a>
+                    <a href="#" class="nav-link" data-page="microphone"><span class="nav-text">麦克风功能测试</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link" data-page="camera">摄像头功能测试</a>
+                    <a href="#" class="nav-link" data-page="camera"><span class="nav-text">摄像头功能测试</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link" data-page="socket">Socket测试网页</a>
+                    <a href="#" class="nav-link" data-page="socket" data-requires-auth="true"><span class="nav-text">Socket测试网页</span><span class="lock-icon" aria-hidden="true">🔒</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link" data-page="curl">CURL测试网页</a>
+                    <a href="#" class="nav-link" data-page="curl" data-requires-auth="true"><span class="nav-text">CURL测试网页</span><span class="lock-icon" aria-hidden="true">🔒</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link" data-page="portscan">公网端口检测</a>
+                    <a href="#" class="nav-link" data-page="portscan" data-requires-auth="true"><span class="nav-text">公网端口检测</span><span class="lock-icon" aria-hidden="true">🔒</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link" data-page="qrcode">二维码&条形码</a>
+                    <a href="#" class="nav-link" data-page="qrcode"><span class="nav-text">二维码&条形码</span></a>
                 </li>
 
             </ul>
@@ -499,42 +714,42 @@
             <!-- 欢迎页面 -->
             <div class="welcome-page active" id="welcomePage">
                 <div class="feature-grid">
-                    <div class="feature-card">
+                    <div class="feature-card" data-page="network">
                         <div class="feature-icon">🌐</div>
                         <div class="feature-title">网络信息检测器</div>
                         <div class="feature-desc">检测IP地址、网络状态、端口信息、WebRTC连接等完整网络信息</div>
                     </div>
-                    <div class="feature-card">
+                    <div class="feature-card" data-page="ip">
                         <div class="feature-icon">🖥️</div>
                         <div class="feature-title">网络IP相关信息</div>
                         <div class="feature-desc">显示所有网络接口和IP配置信息，表格化展示更直观</div>
                     </div>
-                    <div class="feature-card">
+                    <div class="feature-card" data-page="microphone">
                         <div class="feature-icon">🎙️</div>
                         <div class="feature-title">麦克风功能测试</div>
                         <div class="feature-desc">测试麦克风设备状态、音频输入和录制功能</div>
                     </div>
-                    <div class="feature-card">
+                    <div class="feature-card" data-page="camera">
                         <div class="feature-icon">📷</div>
                         <div class="feature-title">摄像头功能测试</div>
                         <div class="feature-desc">测试摄像头设备状态、拍照、录像和录音功能</div>
                     </div>
-                    <div class="feature-card">
+                    <div class="feature-card locked" data-page="socket" data-requires-auth="true">
                         <div class="feature-icon">🔌</div>
                         <div class="feature-title">Socket测试网页</div>
                         <div class="feature-desc">WebSocket连接测试，支持ws://和wss://协议，实时消息通信</div>
                     </div>
-                    <div class="feature-card">
+                    <div class="feature-card locked" data-page="curl" data-requires-auth="true">
                         <div class="feature-icon">🌍</div>
                         <div class="feature-title">CURL测试网页</div>
                         <div class="feature-desc">解析并执行CURL命令，支持HTTP/HTTPS请求测试，显示响应结果</div>
                     </div>
-                    <div class="feature-card">
+                    <div class="feature-card locked" data-page="portscan" data-requires-auth="true">
                         <div class="feature-icon">🔍</div>
                         <div class="feature-title">公网端口检测</div>
                         <div class="feature-desc">检测公网IP的端口开放状态，支持全端口扫描和自定义端口列表</div>
                     </div>
-                    <div class="feature-card">
+                    <div class="feature-card" data-page="qrcode">
                         <div class="feature-icon">📱</div>
                         <div class="feature-title">二维码&条形码</div>
                         <div class="feature-desc">生成和解析二维码、条形码，支持摄像头扫描、图片上传解析等功能</div>
@@ -574,6 +789,117 @@
                 正在加载页面内容...
             </div>
         </main>
+    </div>
+
+    <!-- 登录弹窗 -->
+    <div class="auth-modal-backdrop" id="loginModalBackdrop">
+        <div class="auth-modal">
+            <div class="auth-modal-header">
+                <div>账号登录</div>
+                <button class="auth-btn secondary" id="loginModalClose">关闭</button>
+            </div>
+            <div class="auth-modal-body">
+                <form id="loginPanel">
+                    <div class="form-group">
+                        <label for="loginUsername">账号</label>
+                        <input type="text" id="loginUsername" autocomplete="username" placeholder="请输入账号">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">密码</label>
+                        <input type="password" id="loginPassword" autocomplete="current-password" placeholder="请输入密码">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginCaptchaCode">图形验证码</label>
+                        <div class="captcha-row">
+                            <input type="text" id="loginCaptchaCode" placeholder="请输入验证码" maxlength="6">
+                            <img id="loginCaptchaImg" class="captcha-image" alt="点击刷新验证码">
+                        </div>
+                    </div>
+                    <div class="auth-error" id="loginError"></div>
+                    <div class="auth-actions-row">
+                        <button type="submit" class="auth-btn auth-primary">登录</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 注册弹窗 -->
+    <div class="auth-modal-backdrop" id="registerModalBackdrop">
+        <div class="auth-modal">
+            <div class="auth-modal-header">
+                <div>账号注册</div>
+                <button class="auth-btn secondary" id="registerModalClose">关闭</button>
+            </div>
+            <div class="auth-modal-body">
+                <form id="registerPanel">
+                    <div class="form-group">
+                        <label for="registerUsername">账号</label>
+                        <input type="text" id="registerUsername" autocomplete="username" placeholder="请输入账号">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">密码</label>
+                        <input type="password" id="registerPassword" autocomplete="new-password" placeholder="请输入密码(不少于6位)">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">邮箱</label>
+                        <input type="email" id="registerEmail" autocomplete="email" placeholder="请输入邮箱">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPhone">手机号</label>
+                        <input type="tel" id="registerPhone" autocomplete="tel" placeholder="请输入手机号">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerCaptchaCode">图形验证码</label>
+                        <div class="captcha-row">
+                            <input type="text" id="registerCaptchaCode" placeholder="请输入验证码" maxlength="6">
+                            <img id="registerCaptchaImg" class="captcha-image" alt="点击刷新验证码">
+                        </div>
+                    </div>
+                    <div class="auth-error" id="registerError"></div>
+                    <div class="auth-actions-row">
+                        <button type="submit" class="auth-btn auth-primary">注册</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 修改密码弹窗 -->
+    <div class="auth-modal-backdrop" id="changeModalBackdrop">
+        <div class="auth-modal">
+            <div class="auth-modal-header">
+                <div>修改密码</div>
+                <button class="auth-btn secondary" id="changeModalClose">关闭</button>
+            </div>
+            <div class="auth-modal-body">
+                <form id="changePanel">
+                    <div class="form-group">
+                        <label for="changeOldPassword">原密码</label>
+                        <input type="password" id="changeOldPassword" autocomplete="current-password" placeholder="请输入原密码">
+                    </div>
+                    <div class="form-group">
+                        <label for="changeNewPassword">新密码</label>
+                        <input type="password" id="changeNewPassword" autocomplete="new-password" placeholder="请输入新密码(不少于6位)">
+                    </div>
+                    <div class="form-group">
+                        <label for="changeNewPassword2">确认新密码</label>
+                        <input type="password" id="changeNewPassword2" autocomplete="new-password" placeholder="请再次输入新密码">
+                    </div>
+                    <div class="form-group">
+                        <label for="changeCaptchaCode">图形验证码</label>
+                        <div class="captcha-row">
+                            <input type="text" id="changeCaptchaCode" placeholder="请输入验证码" maxlength="6">
+                            <img id="changeCaptchaImg" class="captcha-image" alt="点击刷新验证码">
+                        </div>
+                    </div>
+                    <div class="auth-error" id="changeError"></div>
+                    <div class="auth-actions-row">
+                        <button type="submit" class="auth-btn auth-primary">确认修改</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <!-- 更新通知栏 -->
@@ -819,13 +1145,349 @@
     </style>
 
     <script>
+        const protectedPages = new Set(['socket', 'curl', 'portscan']);
+        let authState = { loggedIn: false, username: '' };
+
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', function() {
+            initAuth();
             initNavigation();
             initPWA();
             updateTime();
             setInterval(updateTime, 1000);
         });
+
+        function initAuth() {
+            const loginBtn = document.getElementById('loginBtn');
+            const registerBtn = document.getElementById('registerBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const changePasswordBtn = document.getElementById('changePasswordBtn');
+            const loginForm = document.getElementById('loginPanel');
+            const registerForm = document.getElementById('registerPanel');
+            const changeForm = document.getElementById('changePanel');
+            const loginCaptchaImg = document.getElementById('loginCaptchaImg');
+            const registerCaptchaImg = document.getElementById('registerCaptchaImg');
+            const changeCaptchaImg = document.getElementById('changeCaptchaImg');
+
+            const loginModalClose = document.getElementById('loginModalClose');
+            const registerModalClose = document.getElementById('registerModalClose');
+            const changeModalClose = document.getElementById('changeModalClose');
+
+            loginBtn.addEventListener('click', openLoginModal);
+            registerBtn.addEventListener('click', openRegisterModal);
+            changePasswordBtn.addEventListener('click', openChangeModal);
+            loginModalClose.addEventListener('click', closeLoginModal);
+            registerModalClose.addEventListener('click', closeRegisterModal);
+            changeModalClose.addEventListener('click', closeChangeModal);
+            logoutBtn.addEventListener('click', handleLogout);
+
+            loginForm.addEventListener('submit', handleLoginSubmit);
+            registerForm.addEventListener('submit', handleRegisterSubmit);
+            changeForm.addEventListener('submit', handleChangePasswordSubmit);
+
+            loginCaptchaImg.addEventListener('click', () => loadCaptcha('login'));
+            registerCaptchaImg.addEventListener('click', () => loadCaptcha('register'));
+            changeCaptchaImg.addEventListener('click', () => loadCaptcha('change'));
+
+            const savedToken = getStoredToken();
+            if (savedToken) {
+                fetchProfile(savedToken);
+            } else {
+                updateProtectedUI();
+            }
+        }
+
+        function openLoginModal() {
+            document.getElementById('loginModalBackdrop').style.display = 'flex';
+            document.getElementById('registerModalBackdrop').style.display = 'none';
+            loadCaptcha('login');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModalBackdrop').style.display = 'none';
+        }
+
+        function openRegisterModal() {
+            document.getElementById('registerModalBackdrop').style.display = 'flex';
+            document.getElementById('loginModalBackdrop').style.display = 'none';
+            loadCaptcha('register');
+        }
+
+        function closeRegisterModal() {
+            document.getElementById('registerModalBackdrop').style.display = 'none';
+        }
+
+        function openChangeModal() {
+            document.getElementById('changeModalBackdrop').style.display = 'flex';
+            document.getElementById('loginModalBackdrop').style.display = 'none';
+            document.getElementById('registerModalBackdrop').style.display = 'none';
+            loadCaptcha('change');
+        }
+
+        function closeChangeModal() {
+            document.getElementById('changeModalBackdrop').style.display = 'none';
+        }
+
+        async function loadCaptcha(target) {
+            let img;
+            if (target === 'login') img = document.getElementById('loginCaptchaImg');
+            else if (target === 'register') img = document.getElementById('registerCaptchaImg');
+            else if (target === 'change') img = document.getElementById('changeCaptchaImg');
+            if (!img) return;
+
+            try {
+                const res = await fetch('/api/auth/captcha');
+                const data = await res.json();
+                if (res.ok && data.captchaData) {
+                    img.src = data.captchaData;
+                    img.dataset.captchaId = data.captchaId;
+                } else {
+                    showToast('验证码获取失败', 'warning');
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('验证码获取失败', 'warning');
+            }
+        }
+
+        function getStoredToken() {
+            return localStorage.getItem('authToken') || '';
+        }
+
+        function setStoredToken(token) {
+            localStorage.setItem('authToken', token);
+        }
+
+        function clearStoredToken() {
+            localStorage.removeItem('authToken');
+        }
+
+        function setAuthMessage(target, message, type = 'error') {
+            let el = null;
+            if (target === 'login') el = document.getElementById('loginError');
+            else if (target === 'register') el = document.getElementById('registerError');
+            else if (target === 'change') el = document.getElementById('changeError');
+            if (!el) return;
+            if (!message) {
+                el.style.display = 'none';
+                el.textContent = '';
+                return;
+            }
+            el.textContent = message;
+            el.style.display = 'block';
+            el.style.color = type === 'success' ? '#16a34a' : '#dc2626';
+        }
+
+        async function fetchProfile(token) {
+            try {
+                const res = await fetch('/api/auth/profile', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    authState = { loggedIn: true, username: data.username };
+                    setAuthUI();
+                } else {
+                    clearStoredToken();
+                    authState = { loggedIn: false, username: '' };
+                    setAuthUI();
+                }
+            } catch (err) {
+                console.error(err);
+                clearStoredToken();
+                authState = { loggedIn: false, username: '' };
+                setAuthUI();
+            }
+        }
+
+        function setAuthUI() {
+            const guestActions = document.getElementById('guestActions');
+            const userActions = document.getElementById('userActions');
+            const currentUser = document.getElementById('currentUser');
+            const authStatus = document.getElementById('authStatus');
+
+            if (authState.loggedIn) {
+                guestActions.classList.add('hidden');
+                userActions.classList.remove('hidden');
+                currentUser.textContent = `已登录：${authState.username}`;
+                authStatus.textContent = '已登录';
+            } else {
+                guestActions.classList.remove('hidden');
+                userActions.classList.add('hidden');
+                currentUser.textContent = '';
+                authStatus.textContent = '未登录';
+            }
+            updateProtectedUI();
+        }
+
+        function updateProtectedUI() {
+            const shouldUnlock = authState.loggedIn;
+            document.querySelectorAll('[data-requires-auth="true"]').forEach(el => {
+                if (shouldUnlock) {
+                    el.classList.remove('locked');
+                } else {
+                    el.classList.add('locked');
+                }
+            });
+        }
+
+        function handleProtectedAccess(page) {
+            if (protectedPages.has(page) && !authState.loggedIn) {
+                showToast('请先登录后再使用该功能', 'warning');
+                openLoginModal();
+                return false;
+            }
+            return true;
+        }
+
+        async function handleLoginSubmit(e) {
+            e.preventDefault();
+            setAuthMessage('login', '');
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            const captchaCode = document.getElementById('loginCaptchaCode').value.trim();
+            const captchaId = document.getElementById('loginCaptchaImg').dataset.captchaId || '';
+
+            if (!username || !password || !captchaCode || !captchaId) {
+                setAuthMessage('login', '请完整填写登录信息和验证码');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, captchaCode, captchaId })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    setStoredToken(data.token);
+                    authState = { loggedIn: true, username: data.user || username };
+                    setAuthUI();
+                setAuthMessage('login', '登录成功', 'success');
+                setTimeout(closeLoginModal, 400);
+                } else {
+                setAuthMessage('login', data.error || '登录失败');
+                    loadCaptcha('login');
+                }
+            } catch (err) {
+                console.error(err);
+            setAuthMessage('login', '登录失败');
+                loadCaptcha('login');
+            }
+        }
+
+        async function handleRegisterSubmit(e) {
+            e.preventDefault();
+        setAuthMessage('register', '');
+            const username = document.getElementById('registerUsername').value.trim();
+            const password = document.getElementById('registerPassword').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const phone = document.getElementById('registerPhone').value.trim();
+            const captchaCode = document.getElementById('registerCaptchaCode').value.trim();
+            const captchaId = document.getElementById('registerCaptchaImg').dataset.captchaId || '';
+
+            if (!username || !password || !email || !phone || !captchaCode || !captchaId) {
+                setAuthMessage('register', '请完整填写注册信息和验证码');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, email, phone, captchaCode, captchaId })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+            setAuthMessage('register', '注册成功，请登录', 'success');
+            setTimeout(() => {
+                closeRegisterModal();
+                openLoginModal();
+            }, 500);
+                } else {
+            setAuthMessage('register', data.error || '注册失败');
+                    loadCaptcha('register');
+                }
+            } catch (err) {
+                console.error(err);
+        setAuthMessage('register', '注册失败');
+                loadCaptcha('register');
+            }
+        }
+
+    async function handleChangePasswordSubmit(e) {
+        e.preventDefault();
+        setAuthMessage('change', '');
+        const oldPassword = document.getElementById('changeOldPassword').value.trim();
+        const newPassword = document.getElementById('changeNewPassword').value.trim();
+            const newPassword2 = document.getElementById('changeNewPassword2').value.trim();
+        const captchaCode = document.getElementById('changeCaptchaCode').value.trim();
+        const captchaId = document.getElementById('changeCaptchaImg').dataset.captchaId || '';
+
+        if (!oldPassword || !newPassword || !captchaCode || !captchaId) {
+            setAuthMessage('change', '请完整填写信息和验证码');
+            return;
+        }
+
+        if (newPassword.length < 6) {
+            setAuthMessage('change', '新密码长度不能少于6位');
+            return;
+        }
+
+            if (newPassword !== newPassword2) {
+                setAuthMessage('change', '两次输入的新密码不一致');
+                return;
+            }
+
+        try {
+            const res = await fetch('/api/auth/change-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${getStoredToken()}`
+                },
+                body: JSON.stringify({ oldPassword, newPassword, captchaCode, captchaId })
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                setAuthMessage('change', '密码修改成功，请重新登录', 'success');
+                clearStoredToken();
+                authState = { loggedIn: false, username: '' };
+                setAuthUI();
+                setTimeout(() => {
+                    closeChangeModal();
+                    openLoginModal();
+                }, 600);
+            } else {
+                setAuthMessage('change', data.error || '修改失败');
+                loadCaptcha('change');
+            }
+        } catch (err) {
+            console.error(err);
+            setAuthMessage('change', '修改失败');
+            loadCaptcha('change');
+        }
+    }
+
+        async function handleLogout() {
+            const token = getStoredToken();
+            try {
+                if (token) {
+                    await fetch('/api/auth/logout', {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                }
+            } catch (err) {
+                console.error(err);
+            } finally {
+                clearStoredToken();
+                authState = { loggedIn: false, username: '' };
+                setAuthUI();
+                showToast('已退出登录', 'info');
+            }
+        }
 
         // 初始化导航功能
         function initNavigation() {
@@ -840,6 +1502,9 @@
                     e.preventDefault();
 
                     const page = this.getAttribute('data-page');
+                    if (!handleProtectedAccess(page)) {
+                        return;
+                    }
 
                     // 更新导航状态
                     navLinks.forEach(l => l.classList.remove('active'));
@@ -875,37 +1540,41 @@
             const featureCards = document.querySelectorAll('.feature-card');
             featureCards.forEach(card => {
                 card.addEventListener('click', function() {
-                    const featureTitle = this.querySelector('.feature-title').textContent;
-                    let page = '';
+                    let page = this.dataset.page;
+                    if (!page) {
+                        const featureTitle = this.querySelector('.feature-title').textContent;
+                        switch(featureTitle) {
+                            case '网络信息检测器':
+                                page = 'network';
+                                break;
+                            case '网络IP相关信息':
+                                page = 'ip';
+                                break;
+                            case '麦克风功能测试':
+                                page = 'microphone';
+                                break;
+                            case '摄像头功能测试':
+                                page = 'camera';
+                                break;
+                            case 'Socket测试网页':
+                                page = 'socket';
+                                break;
+                            case 'CURL测试网页':
+                                page = 'curl';
+                                break;
+                            case '公网端口检测':
+                                page = 'portscan';
+                                break;
+                            case '二维码&条形码':
+                                page = 'qrcode';
+                                break;
+                            default:
+                                return;
+                        }
+                    }
 
-                    // 根据卡片标题映射到对应的page值
-                    switch(featureTitle) {
-                        case '网络信息检测器':
-                            page = 'network';
-                            break;
-                        case '网络IP相关信息':
-                            page = 'ip';
-                            break;
-                        case '麦克风功能测试':
-                            page = 'microphone';
-                            break;
-                        case '摄像头功能测试':
-                            page = 'camera';
-                            break;
-                        case 'Socket测试网页':
-                            page = 'socket';
-                            break;
-                        case 'CURL测试网页':
-                            page = 'curl';
-                            break;
-                        case '公网端口检测':
-                            page = 'portscan';
-                            break;
-                        case '二维码&条形码':
-                            page = 'qrcode';
-                            break;
-                        default:
-                            return;
+                    if (!handleProtectedAccess(page)) {
+                        return;
                     }
 
                     // 触发对应导航链接的点击事件
@@ -987,15 +1656,21 @@
                         break;
                     case '6':
                         e.preventDefault();
-                        document.querySelector('[data-page="socket"]').click();
+                        if (handleProtectedAccess('socket')) {
+                            document.querySelector('[data-page="socket"]').click();
+                        }
                         break;
                     case '7':
                         e.preventDefault();
-                        document.querySelector('[data-page="curl"]').click();
+                        if (handleProtectedAccess('curl')) {
+                            document.querySelector('[data-page="curl"]').click();
+                        }
                         break;
                     case '8':
                         e.preventDefault();
-                        document.querySelector('[data-page="portscan"]').click();
+                        if (handleProtectedAccess('portscan')) {
+                            document.querySelector('[data-page="portscan"]').click();
+                        }
                         break;
                     case '9':
                         e.preventDefault();

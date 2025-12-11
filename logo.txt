@@ -1,0 +1,77 @@
+<!-- 皇夜_ LOGO 组件 - 可在任何页面使用 -->
+<!-- 使用方法：复制下面的代码到你的HTML中 -->
+
+<style>
+    .huangye-logo {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.3s ease;
+    }
+
+    .huangye-logo:hover {
+        transform: translateY(-2px);
+    }
+
+    .huangye-logo-icon {
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
+    }
+
+    .huangye-logo-text {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.2;
+    }
+
+    .huangye-logo-main {
+        font-size: 1.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: 0.05em;
+    }
+
+    .huangye-logo-sub {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #9ca3af;
+        letter-spacing: 0.1em;
+        text-transform: lowercase;
+    }
+</style>
+
+<a href="/" class="huangye-logo">
+    <svg class="huangye-logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 28L12 20L16 24L20 12L24 24L28 20L32 28H8Z" fill="url(#crownGradient)" stroke="url(#crownStroke)" stroke-width="1.5"/>
+        <circle cx="12" cy="20" r="2" fill="#fbbf24"/>
+        <circle cx="20" cy="12" r="2.5" fill="#f59e0b"/>
+        <circle cx="28" cy="20" r="2" fill="#fbbf24"/>
+        <path d="M30 8C30 10.2091 28.2091 12 26 12C23.7909 12 22 10.2091 22 8C22 5.79086 23.7909 4 26 4C28.2091 4 30 5.79086 30 8Z" fill="url(#moonGradient)"/>
+        <defs>
+            <linearGradient id="crownGradient" x1="20" y1="12" x2="20" y2="28" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#fbbf24"/>
+                <stop offset="50%" stop-color="#f59e0b"/>
+                <stop offset="100%" stop-color="#d97706"/>
+            </linearGradient>
+            <linearGradient id="crownStroke" x1="8" y1="28" x2="32" y2="28" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#fbbf24"/>
+                <stop offset="50%" stop-color="#f59e0b"/>
+                <stop offset="100%" stop-color="#d97706"/>
+            </linearGradient>
+            <linearGradient id="moonGradient" x1="22" y1="4" x2="30" y2="12" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#e0e7ff"/>
+                <stop offset="100%" stop-color="#c7d2fe"/>
+            </linearGradient>
+        </defs>
+    </svg>
+    <div class="huangye-logo-text">
+        <span class="huangye-logo-main">皇夜_</span>
+        <span class="huangye-logo-sub">huangye</span>
+    </div>
+</a>
