@@ -29,3 +29,9 @@ cd gin-web-server
 #go mod tidy
 go run main.go
 
+
+cd /data/webtools/webtools
+kill -9 `pgrep -f app-linux-amd64`
+chmod +x app-linux-amd64
+nohup ./app-linux-amd64 >> p2p.log  2>& 1 &
+tail -f /data/webtools/webtools/p2p.log

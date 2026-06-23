@@ -29,6 +29,11 @@ func main() {
 	})
 
 	// 设置HTML模板目录
+	r.GET("/ads.txt", func(c *gin.Context) {
+		c.Header("Content-Type", "text/plain; charset=utf-8")
+		c.File("./static/ads.txt")
+	})
+
 	r.LoadHTMLGlob("templates/*")
 
 	// 定义根路由
